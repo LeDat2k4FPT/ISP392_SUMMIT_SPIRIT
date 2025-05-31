@@ -27,18 +27,28 @@ public class AddController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        try ( PrintWriter out = response.getWriter()) {
-            /* TODO output your page here. You may use following sample code. */
-            out.println("<!DOCTYPE html>");
-            out.println("<html>");
-            out.println("<head>");
-            out.println("<title>Servlet AddController</title>");            
-            out.println("</head>");
-            out.println("<body>");
-            out.println("<h1>Servlet AddController at " + request.getContextPath() + "</h1>");
-            out.println("</body>");
-            out.println("</html>");
-        }
+//   try {
+//            String productID = request.getParameter("productID");
+//            String productName = request.getParameter("productName");
+//            double price = Double.parseDouble(request.getParameter("price"));
+//            int quantity = Integer.parseInt(request.getParameter("quantity"));
+//
+//            HttpSession session = request.getSession();
+//            Cart cart = (Cart) session.getAttribute("CART");
+//            if (cart == null) {
+//                cart = new Cart();
+//            }
+//            boolean check = cart.add(new Clothes(productID, productName, quantity, price));
+//            if (check) {
+//                session.setAttribute("CART", cart);
+//                request.setAttribute("MESSAGE", "Đã thêm " + " : " + quantity + " thành công");
+//                url = SUCCESS;
+//            }
+//        } catch (Exception e) {
+//            log("Error at AddController: " + e.toString());
+//        } finally {
+//            request.getRequestDispatcher(url).forward(request, response);
+//        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
