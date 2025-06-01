@@ -11,8 +11,8 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import user.UserDAO;
-import user.UserDTO;
+import dao.UserDAO;
+import dto.UserDTO;
 
 /**
  *
@@ -26,7 +26,7 @@ public class LoginController extends HttpServlet {
     private static final String ADMIN_PAGE = "admin.jsp";
     private static final String US = "US";
     private static final String USER_PAGE = "user.jsp";
-    private static final String INCORRECT_MESSAGE = "Incorrect UserID or Password!";
+    private static final String INCORRECT_MESSAGE = "Incorrect Email or Password!";
     private static final String UNSUPPORT_MESSAGE = "Your role is not support yet !";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -34,15 +34,13 @@ public class LoginController extends HttpServlet {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
         try {
-            String userID = request.getParameter("userID");
+            String email = request.getParameter("email");
             String password = request.getParameter("password");
             UserDAO dao = new UserDAO();
-            UserDTO loginUser = dao.checkLogin(userID,password);
-//          cho nay xac thuc co tk hay khong
+            UserDTO loginUser = dao.checkLogin(email, password);
             if(loginUser != null){
                 HttpSession session = request.getSession();
                 session.setAttribute("LOGIN_USER", loginUser);
-//          cho nay phan quyen (xem no co quyen han gi)
                 String roleID = loginUser.getRoleID();
                 if(AD.equals(roleID)){
                     url = ADMIN_PAGE;
