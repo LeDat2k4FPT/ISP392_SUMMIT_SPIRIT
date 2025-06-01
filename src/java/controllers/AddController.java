@@ -10,48 +10,47 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.io.PrintWriter;
 
-/**
- *
- * @author Admin
- */
-@WebServlet(name = "MainController", urlPatterns = {"/MainController"})
-public class MainController extends HttpServlet {
 
-    //LÊ ĐẠT LEADER
-    private static final String WELCOME = "login.jsp";
-    private static final String LOGIN = "Login";
-    private static final String LOGIN_CONTROLLER = "LoginController";
-    private static final String LOGOUT = "Logout";
-    private static final String LOGOUT_CONTROLLER = "LogoutController";
-    private static final String SEARCH = "Search";
-    private static final String SEARCH_CONTROLLER = "SearchController";
-    private static final String CREATE = "Create";
-    private static final String CREATE_CONTROLLER = "CreateController";
+@WebServlet(name = "AddController", urlPatterns = {"/AddController"})
+public class AddController extends HttpServlet {
 
+    /**
+     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
+     * methods.
+     *
+     * @param request servlet request
+     * @param response servlet response
+     * @throws ServletException if a servlet-specific error occurs
+     * @throws IOException if an I/O error occurs
+     */
+    //vinh
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
-        String url = WELCOME;
-        try {
-            String action = request.getParameter("action");
-            if (action == null) {
-                url = WELCOME;
-            } else if (LOGIN.equals(action)) {
-                url = LOGIN_CONTROLLER;
-            } else if (LOGOUT.equals(action)) {
-                url = LOGOUT_CONTROLLER;
-            } else if (SEARCH.equals(action)) {
-                url = SEARCH_CONTROLLER;
-            } else if (CREATE.equals(action)) {
-                url = CREATE_CONTROLLER;
-            }
-
-        } catch (Exception e) {
-            log("error at MainController: " + e.toString());
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
-        }
+//   try {
+//            String productID = request.getParameter("productID");
+//            String productName = request.getParameter("productName");
+//            double price = Double.parseDouble(request.getParameter("price"));
+//            int quantity = Integer.parseInt(request.getParameter("quantity"));
+//
+//            HttpSession session = request.getSession();
+//            Cart cart = (Cart) session.getAttribute("CART");
+//            if (cart == null) {
+//                cart = new Cart();
+//            }
+//            boolean check = cart.add(new Clothes(productID, productName, quantity, price));
+//            if (check) {
+//                session.setAttribute("CART", cart);
+//                request.setAttribute("MESSAGE", "Đã thêm " + " : " + quantity + " thành công");
+//                url = SUCCESS;
+//            }
+//        } catch (Exception e) {
+//            log("Error at AddController: " + e.toString());
+//        } finally {
+//            request.getRequestDispatcher(url).forward(request, response);
+//        }
     }
 
     // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
