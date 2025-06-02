@@ -10,6 +10,7 @@ import java.util.List;
 import utils.DBUtils;
 
 public class OrderDAO {
+
     private static final String GET_ALL_ORDERS = "SELECT * FROM Orders";
     private static final String GET_ORDER_BY_ID = "SELECT * FROM Orders WHERE OrderID = ?";
     private static final String GET_ORDERS_BY_USER = "SELECT * FROM Orders WHERE userID = ? ORDER BY orderDate DESC";
@@ -42,9 +43,15 @@ public class OrderDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) rs.close();
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return list;
     }
@@ -73,9 +80,15 @@ public class OrderDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) rs.close();
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return order;
     }
@@ -104,9 +117,15 @@ public class OrderDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) rs.close();
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return orders;
     }
@@ -128,8 +147,12 @@ public class OrderDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return check;
     }
@@ -149,8 +172,12 @@ public class OrderDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return check;
     }
@@ -169,9 +196,13 @@ public class OrderDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return check;
     }
-} 
+}

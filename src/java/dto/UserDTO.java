@@ -7,12 +7,12 @@ public class UserDTO {
     private String password;
     private String phone;
     private String email;
-    private int roleID;
+    private String roleID;
 
     public UserDTO() {
     }
 
-    public UserDTO(int userID, String fullName, String address, String password, String phone, String email, int roleID) {
+    public UserDTO(int userID, String fullName, String address, String password, String phone, String email, String roleID) {
         this.userID = userID;
         this.fullName = fullName;
         this.address = address;
@@ -70,11 +70,13 @@ public class UserDTO {
         this.email = email;
     }
 
-    public int getRoleID() {
+    public String getRoleID() {
         return roleID;
     }
 
-    public void setRoleID(int roleID) {
+    public void setRoleID(String roleID) {
         this.roleID = roleID;
     }
+
+
 } 

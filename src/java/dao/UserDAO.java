@@ -35,7 +35,7 @@ public class UserDAO {
                             rs.getString("Password"),
                             rs.getString("Phone"),
                             rs.getString("Email"),
-                            rs.getInt("RoleID")
+                            rs.getString("RoleID")
                     );
                 }
             }
@@ -59,7 +59,7 @@ public class UserDAO {
                 ptm = conn.prepareStatement(CREATE);
                 ptm.setString(1, user.getFullName());
                 ptm.setString(2, user.getPassword());
-                ptm.setInt(3, user.getRoleID());
+                ptm.setString(3, user.getRoleID());
                 check = ptm.executeUpdate() > 0;
             }
         } catch (Exception e) {
@@ -115,7 +115,7 @@ public class UserDAO {
                             rs.getString("Password"),
                             rs.getString("Phone"),
                             rs.getString("Email"),
-                            rs.getInt("RoleID")
+                            rs.getString("RoleID")
                     );
                 }
             }

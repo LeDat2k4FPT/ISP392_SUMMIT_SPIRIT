@@ -23,6 +23,16 @@ public class OrderDTO {
         this.status = status;
     }
 
+    public OrderDTO(int orderID, int userID, Date orderDate, double total, String status, String paymentStatus, Timestamp paymentDate) {
+        this.orderID = orderID;
+        this.userID = userID;
+        this.orderDate = orderDate;
+        this.total = total;
+        this.status = status;
+        this.paymentStatus = paymentStatus;
+        this.paymentDate = paymentDate;
+    }
+
     public int getOrderID() {
         return orderID;
     }
@@ -78,4 +88,6 @@ public class OrderDTO {
     public void setPaymentDate(Timestamp paymentDate) {
         this.paymentDate = paymentDate;
     }
-} 
+}
+
+   
