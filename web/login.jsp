@@ -10,6 +10,7 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>SUMMIT SPIRIT Page</title>
+<<<<<<< HEAD
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <style>
             body {
@@ -66,5 +67,25 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+=======
+    </head>
+    <body>
+        
+        <form action="MainController" method="POST">
+            User ID: <input type="text" name="userID" required=""/>
+            </br>Password: <input type="password" name="password" required=""/>
+            </br><input type="submit" name="action" value="Login"/>
+            <input type="reset" value="Reset"/>
+        </form>      
+        </br><a href="createUser.jsp">Create user</a>
+        <% 
+            String message= (String)request.getAttribute("MESSAGE");
+            if(message== null) message="";
+            
+        %>
+        <%= message %>
+    
+       
+>>>>>>> 608a15763e5e09c5cb5d6b029a0d33fd43000f9f
     </body>
 </html>

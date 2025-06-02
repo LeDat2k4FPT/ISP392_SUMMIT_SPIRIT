@@ -10,7 +10,10 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+<<<<<<< HEAD
 
+=======
+>>>>>>> 608a15763e5e09c5cb5d6b029a0d33fd43000f9f
 /**
  *
  * @author Admin
@@ -26,9 +29,12 @@ public class MainController extends HttpServlet {
     private static final String LOGOUT_CONTROLLER = "LogoutController";
     private static final String SEARCH = "Search";
     private static final String SEARCH_CONTROLLER = "SearchController";
+<<<<<<< HEAD
     private static final String CREATE = "Create";
     private static final String CREATE_CONTROLLER = "CreateController";
 
+=======
+>>>>>>> 608a15763e5e09c5cb5d6b029a0d33fd43000f9f
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -43,8 +49,11 @@ public class MainController extends HttpServlet {
                 url = LOGOUT_CONTROLLER;
             } else if (SEARCH.equals(action)) {
                 url = SEARCH_CONTROLLER;
+<<<<<<< HEAD
             } else if (CREATE.equals(action)) {
                 url = CREATE_CONTROLLER;
+=======
+>>>>>>> 608a15763e5e09c5cb5d6b029a0d33fd43000f9f
             }
 
         } catch (Exception e) {
