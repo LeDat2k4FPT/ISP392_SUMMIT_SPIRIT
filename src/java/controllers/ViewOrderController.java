@@ -13,6 +13,7 @@ import java.io.IOException;
 import java.util.List;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 @WebServlet(name = "ViewOrderController", urlPatterns = {"/ViewOrders"})
 public class ViewOrderController extends HttpServlet {
 
@@ -20,11 +21,16 @@ public class ViewOrderController extends HttpServlet {
 @WebServlet(name = "ViewOrderController", urlPatterns = {"/ViewOrderController"})
 public class ViewOrderController extends HttpServlet {
 >>>>>>> dd4dc50dad166f64a8d749f7f7c88852de362a43
+=======
+@WebServlet(name = "ViewOrderController", urlPatterns = {"/ViewOrderController"})
+public class ViewOrderController extends HttpServlet {
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
     private static final String ERROR = "error.jsp";
     private static final String ORDER_PAGE = "orderHistory.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
+<<<<<<< HEAD
 <<<<<<< HEAD
         String url = ERROR;
         try {
@@ -50,6 +56,8 @@ public class ViewOrderController extends HttpServlet {
         }
         request.getRequestDispatcher(url).forward(request, response);
 =======
+=======
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
         try {
@@ -66,7 +74,10 @@ public class ViewOrderController extends HttpServlet {
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
+<<<<<<< HEAD
 >>>>>>> dd4dc50dad166f64a8d749f7f7c88852de362a43
+=======
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
     }
 
     @Override
@@ -81,12 +92,19 @@ public class ViewOrderController extends HttpServlet {
         processRequest(request, response);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 }
 =======
+=======
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
 
     @Override
     public String getServletInfo() {
         return "Short description";
     }
+<<<<<<< HEAD
 } 
 >>>>>>> dd4dc50dad166f64a8d749f7f7c88852de362a43
+=======
+} 
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21

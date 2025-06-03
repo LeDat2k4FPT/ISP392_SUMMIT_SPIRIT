@@ -14,6 +14,7 @@ import java.sql.SQLException;
  */
 public class DBUtils {
 <<<<<<< HEAD
+<<<<<<< HEAD
     private static final String DB_NAME = "ISM302";
 =======
 <<<<<<< HEAD
@@ -22,6 +23,12 @@ public class DBUtils {
     private static final String DB_NAME = "ISM302";
 >>>>>>> 3bc1e18dc4be164fe4acac256b9f36a99958f6a7
 >>>>>>> dd4dc50dad166f64a8d749f7f7c88852de362a43
+=======
+    private static final String DB_NAME = "ISP302";
+=======
+    private static final String DB_NAME = "ISM302";
+>>>>>>> 608a15763e5e09c5cb5d6b029a0d33fd43000f9f
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
     private static final String DB_USER_NAME = "sa";
     private static final String DB_PASSWORD = "12345";
 

@@ -10,6 +10,10 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>SUMMIT SPIRIT Page</title>
+<<<<<<< HEAD
+=======
+<<<<<<< HEAD
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
         <style>
             body {
@@ -44,6 +48,7 @@
                 margin-top: 15px;
             }
         </style>
+<<<<<<< HEAD
     </head>
     <body>
         <div class="container">
@@ -66,5 +71,49 @@
             </div>
         </div>
         <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+=======
+    </head>
+    <body>
+        <div class="container">
+            <div class="login-container">
+                <h2 class="login-title">Login</h2>
+                <form action="LoginController" method="POST">
+                    <div class="mb-3">
+                        <label for="email" class="form-label">Email</label>
+                        <input type="email" class="form-control" id="email" name="email" required>
+                    </div>
+                    <div class="mb-3">
+                        <label for="password" class="form-label">Password</label>
+                        <input type="password" class="form-control" id="password" name="password" required>
+                    </div>
+                    <button type="submit" class="btn btn-primary btn-login">Login</button>
+                    <div class="register-link">
+                        <p>Don't have an account? <a href="createUser.jsp">Register here</a></p>
+                    </div>
+                </form>
+            </div>
+        </div>
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+=======
+    </head>
+    <body>
+        
+        <form action="MainController" method="POST">
+            User ID: <input type="text" name="userID" required=""/>
+            </br>Password: <input type="password" name="password" required=""/>
+            </br><input type="submit" name="action" value="Login"/>
+            <input type="reset" value="Reset"/>
+        </form>      
+        </br><a href="createUser.jsp">Create user</a>
+        <% 
+            String message= (String)request.getAttribute("MESSAGE");
+            if(message== null) message="";
+            
+        %>
+        <%= message %>
+    
+       
+>>>>>>> 608a15763e5e09c5cb5d6b029a0d33fd43000f9f
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
     </body>
 </html>

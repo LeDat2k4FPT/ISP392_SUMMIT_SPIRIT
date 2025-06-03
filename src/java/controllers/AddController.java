@@ -5,16 +5,20 @@
 package controllers;
 
 <<<<<<< HEAD
+<<<<<<< HEAD
 import dao.ProductDAO;
 import dto.ProductDTO;
 =======
 >>>>>>> dd4dc50dad166f64a8d749f7f7c88852de362a43
+=======
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+<<<<<<< HEAD
 <<<<<<< HEAD
 
 @WebServlet(name = "AddController", urlPatterns = {"/AddProduct"})
@@ -62,6 +66,8 @@ public class AddController extends HttpServlet {
     }
 
 =======
+=======
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
 import java.io.PrintWriter;
 
 
@@ -128,14 +134,20 @@ public class AddController extends HttpServlet {
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
      */
+<<<<<<< HEAD
 >>>>>>> dd4dc50dad166f64a8d749f7f7c88852de362a43
+=======
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 <<<<<<< HEAD
+<<<<<<< HEAD
 =======
+=======
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
 
     /**
      * Returns a short description of the servlet.
@@ -147,5 +159,8 @@ public class AddController extends HttpServlet {
         return "Short description";
     }// </editor-fold>
 
+<<<<<<< HEAD
 >>>>>>> dd4dc50dad166f64a8d749f7f7c88852de362a43
+=======
+>>>>>>> 6a22f44c9917dddd110f1771c211d30f0c0fea21
 }
