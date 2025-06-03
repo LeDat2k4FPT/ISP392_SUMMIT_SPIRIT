@@ -13,7 +13,15 @@ import java.sql.SQLException;
  * @author Admin
  */
 public class DBUtils {
+<<<<<<< HEAD
     private static final String DB_NAME = "ISM302";
+=======
+<<<<<<< HEAD
+    private static final String DB_NAME = "ISP302";
+=======
+    private static final String DB_NAME = "ISM302";
+>>>>>>> 3bc1e18dc4be164fe4acac256b9f36a99958f6a7
+>>>>>>> dd4dc50dad166f64a8d749f7f7c88852de362a43
     private static final String DB_USER_NAME = "sa";
     private static final String DB_PASSWORD = "12345";
 
