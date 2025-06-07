@@ -31,10 +31,10 @@ public class OrderDAO {
                 while (rs.next()) {
                     list.add(new OrderDTO(
                             rs.getInt("OrderID"),
-                            rs.getDate("OrderDate"),
-                            rs.getString("Status"),
-                            rs.getDouble("Total"),
                             rs.getInt("UserID"),
+                            rs.getDate("OrderDate"),
+                            rs.getDouble("Total"),
+                            rs.getString("Status"),
                             rs.getString("PaymentStatus"),
                             rs.getTimestamp("PaymentDate")
                     ));

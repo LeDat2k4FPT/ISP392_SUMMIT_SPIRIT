@@ -8,7 +8,8 @@ import java.sql.SQLException;
 import utils.DBUtils;
 
 public class UserDAO {
-    private static final String LOGIN = "SELECT * FROM Account WHERE Email = ? AND Password = ?";
+    private static final String LOGIN = 
+    "SELECT UserID, FullName, Address, Phone, Role FROM Account WHERE Email =? AND Password =?";
     private static final String CREATE = "INSERT INTO Account (FullName, Password, RoleID) VALUES (?, ?, ?)";
     private static final String CHECK_DUPLICATE = "SELECT userID FROM Account WHERE userID = ?";
     private static final String GET_USER = "SELECT * FROM Account WHERE userID = ?";
@@ -28,15 +29,12 @@ public class UserDAO {
                 ptm.setString(2, password);
                 rs = ptm.executeQuery();
                 if (rs.next()) {
-                    user = new UserDTO(
-                            rs.getInt("userID"),
-                            rs.getString("FullName"),
-                            rs.getString("Address"),
-                            rs.getString("Password"),
-                            rs.getString("Phone"),
-                            rs.getString("Email"),
-                            rs.getString("RoleID")
-                    );
+                    int userID = rs.getInt("userID");                   
+                    String fullName = rs.getString("fullName");
+                    String role = rs.getString("role");
+                    String address = rs.getString("address");
+                    String phone = rs.getString("phone");
+                    user = new UserDTO(userID, fullName, address, "", phone, email, role);
                 }
             }
         } catch (Exception e) {
@@ -59,7 +57,7 @@ public class UserDAO {
                 ptm = conn.prepareStatement(CREATE);
                 ptm.setString(1, user.getFullName());
                 ptm.setString(2, user.getPassword());
-                ptm.setString(3, user.getRoleID());
+                ptm.setString(3, user.getRole());
                 check = ptm.executeUpdate() > 0;
             }
         } catch (Exception e) {

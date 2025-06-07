@@ -1,6 +1,6 @@
 <%-- 
-    Document   : admin
-    Created on : May 28, 2025, 5:48:17 PM
+    Document   : staff
+    Created on : Jun 2, 2025, 6:19:18 PM
     Author     : Admin
 --%>
 
@@ -12,6 +12,6 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h1>Hello ADMIN!</h1>
+        <h1>Hello World!</h1>
     </body>
 </html>

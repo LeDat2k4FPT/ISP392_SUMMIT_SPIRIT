@@ -1,95 +1,67 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controllers;
+
+import dao.ProductDAO;
+import dto.ProductDTO;
+import dto.CartItemDTO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import java.io.IOException;
-import java.io.PrintWriter;
+import jakarta.servlet.http.*;
 
+import java.io.IOException;
+import java.util.HashMap;
+import java.util.Map;
 
 @WebServlet(name = "AddController", urlPatterns = {"/AddController"})
 public class AddController extends HttpServlet {
 
-    /**
-     * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
-     * methods.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
-    //vinh
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-//   try {
-//            String productID = request.getParameter("productID");
-//            String productName = request.getParameter("productName");
-//            double price = Double.parseDouble(request.getParameter("price"));
-//            int quantity = Integer.parseInt(request.getParameter("quantity"));
-//
-//            HttpSession session = request.getSession();
-//            Cart cart = (Cart) session.getAttribute("CART");
-//            if (cart == null) {
-//                cart = new Cart();
-//            }
-//            boolean check = cart.add(new Clothes(productID, productName, quantity, price));
-//            if (check) {
-//                session.setAttribute("CART", cart);
-//                request.setAttribute("MESSAGE", "Đã thêm " + " : " + quantity + " thành công");
-//                url = SUCCESS;
-//            }
-//        } catch (Exception e) {
-//            log("Error at AddController: " + e.toString());
-//        } finally {
-//            request.getRequestDispatcher(url).forward(request, response);
-//        }
+
+        HttpSession session = request.getSession();
+        Map<Integer, CartItemDTO> cart = (Map<Integer, CartItemDTO>) session.getAttribute("CART");
+
+        if (cart == null) {
+            cart = new HashMap<>();
+        }
+
+        String productIDStr = request.getParameter("productID");
+        String quantityStr = request.getParameter("quantity");
+
+        if (productIDStr != null && quantityStr != null) {
+            try {
+                int productID = Integer.parseInt(productIDStr);
+                int quantity = Integer.parseInt(quantityStr);
+
+                ProductDAO productDAO = new ProductDAO();
+                ProductDTO product = productDAO.getProductByID(productID);
+
+                if (product != null) {
+                    CartItemDTO cartItem = cart.get(productID);
+                    if (cartItem == null) {
+                        cart.put(productID, new CartItemDTO(product, quantity));
+                    } else {
+                        cartItem.setQuantity(cartItem.getQuantity() + quantity);
+                    }
+                }
+            } catch (Exception e) {
+                e.printStackTrace();
+            }
+        }
+
+        session.setAttribute("CART", cart);
+        response.sendRedirect("cart.jsp");
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }// </editor-fold>
-
 }

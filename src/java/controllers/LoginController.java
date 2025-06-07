@@ -22,10 +22,12 @@ import dto.UserDTO;
 public class LoginController extends HttpServlet {
 
     private static final String ERROR = "login.jsp";
-    private static final String AD = "AD";
+    private static final String AD = "Admin";
     private static final String ADMIN_PAGE = "admin.jsp";
-    private static final String US = "US";
+    private static final String US = "User";
     private static final String USER_PAGE = "user.jsp";
+    private static final String ST = "Staff";
+    private static final String STAFF_PAGE = "staff.jsp";
     private static final String INCORRECT_MESSAGE = "Incorrect Email or Password!";
     private static final String UNSUPPORT_MESSAGE = "Your role is not support yet !";
 
@@ -41,11 +43,13 @@ public class LoginController extends HttpServlet {
             if(loginUser != null){
                 HttpSession session = request.getSession();
                 session.setAttribute("LOGIN_USER", loginUser);
-                String roleID = loginUser.getRoleID();
-                if(AD.equals(roleID)){
+                String role = loginUser.getRole();
+                if(AD.equals(role)){
                     url = ADMIN_PAGE;
-                }else if (US.equals(roleID)){
+                }else if (US.equals(role)){
                     url = USER_PAGE;
+                }else if (ST.equals(role)){
+                    url = STAFF_PAGE;
                 }else{
                     request.setAttribute("MESSAGE", UNSUPPORT_MESSAGE);
                 }

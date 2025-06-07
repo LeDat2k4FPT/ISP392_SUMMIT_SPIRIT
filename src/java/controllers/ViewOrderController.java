@@ -3,38 +3,52 @@ package controllers;
 import dao.OrderDAO;
 import dto.OrderDTO;
 import dto.UserDTO;
+
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.HttpServlet;
-import jakarta.servlet.http.HttpServletRequest;
-import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
+import jakarta.servlet.http.*;
+
 import java.io.IOException;
 import java.util.List;
 
 @WebServlet(name = "ViewOrderController", urlPatterns = {"/ViewOrderController"})
 public class ViewOrderController extends HttpServlet {
-    private static final String ERROR = "error.jsp";
-    private static final String ORDER_PAGE = "orderHistory.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        response.setContentType("text/html;charset=UTF-8");
-        String url = ERROR;
+        
+        // Lấy session người dùng
+        HttpSession session = request.getSession();
+        UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+
+        // Kiểm tra nếu người dùng chưa đăng nhập
+        if (loginUser == null) {
+            // Nếu không có người dùng đăng nhập, chuyển hướng tới trang đăng nhập
+            response.sendRedirect("login.jsp");
+            return;
+        }
+
+        int userID = loginUser.getUserID();
+        OrderDAO orderDAO = new OrderDAO();
+
         try {
-            HttpSession session = request.getSession();
-            UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
-            if (loginUser != null) {
-                OrderDAO orderDAO = new OrderDAO();
-                List<OrderDTO> orders = orderDAO.getOrdersByUser(loginUser.getUserID());
-                request.setAttribute("ORDER_LIST", orders);
-                url = ORDER_PAGE;
+            // Lấy danh sách đơn hàng của người dùng
+            List<OrderDTO> orderList = orderDAO.getOrdersByUser(userID);
+            
+            // Nếu danh sách đơn hàng không rỗng
+            if (orderList != null && !orderList.isEmpty()) {
+                request.setAttribute("ORDER_LIST", orderList);
+            } else {
+                request.setAttribute("MESSAGE", "Bạn chưa có đơn hàng nào.");
             }
         } catch (Exception e) {
-            log("Error at ViewOrderController: " + e.toString());
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
+            // Log lỗi chi tiết
+            e.printStackTrace();
+            request.setAttribute("ERROR", "Đã xảy ra lỗi khi lấy thông tin đơn hàng. Vui lòng thử lại sau.");
         }
+
+        // Forward đến trang lịch sử đơn hàng
+        request.getRequestDispatcher("orderHistory.jsp").forward(request, response);
     }
 
     @Override
@@ -48,9 +62,4 @@ public class ViewOrderController extends HttpServlet {
             throws ServletException, IOException {
         processRequest(request, response);
     }
-
-    @Override
-    public String getServletInfo() {
-        return "Short description";
-    }
-} 
+}
