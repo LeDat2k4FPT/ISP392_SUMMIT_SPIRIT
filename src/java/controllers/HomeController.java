@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package controllers;
 
 import jakarta.servlet.ServletException;
@@ -11,30 +7,27 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.io.PrintWriter;
 
 /**
  *
- * @author Admin
+ * @author gmt
  */
-@WebServlet(name = "LogoutController", urlPatterns = {"/LogoutController"})
-public class LogoutController extends HttpServlet {
+@WebServlet(name = "HomeController", urlPatterns = {"/HomeController"})
+public class HomeController extends HttpServlet {
 
-    private static final String ERROR = "user.jsp";
-    private static final String SUCCESS = "login.jsp";
+    private static final String ERROR = "login.jsp";
+    private static final String SUCCESS = "user.jsp";
 
-    protected void processRequest(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
         try {
             HttpSession session = request.getSession(false);
-            if (session != null) {
-                session.invalidate();
+            if (session != null && session.getAttribute("LOGIN_USER") != null) {
                 url = SUCCESS;
             }
         } catch (Exception e) {
-            log("Error at LogoutController: " + e.toString());
+            log("Error at HomeController: " + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
@@ -50,8 +43,7 @@ public class LogoutController extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response);
     }
 
@@ -64,8 +56,7 @@ public class LogoutController extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         processRequest(request, response);
     }
 

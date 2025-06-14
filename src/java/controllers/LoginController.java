@@ -40,25 +40,26 @@ public class LoginController extends HttpServlet {
             String password = request.getParameter("password");
             UserDAO dao = new UserDAO();
             UserDTO loginUser = dao.checkLogin(email, password);
-            if(loginUser != null){
+            if (loginUser != null) {
+                loginUser.setPassword(password);
                 HttpSession session = request.getSession();
                 session.setAttribute("LOGIN_USER", loginUser);
                 String role = loginUser.getRole();
-                if(AD.equals(role)){
+                if (AD.equals(role)) {
                     url = ADMIN_PAGE;
-                }else if (US.equals(role)){
+                } else if (US.equals(role)) {
                     url = USER_PAGE;
-                }else if (ST.equals(role)){
+                } else if (ST.equals(role)) {
                     url = STAFF_PAGE;
-                }else{
+                } else {
                     request.setAttribute("MESSAGE", UNSUPPORT_MESSAGE);
                 }
-            }else{
-               request.setAttribute("MESSAGE", INCORRECT_MESSAGE);
+            } else {
+                request.setAttribute("MESSAGE", INCORRECT_MESSAGE);
             }
         } catch (Exception e) {
             log("Error at LoginController: " + e.toString());
-        }finally{
+        } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
     }

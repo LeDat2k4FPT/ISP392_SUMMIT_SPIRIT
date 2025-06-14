@@ -1,6 +1,7 @@
 package dto;
 
 public class UserDTO {
+
     private int userID;
     private String fullName;
     private String address;
@@ -10,6 +11,13 @@ public class UserDTO {
     private String role;
 
     public UserDTO() {
+        this.userID = 0;
+        this.fullName = "";
+        this.address = "";
+        this.password = "";
+        this.phone = "";
+        this.email = "";
+        this.role = "";
     }
 
     public UserDTO(int userID, String fullName, String address, String password, String phone, String email, String role) {
@@ -77,7 +85,4 @@ public class UserDTO {
     public void setRole(String role) {
         this.role = role;
     }
-
-
-
-} 
+}

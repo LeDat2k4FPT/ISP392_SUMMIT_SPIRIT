@@ -8,10 +8,10 @@ import java.sql.SQLException;
 import utils.DBUtils;
 
 public class UserDAO {
-    private static final String LOGIN = 
-    "SELECT UserID, FullName, Address, Phone, Role FROM Account WHERE Email =? AND Password =?";
-    private static final String CREATE = "INSERT INTO Account (FullName, Password, RoleID) VALUES (?, ?, ?)";
-    private static final String CHECK_DUPLICATE = "SELECT userID FROM Account WHERE userID = ?";
+
+    private static final String LOGIN = "SELECT UserID, FullName, Address, Phone, Role FROM Account WHERE Email = ? AND Password = ?";
+    private static final String CREATE = "INSERT INTO Account (FullName, Address, Email, Phone, Role, Password) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String EDIT_PROFILE = "UPDATE Account set FullName=?, Address=?, Email=?, Phone=? WHERE UserID=?";
     private static final String GET_USER = "SELECT * FROM Account WHERE userID = ?";
     private static final String UPDATE_USER = "UPDATE Account SET FullName=?, Address=?, Phone=?, Email=? WHERE userID=?";
     private static final String UPDATE_PASSWORD = "UPDATE Account SET Password=? WHERE userID=?";
@@ -29,7 +29,7 @@ public class UserDAO {
                 ptm.setString(2, password);
                 rs = ptm.executeQuery();
                 if (rs.next()) {
-                    int userID = rs.getInt("userID");                   
+                    int userID = rs.getInt("userID");
                     String fullName = rs.getString("fullName");
                     String role = rs.getString("role");
                     String address = rs.getString("address");
@@ -40,9 +40,15 @@ public class UserDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) rs.close();
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return user;
     }
@@ -56,40 +62,50 @@ public class UserDAO {
             if (conn != null) {
                 ptm = conn.prepareStatement(CREATE);
                 ptm.setString(1, user.getFullName());
-                ptm.setString(2, user.getPassword());
-                ptm.setString(3, user.getRole());
-                check = ptm.executeUpdate() > 0;
+                ptm.setString(2, user.getAddress());
+                ptm.setString(3, user.getEmail());
+                ptm.setString(4, user.getPhone());
+                ptm.setString(5, user.getRole());
+                ptm.setString(6, user.getPassword());
+                check = ptm.executeUpdate() > 0 ? true : false;
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return check;
     }
 
-    public boolean checkDuplicate(String userID) throws SQLException {
+    public boolean edit(UserDTO user) throws SQLException {
         boolean check = false;
         Connection conn = null;
         PreparedStatement ptm = null;
-        ResultSet rs = null;
         try {
             conn = DBUtils.getConnection();
             if (conn != null) {
-                ptm = conn.prepareStatement(CHECK_DUPLICATE);
-                ptm.setString(1, userID);
-                rs = ptm.executeQuery();
-                if (rs.next()) {
-                    check = true;
-                }
+                ptm = conn.prepareStatement(EDIT_PROFILE);
+                ptm.setString(1, user.getFullName());
+                ptm.setString(2, user.getAddress());
+                ptm.setString(3, user.getEmail());
+                ptm.setString(4, user.getPhone());
+                ptm.setInt(5, user.getUserID());
+                check = ptm.executeUpdate() > 0 ? true : false;
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) rs.close();
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return check;
     }
@@ -120,9 +136,15 @@ public class UserDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) rs.close();
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return user;
     }
@@ -145,8 +167,12 @@ public class UserDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return check;
     }
@@ -166,9 +192,13 @@ public class UserDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return check;
     }
-} 
+}

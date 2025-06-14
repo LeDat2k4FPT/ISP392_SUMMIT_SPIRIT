@@ -5,6 +5,38 @@
     <head>
         <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>User Page</title>
+        <style>
+            .user-dropdown {
+                position: relative;
+                display: inline-block;
+                font-family: Arial;
+            }
+            .user-name {
+                cursor: pointer;
+                font-weight: bold;
+                padding: 10px;
+            }
+            .dropdown-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background-color: white;
+                min-width: 160px;
+                box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+                border-radius: 4px;
+                z-index: 1000;
+            }
+            .dropdown-menu a {
+                padding: 12px 16px;
+                display: block;
+                text-decoration: none;
+                color: black;
+            }
+            .dropdown-menu a:hover {
+                background-color: #f1f1f1;
+            }
+        </style>
     </head>
     <body>
         <%
@@ -14,13 +46,38 @@
                 return;
             }
         %>
-
-        <h2>User Information:</h2>
-        User ID: <%= loginUser.getUserID() %><br/>
-        Full Name: <%= loginUser.getFullName() %><br/>
-        Role: <%= loginUser.getRole() %><br/>
-        Password: <%= loginUser.getPassword() %><br/>
-
-<!--        <br/><a href="shopping.jsp">Shopping</a>-->
+        <div>
+            <a href="user.jsp" class="btn btn-primary me-2">Home</a>
+            <a href="cart.jsp" class="btn btn-secondary me-2">Cart</a>
+            <div class="user-dropdown">
+                <div class="user-name" onclick="toggleMenu()">
+                    <%= loginUser.getFullName()%>
+                </div>
+                <div id="dropdown" class="dropdown-menu">
+                    <a href="profile.jsp">User Profile</a>
+                    <a href="MainController?action=Logout">Logout</a>
+                </div>
+            </div>
+            <script>
+                function toggleMenu() {
+                    const menu = document.getElementById("dropdown");
+                    menu.style.display = menu.style.display === "block" ? "none" : "block";
+                }
+                document.addEventListener("click", function (event) {
+                    const dropdown = document.getElementById("dropdown");
+                    const userBtn = document.querySelector(".user-name");
+                    if (!dropdown.contains(event.target) && !userBtn.contains(event.target)) {
+                        dropdown.style.display = "none";
+                    }
+                });
+            </script>
+        </div>
+        <%
+            String message = (String) request.getAttribute("MESSAGE");
+            if (message == null) {
+                message = "";
+            }
+        %>
+        <%= message%>
     </body>
 </html>

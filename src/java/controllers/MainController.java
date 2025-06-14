@@ -24,10 +24,14 @@ public class MainController extends HttpServlet {
     private static final String LOGIN_CONTROLLER = "LoginController";
     private static final String LOGOUT = "Logout";
     private static final String LOGOUT_CONTROLLER = "LogoutController";
-    private static final String SEARCH = "Search";
-    private static final String SEARCH_CONTROLLER = "SearchController";
-    private static final String CREATE = "Create";
-    private static final String CREATE_CONTROLLER = "CreateController";
+    private static final String EDIT_PROFILE = "EditProfile";
+    private static final String EDIT_PROFILE_CONTROLLER = "EditProfileController";
+    private static final String HOME = "Home";
+    private static final String HOME_CONTROLLER = "HomeController";
+    private static final String FORGOTPASSWORD = "ForgotPassword";
+    private static final String FORGOTPASSWORD_CONTROLLER = "ForgotPasswordController";
+    private static final String CREATE_USER = "CreateUser";
+    private static final String CREATE_USER_CONTROLLER = "CreateUserController";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -41,12 +45,15 @@ public class MainController extends HttpServlet {
                 url = LOGIN_CONTROLLER;
             } else if (LOGOUT.equals(action)) {
                 url = LOGOUT_CONTROLLER;
-            } else if (SEARCH.equals(action)) {
-                url = SEARCH_CONTROLLER;
-            } else if (CREATE.equals(action)) {
-                url = CREATE_CONTROLLER;
+            } else if (EDIT_PROFILE.equals(action)) {
+                url = EDIT_PROFILE_CONTROLLER;
+            } else if (HOME.equals(action)) {
+                url = HOME_CONTROLLER;
+            } else if (FORGOTPASSWORD.equals(action)) {
+                url = FORGOTPASSWORD_CONTROLLER;
+            } else if (CREATE_USER.equals(action)) {
+                url = CREATE_USER_CONTROLLER;
             }
-
         } catch (Exception e) {
             log("error at MainController: " + e.toString());
         } finally {
