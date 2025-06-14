@@ -8,7 +8,7 @@ import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import utils.DBUtils;
-
+//123
 public class ProductDAO {
     private static final String GET_ALL_PRODUCTS = "SELECT * FROM Product";
     private static final String GET_PRODUCT_BY_ID = "SELECT * FROM Product WHERE ProductID = ?";
