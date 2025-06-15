@@ -50,16 +50,16 @@
         <div class="container">
             <div class="login-container">
                 <h2 class="login-title">Forgot Password</h2>
-                <p>Enter your email and we'll send you the instructions</p>
-                <%
+                <p>Enter your email and we'll send you the OTP code</p>
+                <form action="MainController" method="POST">
+                    <%
                             String message = (String) request.getAttribute("MESSAGE");
                             if (message != null && !message.isEmpty()) {
-                %>
-                <p style="color:red; text-align:center;"><%= message %></p>
-                <%
-                    }
-                %>
-                <form action="MainController" method="POST">
+                    %>
+                    <p style="color:red; text-align:center;"><%= message %></p>
+                    <%
+                        }
+                    %>
                     <div class="mb-3">
                         <label for="email" class="form-label">Email</label>
                         <input type="email" class="form-control" id="email" name="email" required>

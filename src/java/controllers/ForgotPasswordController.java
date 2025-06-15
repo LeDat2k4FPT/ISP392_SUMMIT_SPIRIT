@@ -1,5 +1,7 @@
 package controllers;
 
+import dao.UserDAO;
+import dto.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -7,27 +9,43 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Random;
+import utils.EmailUtils;
 
 /**
  *
  * @author gmt
  */
-@WebServlet(name = "HomeController", urlPatterns = {"/HomeController"})
-public class HomeController extends HttpServlet {
+@WebServlet(name = "ForgotPasswordController", urlPatterns = {"/ForgotPasswordController"})
+public class ForgotPasswordController extends HttpServlet {
 
-    private static final String ERROR = "login.jsp";
-    private static final String SUCCESS = "homepage.jsp";
+    private static final String ERROR = "forgotPassword.jsp";
+    private static final String SUCCESS = "verifyOtp.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
+        boolean checkValidation = true;
         try {
-            HttpSession session = request.getSession(false);
-            if (session != null && session.getAttribute("LOGIN_USER") != null) {
-                url = SUCCESS;
+            String email = request.getParameter("email");
+            String otp = String.valueOf(new Random().nextInt(900000) + 100000);
+            if (checkValidation) {
+                UserDAO dao = new UserDAO();
+                HttpSession session = request.getSession();
+                UserDTO user = dao.findByEmail(email);
+                if (user != null) {
+                    session.setAttribute("OTP", otp);
+                    session.setAttribute("email", email);
+                    //Gửi OTP qua email
+                    EmailUtils.sendOtpEmail(email, otp);
+                    url = SUCCESS;
+                } else {
+                    request.setAttribute("MESSAGE", "Email doesn't exist!");
+                    url = ERROR;
+                }
             }
         } catch (Exception e) {
-            log("Error at HomeController: " + e.toString());
+            log("Error at ForgotPasswordController: " + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }

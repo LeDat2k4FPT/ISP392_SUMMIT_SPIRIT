@@ -13,8 +13,10 @@ public class UserDAO {
     private static final String CREATE = "INSERT INTO Account (FullName, Address, Email, Phone, Role, Password) VALUES (?, ?, ?, ?, ?, ?)";
     private static final String EDIT_PROFILE = "UPDATE Account set FullName=?, Address=?, Email=?, Phone=? WHERE UserID=?";
     private static final String GET_USER = "SELECT * FROM Account WHERE userID = ?";
-    private static final String UPDATE_USER = "UPDATE Account SET FullName=?, Address=?, Phone=?, Email=? WHERE userID=?";
-    private static final String UPDATE_PASSWORD = "UPDATE Account SET Password=? WHERE userID=?";
+    private static final String UPDATE_PASSWORD = "UPDATE Account SET Password=? WHERE Email=?";
+    private static final String FIND_BY_EMAIL = "SELECT UserID, FullName, Address, Password, Phone, Role FROM Account WHERE Email = ?";
+    private static final String CHECK_DUPLICATE = "SELECT FullName FROM Account WHERE Email = ?";
+    private static final String CHECK_PHONE_DUPLICATE = "SELECT FullName FROM Account WHERE Phone = ?";
 
     public UserDTO checkLogin(String email, String password) throws SQLException {
         UserDTO user = null;
@@ -149,20 +151,17 @@ public class UserDAO {
         return user;
     }
 
-    public boolean updateUser(UserDTO user) throws SQLException {
+    public boolean updatePassword(String email, String newPassword) throws SQLException {
         boolean check = false;
         Connection conn = null;
         PreparedStatement ptm = null;
         try {
             conn = DBUtils.getConnection();
             if (conn != null) {
-                ptm = conn.prepareStatement(UPDATE_USER);
-                ptm.setString(1, user.getFullName());
-                ptm.setString(2, user.getAddress());
-                ptm.setString(3, user.getPhone());
-                ptm.setString(4, user.getEmail());
-                ptm.setInt(5, user.getUserID());
-                check = ptm.executeUpdate() > 0;
+                ptm = conn.prepareStatement(UPDATE_PASSWORD);
+                ptm.setString(1, newPassword);
+                ptm.setString(2, email);
+                check = ptm.executeUpdate() > 0 ? true : false;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -177,21 +176,96 @@ public class UserDAO {
         return check;
     }
 
-    public boolean updatePassword(UserDTO user) throws SQLException {
-        boolean check = false;
+    public UserDTO findByEmail(String email) throws SQLException {
+        UserDTO user = null;
         Connection conn = null;
         PreparedStatement ptm = null;
+        ResultSet rs = null;
         try {
             conn = DBUtils.getConnection();
             if (conn != null) {
-                ptm = conn.prepareStatement(UPDATE_PASSWORD);
-                ptm.setString(1, user.getPassword());
-                ptm.setInt(2, user.getUserID());
-                check = ptm.executeUpdate() > 0;
+                ptm = conn.prepareStatement(FIND_BY_EMAIL);
+                ptm.setString(1, email);
+                rs = ptm.executeQuery();
+                while (rs.next()) {
+                    int userID = rs.getInt("UserID");
+                    String fullName = rs.getString("FullName");
+                    String address = rs.getString("Address");
+                    String password = rs.getString("Password");
+                    String phone = rs.getString("Phone");
+                    String role = rs.getString("Role");
+
+                    user = new UserDTO(userID, fullName, address, password, phone, email, role);
+                }
             }
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return user;
+    }
+
+    public boolean checkEmailExists(String email) throws SQLException {
+        boolean check = false;
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        ResultSet rs = null;
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                ptm = conn.prepareStatement(CHECK_DUPLICATE);
+                ptm.setString(1, email);
+                rs = ptm.executeQuery();
+                if (rs.next()) {
+                    check = true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return check;
+    }
+
+    public boolean checkPhoneExists(String phone) throws SQLException {
+        boolean check = false;
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        ResultSet rs = null;
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                ptm = conn.prepareStatement(CHECK_PHONE_DUPLICATE);
+                ptm.setString(1, phone);
+                rs = ptm.executeQuery();
+                if (rs.next()) {
+                    check = true;
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
             if (ptm != null) {
                 ptm.close();
             }

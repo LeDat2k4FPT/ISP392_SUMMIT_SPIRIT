@@ -12,22 +12,27 @@ import java.io.IOException;
  *
  * @author gmt
  */
-@WebServlet(name = "HomeController", urlPatterns = {"/HomeController"})
-public class HomeController extends HttpServlet {
+@WebServlet(name = "VerifyOtpController", urlPatterns = {"/VerifyOtpController"})
+public class VerifyOtpController extends HttpServlet {
 
-    private static final String ERROR = "login.jsp";
-    private static final String SUCCESS = "homepage.jsp";
+    private static final String ERROR = "verifyOtp.jsp";
+    private static final String SUCCESS = "resetPassword.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
         try {
-            HttpSession session = request.getSession(false);
-            if (session != null && session.getAttribute("LOGIN_USER") != null) {
+            String userOtp = request.getParameter("otp");
+            HttpSession session = request.getSession();
+            String sessionOtp = (String) session.getAttribute("OTP");
+            if (userOtp.equals(sessionOtp)) {
                 url = SUCCESS;
+            } else {
+                request.setAttribute("MESSAGE", "Invalid OTP!");
+                url = ERROR;
             }
         } catch (Exception e) {
-            log("Error at HomeController: " + e.toString());
+            log("Error at VerifyOtpController: " + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }

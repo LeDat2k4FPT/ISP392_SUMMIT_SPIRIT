@@ -1,5 +1,6 @@
 package controllers;
 
+import dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,22 +13,41 @@ import java.io.IOException;
  *
  * @author gmt
  */
-@WebServlet(name = "HomeController", urlPatterns = {"/HomeController"})
-public class HomeController extends HttpServlet {
+@WebServlet(name = "ResetPasswordController", urlPatterns = {"/ResetPasswordController"})
+public class ResetPasswordController extends HttpServlet {
 
-    private static final String ERROR = "login.jsp";
-    private static final String SUCCESS = "homepage.jsp";
+    private static final String ERROR = "resetPassword.jsp";
+    private static final String SUCCESS = "login.jsp";
+    private static final String NOT_MATCH = "Please make sure the password and confirm password match!";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
         try {
-            HttpSession session = request.getSession(false);
-            if (session != null && session.getAttribute("LOGIN_USER") != null) {
-                url = SUCCESS;
+            String newPassword = request.getParameter("newPassword");
+            String confirmNewPassword = request.getParameter("confirmNewPassword");
+            if (!confirmNewPassword.equals(newPassword)) {
+                request.setAttribute("MESSAGE", NOT_MATCH);
+            } else if (!newPassword.matches("[A-Z](?=.*[a-z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{7,}$")) {
+                request.setAttribute("MESSAGE", "Password must be at least 8 characters long and include one first uppercase, lowercase, number, and one special character.");
+            } else {
+                HttpSession session = request.getSession();
+                String email = (String) session.getAttribute("email");
+                if (email != null) {
+                    UserDAO dao = new UserDAO();
+                    boolean checkUpdate = dao.updatePassword(email, newPassword);
+                    if (checkUpdate) {
+                        session.invalidate();
+                        url = SUCCESS;
+                    } else {
+                        url = ERROR;
+                    }
+                } else {
+                    request.setAttribute("MESSAGE", "Session expired.");
+                }
             }
         } catch (Exception e) {
-            log("Error at HomeController: " + e.toString());
+            log("Error at ResetPasswordController: " + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }
@@ -69,5 +89,4 @@ public class HomeController extends HttpServlet {
     public String getServletInfo() {
         return "Short description";
     }// </editor-fold>
-
 }

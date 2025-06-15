@@ -2,8 +2,8 @@
 <%@ page import="java.util.*, dao.ProductDAO, dto.ProductDTO, dto.UserDTO" %>
 
 <%
-    UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
-    if (user == null) {
+    UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+    if (loginUser == null || !"User".equals(loginUser.getRole())) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -24,136 +24,189 @@
 
 <!DOCTYPE html>
 <html>
-<head>
-    <title>Homepage</title>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+    <head>
+        <title>Homepage</title>
+        <style>
+            body {
+                font-family: Arial, sans-serif;
+                margin: 0;
+                padding: 0;
+            }
+            .header {
+                padding: 20px 40px;
+                background-color: #f4f4f4;
+                display: flex;
+                align-items: center;
+                justify-content: space-between;
+            }
+            .logo {
+                font-size: 28px;
+                font-weight: bold;
+                color: #1a1a1a;
+            }
+            .categories {
+                display: flex;
+                justify-content: center;
+                background-color: #fff;
+                border-top: 1px solid #eee;
+                border-bottom: 1px solid #eee;
+                padding: 15px 0;
+                gap: 40px;
+            }
+            .categories a {
+                text-decoration: none;
+                font-size: 16px;
+                font-weight: bold;
+                color: #333;
+            }
+            .categories a:hover {
+                color: #007bff;
+            }
+            .main {
+                padding: 40px;
+            }
+            h2 {
+                margin-top: 0;
+                font-size: 26px;
+                color: #333;
+            }
+            .product-list {
+                display: flex;
+                gap: 40px;
+                flex-wrap: wrap;
+                margin-top: 30px;
+            }
+            .product {
+                width: 250px;
+                border: 1px solid #ddd;
+                border-radius: 10px;
+                padding: 20px;
+                text-align: center;
+                box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
+            }
+            .product img {
+                width: 200px;
+                height: 200px;
+                object-fit: contain;
+                margin-bottom: 10px;
+            }
+            .product h4 {
+                margin: 10px 0 5px;
+                font-size: 16px;
+            }
+            .product p {
+                font-size: 14px;
+                color: #555;
+            }
+            .product strong {
+                display: block;
+                margin-top: 10px;
+                font-size: 16px;
+                color: #000;
+            }
+            .user-dropdown {
+                position: relative;
+                display: inline-block;
+                font-family: Arial;
+            }
+            .user-name {
+                cursor: pointer;
+                font-weight: bold;
+                padding: 10px;
+            }
+            .dropdown-menu {
+                display: none;
+                position: absolute;
+                top: 100%;
+                left: 0;
+                background-color: white;
+                min-width: 160px;
+                box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+                border-radius: 4px;
+                z-index: 1000;
+            }
+            .dropdown-menu a {
+                padding: 12px 16px;
+                display: block;
+                text-decoration: none;
+                color: black;
+            }
+            .dropdown-menu a:hover {
+                background-color: #f1f1f1;
+            }
+        </style>
+    </head>
+    <body>
 
-        .header {
-            padding: 20px 40px;
-            background-color: #f4f4f4;
-            display: flex;
-            align-items: center;
-            justify-content: space-between;
-        }
-        .logo {
-            font-size: 28px;
-            font-weight: bold;
-            color: #1a1a1a;
-        }
+        <!-- Header -->
+        <div class="header">
+            <div class="logo">SUMMIT SPIRIT</div>
+            <a href="homepage.jsp" class="btn btn-primary me-2">Home</a>
+            <a href="cart.jsp" class="btn btn-secondary me-2">Cart</a>
+            <div class="user-dropdown">
+                <div class="user-name" onclick="toggleMenu()">
+                    <%= loginUser.getFullName()%>
+                </div>
+                <div id="dropdown" class="dropdown-menu">
+                    <a href="profile.jsp">User Profile</a>
+                    <a href="MainController?action=Logout">Logout</a>
+                </div>
+            </div>
+            <script>
+                function toggleMenu() {
+                    const menu = document.getElementById("dropdown");
+                    menu.style.display = menu.style.display === "block" ? "none" : "block";
+                }
+                document.addEventListener("click", function (event) {
+                    const dropdown = document.getElementById("dropdown");
+                    const userBtn = document.querySelector(".user-name");
+                    if (!dropdown.contains(event.target) && !userBtn.contains(event.target)) {
+                        dropdown.style.display = "none";
+                    }
+                });
+            </script>
+        </div>
 
-        .categories {
-            display: flex;
-            justify-content: center;
-            background-color: #fff;
-            border-top: 1px solid #eee;
-            border-bottom: 1px solid #eee;
-            padding: 15px 0;
-            gap: 40px;
-        }
-        .categories a {
-            text-decoration: none;
-            font-size: 16px;
-            font-weight: bold;
-            color: #333;
-        }
-        .categories a:hover {
-            color: #007bff;
-        }
+        <!-- Categories Horizontal -->
+        <div class="categories">
+            <a href="ViewProductController?category=ao">Shirts</a>
+            <a href="ViewProductController?category=quan">Pants</a>
+            <a href="ViewProductController?category=balo">Backpacks</a>
+            <a href="ViewProductController?category=dungcu">Gears</a>
+            <a href="ViewProductController?category=trai">Tents</a>
+        </div>
 
-        .main {
-            padding: 40px;
-        }
+        <!-- Main Content -->
+        <div class="main">
+            <h2>Top Sales</h2>
 
-        h2 {
-            margin-top: 0;
-            font-size: 26px;
-            color: #333;
-        }
-
-        .product-list {
-            display: flex;
-            gap: 40px;
-            flex-wrap: wrap;
-            margin-top: 30px;
-        }
-
-        .product {
-            width: 250px;
-            border: 1px solid #ddd;
-            border-radius: 10px;
-            padding: 20px;
-            text-align: center;
-            box-shadow: 2px 2px 8px rgba(0,0,0,0.1);
-        }
-
-        .product img {
-            width: 200px;
-            height: 200px;
-            object-fit: contain;
-            margin-bottom: 10px;
-        }
-
-        .product h4 {
-            margin: 10px 0 5px;
-            font-size: 16px;
-        }
-
-        .product p {
-            font-size: 14px;
-            color: #555;
-        }
-
-        .product strong {
-            display: block;
-            margin-top: 10px;
-            font-size: 16px;
-            color: #000;
-        }
-
-    </style>
-</head>
-<body>
-
-<!-- Header -->
-<div class="header">
-    <div class="logo">SUMMIT SPIRIT</div>
-</div>
-
-<!-- Categories Horizontal -->
-<div class="categories">
-    <a href="ViewProductController?category=ao">Shirts</a>
-    <a href="ViewProductController?category=quan">Pants</a>
-    <a href="ViewProductController?category=balo">Backpacks</a>
-    <a href="ViewProductController?category=dungcu">Gears</a>
-    <a href="ViewProductController?category=trai">Tents</a>
-</div>
-
-<!-- Main Content -->
-<div class="main">
-    <h2>Top Sales</h2>
-
-    <div class="product-list">
-        <%
-            if (products != null && !products.isEmpty()) {
-                for (ProductDTO p : products) {
-        %>
-        <div class="product">
-            <img src="<%= p.getProductImage() %>" alt="Product Image" />
-            <h4><%= p.getProductName() %></h4>
-            <p><%= p.getDescription() %></p>
-            <strong><%= String.format("%,.0f", p.getPrice()) %> VND</strong>
+            <div class="product-list">
+                <%
+                    if (products != null && !products.isEmpty()) {
+                        for (ProductDTO p : products) {
+                %>
+                <div class="product">
+                    <img src="<%= p.getProductImage() %>" alt="Product Image" />
+                    <h4><%= p.getProductName() %></h4>
+                    <p><%= p.getDescription() %></p>
+                    <strong><%= String.format("%,.0f", p.getPrice()) %> VND</strong>
+                </div>
+                <%
+                        }
+                    } else {
+                %>
+                <p>No products available to display.</p>
+                <%
+                    }
+                %>
+            </div>
         </div>
         <%
-                }
-            } else {
+        String message = (String) request.getAttribute("MESSAGE");
+        if (message == null) {
+            message = "";
+        }
         %>
-        <p>No products available to display.</p>
-        <%
-            }
-        %>
-    </div>
-</div>
-
-</body>
+        <%= message%>
+    </body>
 </html>

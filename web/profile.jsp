@@ -86,8 +86,9 @@
                 return;
             }
         %>
-        <div>
-            <a href="user.jsp" class="btn btn-primary me-2">Home</a>
+        <div class="header">
+            <div class="logo">SUMMIT SPIRIT</div>
+            <a href="homepage.jsp" class="btn btn-primary me-2">Home</a>
             <a href="cart.jsp" class="btn btn-secondary me-2">Cart</a>
             <div class="user-dropdown">
                 <div class="user-name" onclick="toggleMenu()">
@@ -154,14 +155,13 @@
                     <div class="text-danger">
                         <%= userError.getPhone() %>
                     </div>
-                    <div class="mb-3">
-                        <label for="role" class="form-label">Role</label>
-                        <input type="text" class="form-control" name="role" value="<%= loginUser.getRole()%>" readonly>
-                    </div>
+                    <input type="hidden" class="form-control" name="role" value="<%= loginUser.getRole()%>">
                     <div class="d-flex justify-content-between">
                         <button type="submit" class="btn btn-primary">Edit Information</button>
-                        <button type="submit" name="action" value="ChangePassword" class="btn btn-secondary">Change Password</button>
                     </div>
+                </form>
+                <form action="changePassword.jsp" method="GET">
+                    <button type="submit" name="action" value="ChangePassword" class="btn btn-secondary">Change Password</button>
                 </form>
                 <div class="text-danger">
                     <%= userError.getErrorMessage()%>

@@ -96,6 +96,9 @@
                         <label for="password" class="form-label">Password</label>
                         <input type="password" class="form-control" id="password" name="password"  value="<%= request.getAttribute("password") != null ? request.getAttribute("password") : "" %>" required>
                     </div>
+                    <div class="text-danger">
+                        <%= userError.getPassword() %>
+                    </div>
                     <div class="mb-3">
                         <label for="confirm" class="form-label">Confirm Password</label>
                         <input type="password" class="form-control" id="confirm" name="confirm"  value="<%= request.getAttribute("confirm") != null ? request.getAttribute("confirm") : "" %>" required>

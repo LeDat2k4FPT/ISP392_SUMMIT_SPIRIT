@@ -33,18 +33,28 @@ public class EditProfileController extends HttpServlet {
             String address = request.getParameter("address");
             String email = request.getParameter("email");
             String phoneNumber = request.getParameter("phone");
+            UserDAO dao = new UserDAO();
+            HttpSession session = request.getSession();
+            UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+            boolean emailExists = dao.checkEmailExists(email);
+            if (emailExists && !email.equals(loginUser.getEmail())) {
+                userError.setEmail("Email already exists!");
+                checkValidation = false;
+            }
             if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
                 userError.setEmail("Invalid email format!");
                 checkValidation = false;
             }
-            if (!phoneNumber.matches("^\\d{10,11}$")) {
+            if (!phoneNumber.matches("^0[0-9]{9}$")) {
                 userError.setPhone("Invalid phone number format!");
                 checkValidation = false;
             }
+            boolean phoneExists = dao.checkPhoneExists(phoneNumber);
+            if (phoneExists && !phoneNumber.equals(loginUser.getPhone())) {
+                userError.setPhone("Phone number already exists!");
+                checkValidation = false;
+            }
             if (checkValidation) {
-                UserDAO dao = new UserDAO();
-                HttpSession session = request.getSession();
-                UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
                 UserDTO user = new UserDTO(userID, fullName, address, "", phoneNumber, email, "");
                 boolean checkEdit = dao.edit(user);
                 if (checkEdit) {

@@ -1,5 +1,7 @@
 package controllers;
 
+import dao.UserDAO;
+import dto.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -12,22 +14,46 @@ import java.io.IOException;
  *
  * @author gmt
  */
-@WebServlet(name = "HomeController", urlPatterns = {"/HomeController"})
-public class HomeController extends HttpServlet {
+@WebServlet(name = "ChangePasswordController", urlPatterns = {"/ChangePasswordController"})
+public class ChangePasswordController extends HttpServlet {
 
-    private static final String ERROR = "login.jsp";
-    private static final String SUCCESS = "homepage.jsp";
+    private static final String ERROR = "changePassword.jsp";
+    private static final String SUCCESS = "login.jsp";
+    private static final String NOT_MATCH = "Please make sure the password and confirm password match!";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
+        boolean checkValidation = true;
         try {
-            HttpSession session = request.getSession(false);
-            if (session != null && session.getAttribute("LOGIN_USER") != null) {
-                url = SUCCESS;
+            String password = request.getParameter("currentPassword");
+            String newPassword = request.getParameter("newPassword");
+            String confirmNewPassword = request.getParameter("confirmNewPassword");
+            if (checkValidation) {
+                UserDAO dao = new UserDAO();
+                HttpSession session = request.getSession();
+                UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+                if (!password.equals(loginUser.getPassword())) {
+                    request.setAttribute("MESSAGE", "Current password is incorrect!");
+                    url = ERROR;
+                } else if (!newPassword.matches("[A-Z](?=.*[a-z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{7,}$")) {
+                    request.setAttribute("MESSAGE", "Password must be at least 8 characters long and include one first uppercase, lowercase, number, and one special character.");
+                    url = ERROR;
+                } else if (!confirmNewPassword.equals(newPassword)) {
+                    request.setAttribute("MESSAGE", NOT_MATCH);
+                    url = ERROR;
+                } else {
+                    boolean checkUpdate = dao.updatePassword(loginUser.getEmail(), newPassword);
+                    if (checkUpdate) {
+                        session.invalidate();
+                        url = SUCCESS;
+                    } else {
+                        url = ERROR;
+                    }
+                }
             }
         } catch (Exception e) {
-            log("Error at HomeController: " + e.toString());
+            log("Error at ChangePasswordController: " + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }

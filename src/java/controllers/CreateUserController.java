@@ -19,9 +19,11 @@ import user.UserError;
 public class CreateUserController extends HttpServlet {
 
     private static final String ERROR = "createUser.jsp";
-    private static final String SUCCESS = "user.jsp";
+    private static final String SUCCESS = "homepage.jsp";
     private static final String UNKNOW_MESSAGE = "Unknow error!";
     private static final String NOT_MATCH = "Please make sure the password and confirm password match!";
+    private static final String DUPLICATE_MESSAGE = "Email already exists!";
+    private static final String DUPLCATE_PHONE_NUMBER = "Phone number already exists!";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -42,16 +44,30 @@ public class CreateUserController extends HttpServlet {
             password = request.getParameter("password");
             confirm = request.getParameter("confirm");
             UserDAO dao = new UserDAO();
+            boolean emailExists = dao.checkEmailExists(email);
+            if (emailExists) {
+                userError.setEmail(DUPLICATE_MESSAGE);
+                checkValidation = false;
+            }
             if (!confirm.equals(password)) {
                 userError.setConfirm(NOT_MATCH);
+                checkValidation = false;
+            }
+            if (!password.matches("^[A-Z](?=.*[a-z])(?=.*\\d)(?=.*[^a-zA-Z0-9]).{7,}$")) {
+                userError.setPassword("Password must be at least 8 characters long and include one first uppercase, lowercase, number, and special character.");
                 checkValidation = false;
             }
             if (!email.matches("^[A-Za-z0-9+_.-]+@[A-Za-z0-9.-]+\\.[A-Za-z]{2,6}$")) {
                 userError.setEmail("Invalid email format!");
                 checkValidation = false;
             }
-            if (!phone.matches("^\\d{10,11}$")) {
+            if (!phone.matches("^0[0-9]{9}$")) {
                 userError.setPhone("Invalid phone number format!");
+                checkValidation = false;
+            }
+            boolean phoneExists = dao.checkPhoneExists(phone);
+            if (phoneExists) {
+                userError.setPhone(DUPLCATE_PHONE_NUMBER);
                 checkValidation = false;
             }
             if (checkValidation) {
@@ -82,7 +98,7 @@ public class CreateUserController extends HttpServlet {
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
+// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
     /**
      * Handles the HTTP <code>GET</code> method.
      *
