@@ -24,7 +24,7 @@
         }
         function confirmLogout() {
             if (confirm("Do you really want to logout?")) {
-                window.location.href = 'logout';
+                window.location.href = 'login.jsp';
             }
         }
     </script>
