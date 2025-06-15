@@ -5,6 +5,8 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.util.ArrayList;
+import java.util.List;
 import utils.DBUtils;
 
 public class UserDAO {
@@ -201,4 +203,78 @@ public class UserDAO {
         }
         return check;
     }
+
+    public List<UserDTO> searchUsers(String keyword) {
+    List<UserDTO> list = new ArrayList<>();
+    String sql = "SELECT * FROM Account WHERE (FullName LIKE ? OR Email LIKE ? OR Address LIKE ? OR Role LIKE ?) AND Role <> 'admin'";
+
+
+    try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        String k = "%" + keyword + "%";
+        for (int i = 1; i <= 4; i++) {
+            ps.setString(i, k);
+        }
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            UserDTO user = new UserDTO(
+                rs.getInt("UserID"),
+                rs.getString("FullName"),
+                rs.getString("Address"),
+                rs.getString("Password"),    
+                rs.getString("Email"),                
+                rs.getString("Phone"),
+                rs.getString("Role")
+            );
+            list.add(user);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return list;
+}
+    public List<UserDTO> getAllUsers() {
+    List<UserDTO> list = new ArrayList<>();
+    String sql = "SELECT * FROM Account WHERE Role <> 'admin'";
+
+    try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            UserDTO user = new UserDTO(
+                rs.getInt("UserID"),
+                rs.getString("FullName"),
+                rs.getString("Address"),
+                rs.getString("Password"),    
+                rs.getString("Email"),                
+                rs.getString("Phone"),
+                rs.getString("Role")
+            );
+            list.add(user);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+    public void toggleRole(int userID) {
+    String sql = "UPDATE Account SET Role = CASE WHEN Role = 'user' THEN 'staff' ELSE 'user' END WHERE UserID = ?";
+    try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, userID);
+        ps.executeUpdate();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
+    public void setActive(int userID, boolean active) {
+    String sql = "UPDATE Account SET Status = ? WHERE UserID = ?";
+    try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, active ? 1 : 0); // 1 = active, 0 = inactive
+        ps.setInt(2, userID);
+        ps.executeUpdate();
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+}
+
 }
