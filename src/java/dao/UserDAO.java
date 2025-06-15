@@ -213,7 +213,7 @@ public class UserDAO {
         String k = "%" + keyword + "%";
         for (int i = 1; i <= 4; i++) {
             ps.setString(i, k);
-        }
+} 
         ResultSet rs = ps.executeQuery();
         while (rs.next()) {
             UserDTO user = new UserDTO(

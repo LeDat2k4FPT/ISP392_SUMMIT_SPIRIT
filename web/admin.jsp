@@ -15,7 +15,7 @@
         <h3>Admin Tools:</h3>
         <ul>
             <li><a href="manageUser">Manage User Accounts</a></li>
-            <!-- Bạn có thể thêm các liên kết khác nếu có nhiều công cụ admin -->
+            <!-- có thể thêm các liên kết khác nếu có nhiều công cụ admin -->
         </ul>
     </body>
 </html>
