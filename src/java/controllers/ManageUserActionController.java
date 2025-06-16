@@ -1,25 +1,25 @@
-
 /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
 package controllers;
 
+import dao.UserDAO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 
+
 /**
  *
- * @author Admin
+ * @author Hanne
  */
-@WebServlet(name = "LogoutController", urlPatterns = {"/LogoutController"})
-public class LogoutController extends HttpServlet {
+@WebServlet(name = "ManageUserActionController", urlPatterns = {"/ManageUserActionController"})
+public class ManageUserActionController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
@@ -38,10 +38,10 @@ public class LogoutController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet LogoutController</title>");            
+            out.println("<title>Servlet ManageUserActionController</title>");            
             out.println("</head>");
             out.println("<body>");
-            out.println("<h1>Servlet LogoutController at " + request.getContextPath() + "</h1>");
+            out.println("<h1>Servlet ManageUserActionController at " + request.getContextPath() + "</h1>");
             out.println("</body>");
             out.println("</html>");
         }
@@ -59,11 +59,7 @@ public class LogoutController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        HttpSession session = request.getSession(false); // Lấy session hiện tại, không tạo mới
-        if (session != null) {
-            session.invalidate(); // Hủy session
-        }
-        response.sendRedirect("login.jsp"); // Chuyển về trang đăng nhập
+        processRequest(request, response);
     }
 
     /**
@@ -75,9 +71,23 @@ public class LogoutController extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        doGet(request, response);
+    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+        int userID = Integer.parseInt(request.getParameter("userID"));
+        String action = request.getParameter("action");
+
+//        UserDAO dao = new UserDAO();
+//
+//        if ("editRole".equals(action)) {
+//            // Get current role from DAO
+//            String currentRole = dao.getUserRole(userID);
+//            String newRole = currentRole.equalsIgnoreCase("user") ? "staff" : "user";
+//            dao.updateUserRole(userID, newRole);
+//        } else if ("deactivate".equals(action)) {
+//            dao.deactivateUser(userID);  // cập nhật role thành 'deactivated' hoặc status 'inactive'
+//        }
+//
+//        // Redirect lại trang quản lý
+//        response.sendRedirect("manageUser");
     }
 
     /**

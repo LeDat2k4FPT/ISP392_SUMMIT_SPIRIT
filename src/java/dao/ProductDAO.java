@@ -12,13 +12,15 @@ import utils.DBUtils;
 
 public class ProductDAO {
 
-    private static final String GET_PRODUCTS_BY_CATEGORY_SORTED =
+     private static final String GET_PRODUCTS_BY_CATEGORY_SORTED =
         "SELECT p.ProductID, p.ProductName, p.Description, " +
-        "p.Price, pa.Size, pa.Stock, i.ImageURL, p.CateID " +
+        "p.Price, MIN(pa.Size) AS Size, MIN(pa.Stock) AS Stock, " +
+        "MIN(i.ImageURL) AS ImageURL, p.CateID " +
         "FROM Product p " +
         "LEFT JOIN ProductAttribute pa ON p.ProductID = pa.ProductID " +
         "LEFT JOIN ProductImages i ON p.ProductID = i.ProductID " +
         "WHERE p.CateID = ? " +
+        "GROUP BY p.ProductID, p.ProductName, p.Description, p.Price, p.CateID " +
         "ORDER BY p.Price ";
 
     public List<ProductDTO> getProductsByCategorySorted(int cateID, String sortOrder)
@@ -30,7 +32,7 @@ public class ProductDAO {
         ResultSet rs = null;
 
         String query = GET_PRODUCTS_BY_CATEGORY_SORTED +
-                       (sortOrder != null && sortOrder.equalsIgnoreCase("asc") ? "ASC" : "DESC");
+                       ("asc".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
 
         try {
             conn = DBUtils.getConnection();
@@ -99,7 +101,7 @@ public class ProductDAO {
             throws SQLException, ClassNotFoundException {
 
         List<ProductDTO> list = new ArrayList<>();
-        String sql = "SELECT p.ProductID, p.ProductName, p.Description, " +
+        String sql = "SELECT TOP 1 p.ProductID, p.ProductName, p.Description, " +
                      "p.Price, pa.Size, pa.Stock, i.ImageURL, p.CateID " +
                      "FROM Product p " +
                      "LEFT JOIN ProductAttribute pa ON p.ProductID = pa.ProductID " +
@@ -130,6 +132,76 @@ public class ProductDAO {
         }
 
         return list;
+    }
+
+    // Giữ nguyên: getProductsByCategoryDistinct nếu bạn dùng nơi khác
+    public List<ProductDTO> getProductsByCategoryDistinct(int cateID)
+            throws SQLException, ClassNotFoundException {
+
+        List<ProductDTO> list = new ArrayList<>();
+        String sql = "SELECT DISTINCT p.ProductID, p.ProductName, p.Description, " +
+                     "p.Price, pa.Size, pa.Stock, i.ImageURL, p.CateID " +
+                     "FROM Product p " +
+                     "LEFT JOIN ProductAttribute pa ON p.ProductID = pa.ProductID " +
+                     "LEFT JOIN ProductImages i ON p.ProductID = i.ProductID " +
+                     "WHERE p.CateID = ?";
+
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ptm = conn.prepareStatement(sql)) {
+
+            ptm.setInt(1, cateID);
+            try (ResultSet rs = ptm.executeQuery()) {
+                while (rs.next()) {
+                    ProductDTO dto = new ProductDTO();
+                    dto.setProductID(rs.getInt("ProductID"));
+                    dto.setProductName(rs.getString("ProductName"));
+                    dto.setDescription(rs.getString("Description"));
+                    dto.setPrice(rs.getDouble("Price"));
+                    dto.setSize(rs.getString("Size"));
+                    dto.setStock(rs.getInt("Stock"));
+                    String image = rs.getString("ImageURL");
+                    dto.setProductImage(image != null ? image : "default.jpg");
+                    dto.setCateID(rs.getInt("CateID"));
+                    list.add(dto);
+                }
+            }
+        }
+
+        return list;
+    }
+
+    // Lấy 3 sản phẩm mặc định khi không chọn danh mục
+    public List<ProductDTO> getTop3Products()
+            throws SQLException, ClassNotFoundException {
+
+        List<ProductDTO> list = new ArrayList<>();
+        String sql = "SELECT TOP 3 p.ProductID, p.ProductName, p.Description, " +
+                     "p.Price, pa.Size, pa.Stock, i.ImageURL, p.CateID " +
+                     "FROM Product p " +
+                     "LEFT JOIN ProductAttribute pa ON p.ProductID = pa.ProductID " +
+                     "LEFT JOIN ProductImages i ON p.ProductID = i.ProductID";
+
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ptm = conn.prepareStatement(sql);
+             ResultSet rs = ptm.executeQuery()) {
+
+            while (rs.next()) {
+                ProductDTO dto = new ProductDTO();
+                dto.setProductID(rs.getInt("ProductID"));
+                dto.setProductName(rs.getString("ProductName"));
+                dto.setDescription(rs.getString("Description"));
+                dto.setPrice(rs.getDouble("Price"));
+                dto.setSize(rs.getString("Size"));
+                dto.setStock(rs.getInt("Stock"));
+                String image = rs.getString("ImageURL");
+                dto.setProductImage(image != null ? image : "default.jpg");
+                dto.setCateID(rs.getInt("CateID"));
+                list.add(dto);
+            }
+        }
+
+        return list;
+    
     }
     public int insertAndReturnID(ProductDTO product) throws SQLException, ClassNotFoundException {
     String sql = "INSERT INTO Product (ProductName, Description, Price, Status, CateID) VALUES (?, ?, ?, ?, ?)";
