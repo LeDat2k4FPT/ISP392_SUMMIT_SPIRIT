@@ -11,27 +11,18 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-<<<<<<< HEAD
-                    <file>${file.reference.jakarta.activation-2.0.1.jar}</file>
+                    <file>${&lt;&lt;&lt;&lt;&lt;&lt;&lt; Upstream, based on origin/main}</file>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.jakarta.servlet.jsp.jstl-2.0.0-javadoc.jar}</file>
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
-                    <file>${file.reference.jakarta.mail-2.0.1.jar}</file>
-=======
+                    <file>${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0-javadoc.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
                     <file>${file.reference.javax.mail.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library dirs="200">
-                    <file>${file.reference.javax.activation-3.0-prelude.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library dirs="200">
-                    <file>${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0.jar}</file>
-                    <path-in-war>WEB-INF/lib</path-in-war>
-                </library>
-                <library dirs="200">
-                    <file>${file.reference.jakarta.servlet.jsp.jstl-2.0.0.jar}</file>
->>>>>>> fb0557dd14e72f5be86a7e48c0617d50ec68d3d1
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>

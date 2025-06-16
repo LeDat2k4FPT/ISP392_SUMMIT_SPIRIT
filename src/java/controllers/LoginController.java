@@ -27,7 +27,7 @@ public class LoginController extends HttpServlet {
     private static final String US = "User";
     private static final String USER_PAGE = "homepage.jsp";
     private static final String ST = "Staff";
-    private static final String STAFF_PAGE = "staff.jsp";
+    private static final String STAFF_PAGE = "dashboard/mnproduct.jsp";
     private static final String INCORRECT_MESSAGE = "Incorrect Email or Password!";
     private static final String UNSUPPORT_MESSAGE = "Your role is not support yet !";
 
