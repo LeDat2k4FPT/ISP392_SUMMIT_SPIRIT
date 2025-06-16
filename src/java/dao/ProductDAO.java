@@ -203,26 +203,35 @@ public class ProductDAO {
         return list;
     
     }
-    public int insertAndReturnID(ProductDTO product) throws SQLException, ClassNotFoundException {
-    String sql = "INSERT INTO Product (ProductName, Description, Price, Status, CateID) VALUES (?, ?, ?, ?, ?)";
-    try (Connection conn = DBUtils.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+   public int insertAndReturnID(ProductDTO product) throws SQLException, ClassNotFoundException {
+    int newProductID = getNextProductID(); // lấy ID mới
 
-        ps.setString(1, product.getProductName());
-        ps.setString(2, product.getDescription());
-        ps.setDouble(3, product.getPrice());
-        ps.setString(4, product.getStatus());
-        ps.setInt(5, product.getCateID());
+    String sql = "INSERT INTO Product (ProductID, ProductName, Description, CateID, Price, Status) VALUES (?, ?, ?, ?, ?, ?)";
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+
+        ps.setInt(1, newProductID);
+        ps.setString(2, product.getProductName());
+        ps.setString(3, product.getDescription());
+        ps.setInt(4, product.getCateID());
+        ps.setDouble(5, product.getPrice());
+        ps.setString(6, product.getStatus());
 
         ps.executeUpdate();
+        return newProductID;
+    }
+}
 
-        try (ResultSet rs = ps.getGeneratedKeys()) {
-            if (rs.next()) {
-                return rs.getInt(1); // trả về ProductID mới
-            }
+public int getNextProductID() throws SQLException, ClassNotFoundException {
+    String sql = "SELECT ISNULL(MAX(ProductID), 0) + 1 FROM Product";
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        if (rs.next()) {
+            return rs.getInt(1);
         }
     }
-    return -1; // lỗi
+    return 1; // fallback nếu bảng rỗng
 }
 
 
