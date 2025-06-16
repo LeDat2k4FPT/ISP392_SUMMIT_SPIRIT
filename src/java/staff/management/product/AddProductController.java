@@ -36,33 +36,33 @@ public class AddProductController extends HttpServlet {
 
         try {
             int cateID = Integer.parseInt(pCateID_raw);
-            double price = Double.parseDouble(pPrice_raw);
+            double price = Double.parseDouble(pPrice_raw.replace(",", ""));
             int stock = Integer.parseInt(stock_raw);
 
-            // ✅ 1. Tạo đối tượng ProductDTO
+            //1. Tạo đối tượng ProductDTO
             ProductDTO product = new ProductDTO(
-                    0,           // ID sẽ được sinh
+                    0, // ID sẽ được sinh
                     pName,
-                    null,        // không cần productImage (ảnh lưu riêng)
+                    null, // không cần productImage (ảnh lưu riêng)
                     pDescription,
-                    null,        // size nằm trong ProductAttribute
+                    null, // size nằm trong ProductAttribute
                     price,
                     pStatus,
-                    0,           // stock nằm trong ProductAttribute
+                    0, // stock nằm trong ProductAttribute
                     cateID
             );
 
-            // ✅ 2. Thêm sản phẩm → lấy ProductID
+            // 2. Thêm sản phẩm → lấy ProductID
             ProductDAO productDAO = new ProductDAO();
             int newProductID = productDAO.insertAndReturnID(product);
 
             if (newProductID != -1) {
-                // ✅ 3. Thêm ProductAttribute
+                //3. Thêm ProductAttribute
                 ProductAttributeDTO attr = new ProductAttributeDTO(newProductID, color, size, stock);
                 ProductAttributeDAO attrDAO = new ProductAttributeDAO();
                 attrDAO.insertAttribute(attr);
 
-                // ✅ 4. Thêm ảnh nếu có
+                //4. Thêm ảnh nếu có
                 if (pImageURLs != null) {
                     ProductImageDAO imageDAO = new ProductImageDAO();
                     for (String imgUrl : pImageURLs) {

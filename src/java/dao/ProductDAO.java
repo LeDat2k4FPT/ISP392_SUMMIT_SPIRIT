@@ -234,5 +234,29 @@ public int getNextProductID() throws SQLException, ClassNotFoundException {
     return 1; // fallback nếu bảng rỗng
 }
 
+public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
+    List<ProductDTO> list = new ArrayList<>();
+    String sql = "SELECT * FROM Product";
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            ProductDTO p = new ProductDTO(
+                rs.getInt("ProductID"),
+                rs.getString("ProductName"),
+                null, // nếu bạn không lưu ProductImage tại đây
+                rs.getString("Description"),
+                null, // nếu bạn không lưu Size tại đây
+                rs.getDouble("Price"),
+                rs.getString("Status"),
+                0, // nếu bạn không lưu Stock tại đây
+                rs.getInt("CateID")
+            );
+            list.add(p);
+        }
+    }
+    return list;
+}
+
 
 }

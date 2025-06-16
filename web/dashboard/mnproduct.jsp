@@ -14,10 +14,11 @@
         body { font-family: Arial; margin: 20px; }
         input, select, textarea { display: block; margin: 10px 0; width: 100%; padding: 8px; }
         button { padding: 10px 20px; }
+        .top-bar { text-align: right; margin-bottom: 20px; }
     </style>
 </head>
 <body>
-    <%
+<%
     UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
     if (user == null || !"Staff".equals(user.getRole())) {
         response.sendRedirect("login.jsp");
@@ -25,6 +26,12 @@
     }
 %>
 
+<div class="top-bar">
+    Welcome, <%= user.getFullName() %> |
+    <form action="LogoutController" method="post" style="display:inline;">
+        <button type="submit">Logout</button>
+    </form>
+</div>
 
 <h2>Add New Product</h2>
 
@@ -47,7 +54,7 @@
     <input type="number" name="stock" required>
 
     <label>Price:</label>
-    <input type="text" name="price" required>
+    <input type="text" name="price" required oninput="this.value = this.value.replace(/[^0-9.]/g, '')">
 
     <label>Category:</label>
     <select name="cateID" required>
@@ -69,8 +76,6 @@
     <label>Product Image URLs:</label>
     <input type="text" name="productImage" placeholder="Image URL 1">
     <input type="text" name="productImage" placeholder="Image URL 2">
-    <input type="text" name="productImage" placeholder="Image URL 3">
-    <!-- Bạn có thể thêm nhiều dòng tùy ý -->
 
     <button type="submit">Add Product</button>
 </form>
