@@ -11,6 +11,7 @@
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
                 <library dirs="200">
+<<<<<<< HEAD
                     <file>${&lt;&lt;&lt;&lt;&lt;&lt;&lt; Upstream, based on origin/main}</file>
                 </library>
                 <library dirs="200">
@@ -23,6 +24,13 @@
                 </library>
                 <library dirs="200">
                     <file>${file.reference.javax.mail.jar}</file>
+=======
+                    <file>${file.reference.jakarta.activation-2.0.1.jar}</file>
+                    <path-in-war>WEB-INF/lib</path-in-war>
+                </library>
+                <library dirs="200">
+                    <file>${file.reference.jakarta.mail-2.0.1.jar}</file>
+>>>>>>> e8047b1 (Add forgot password, change password,...)
                     <path-in-war>WEB-INF/lib</path-in-war>
                 </library>
             </web-module-libraries>
