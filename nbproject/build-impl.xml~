@@ -1009,24 +1009,12 @@ exists or setup the property manually. For example like this:
     <target depends="init" if="dist.ear.dir" name="library-inclusion-in-manifest">
         <copyfiles files="${file.reference.sqljdbc4.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
 <<<<<<< HEAD
-<<<<<<< Upstream, based on origin/main
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0-javadoc.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0-javadoc.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
+        <copyfiles files="${file.reference.javax.mail.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
 =======
->>>>>>> e8047b1 (Add forgot password, change password,...)
-<<<<<<< HEAD
         <copyfiles files="${file.reference.jakarta.activation-2.0.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
         <copyfiles files="${file.reference.jakarta.mail-2.0.1.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-=======
-        <copyfiles files="${file.reference.javax.mail.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.javax.activation-3.0-prelude.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
->>>>>>> fb0557dd14e72f5be86a7e48c0617d50ec68d3d1
-<<<<<<< HEAD
-=======
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0-javadoc.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0-javadoc.jar}" iftldtodir="${build.web.dir}/WEB-INF" todir="${dist.ear.dir}/lib"/>
->>>>>>> 65241cd ViewOrderController, ViewProductController, AddProductController
-=======
 >>>>>>> e8047b1 (Add forgot password, change password,...)
         <mkdir dir="${build.web.dir}/META-INF"/>
         <manifest file="${build.web.dir}/META-INF/MANIFEST.MF" mode="update"/>
@@ -1034,24 +1022,12 @@ exists or setup the property manually. For example like this:
     <target depends="init" name="library-inclusion-in-archive" unless="dist.ear.dir">
         <copyfiles files="${file.reference.sqljdbc4.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
 <<<<<<< HEAD
-<<<<<<< Upstream, based on origin/main
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0-javadoc.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0-javadoc.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
+        <copyfiles files="${file.reference.javax.mail.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
 =======
->>>>>>> e8047b1 (Add forgot password, change password,...)
-<<<<<<< HEAD
         <copyfiles files="${file.reference.jakarta.activation-2.0.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
         <copyfiles files="${file.reference.jakarta.mail-2.0.1.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-=======
-        <copyfiles files="${file.reference.javax.mail.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${file.reference.javax.activation-3.0-prelude.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
->>>>>>> fb0557dd14e72f5be86a7e48c0617d50ec68d3d1
-<<<<<<< HEAD
-=======
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-api-2.0.0-javadoc.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
-        <copyfiles files="${file.reference.jakarta.servlet.jsp.jstl-2.0.0-javadoc.jar}" todir="${build.web.dir}/WEB-INF/lib"/>
->>>>>>> 65241cd ViewOrderController, ViewProductController, AddProductController
-=======
 >>>>>>> e8047b1 (Add forgot password, change password,...)
     </target>
     <target depends="init" if="dist.ear.dir" name="-clean-webinf-lib">
