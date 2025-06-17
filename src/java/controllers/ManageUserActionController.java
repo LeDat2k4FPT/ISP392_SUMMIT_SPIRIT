@@ -18,14 +18,14 @@ import java.io.PrintWriter;
  *
  * @author Hanne
  */
-@WebServlet(name = "ManageUserActionController", urlPatterns = {"/ManageUserActionController"})
+@WebServlet(name = "ManageUserActionController", urlPatterns = {"/manageUserActionController"})
 public class ManageUserActionController extends HttpServlet {
 
     /**
      * Processes requests for both HTTP <code>GET</code> and <code>POST</code>
      * methods.
      *
-     * @param request servlet request
+     * @param request servlet requestaa
      * @param response servlet response
      * @throws ServletException if a servlet-specific error occurs
      * @throws IOException if an I/O error occurs
@@ -74,6 +74,25 @@ public class ManageUserActionController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         int userID = Integer.parseInt(request.getParameter("userID"));
         String action = request.getParameter("action");
+         UserDAO dao = new UserDAO();
+
+        try {
+            switch (action) {
+                case "editRole":
+                    dao.toggleRole(userID);
+                    break;
+                case "deactivate":
+                    dao.setActive(userID, false); // Set status = 0 (inactive)
+                    break;
+                default:
+                    request.setAttribute("ERROR", "Unknown action: " + action);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("ERROR", "Failed to perform action: " + e.getMessage());
+        }
+
+        response.sendRedirect("manageUser"); // Reload the list
 
 //        UserDAO dao = new UserDAO();
 //

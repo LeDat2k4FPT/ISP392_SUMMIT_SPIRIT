@@ -23,79 +23,326 @@ GO
 -- Core Tables
 -- ========================
 
+-- ACCOUNT
+CREATE TABLE Account (
+    UserID INT PRIMARY KEY IDENTITY(1,1),
+    FullName NVARCHAR(100),
+	Address NVARCHAR(255),
+	Phone NVARCHAR(100),
+    Email NVARCHAR(100),
+    Password NVARCHAR(255),
+    Role NVARCHAR(20) -- 'admin', 'staff', 'customer'
+);
+
+-- Insert Account 
+INSERT INTO Account (FullName, Address, Phone, Email, Password, Role) VALUES
+(N'Admin 1', N'', N'', N'admin@gmail.com',  N'12345678', N'Admin'),
+(N'Khang Lanh', N'Nguyen Xi, Binh Thanh', N'0834283177', N'khangglanhh@gmail.com', N'12345', N'User'),
+(N'Thanh Dat', N'Tran Hung Dao, Quan 1',N'0834283177', N'thanhdat@gmail.com', N'12345',  N'User'),
+(N'Khanh Ly', N'Pham Van Dong, Thu Duc',N'0834283177',  N'khanhly@gmail.com', N'12345', N'Staff'),
+(N'Nhat Anh', N'Dien Bien Phu, Quan 1',N'0834283177', N'nhatanh@gmail.com',N'12345', N'Staff'),
+(N'Thu Ha', N'Le Van Viet, Quan 9',N'0834283177', N'thuha@gmail.com', N'12345', N'Staff'),
+(N'Minh Hai', N'Vo Van Ngan, Quan 9',N'0834283177', N'minhhai@gmail.com', N'12345', N'User');
+
+
 -- CATEGORY
 CREATE TABLE Category (
-    CateID INT PRIMARY KEY,
+    CateID INT PRIMARY KEY IDENTITY(1,1),
     CateName NVARCHAR(100)
 );
 -- insert category
-INSERT INTO Category (CateID, CateName) VALUES
-(1, N'Clothing'),
-(2, N'Shirts'),
-(3, N'Backpacks'),
-(4, N'Camping Tools'),
-(5, N'Tents'),
-(6, N'Hats'),
-(7, N'Cooking Equipment');
+INSERT INTO Category(CateName) VALUES
+( N'Clothing'),
+( N'Shirts'),
+( N'Backpacks'),
+( N'Camping Tools'),
+( N'Tents'),
+( N'Hats'),
+( N'Cooking Equipment');
+
 
 -- PRODUCT
-CREATE TABLE Product (
-    ProductID INT PRIMARY KEY,
+CREATE TABLE Product(
+    ProductID INT PRIMARY KEY IDENTITY(1,1),
     ProductName NVARCHAR(100),
-	Price DECIMAL(10, 2),
     Description NVARCHAR(MAX),
-    Status NVARCHAR(50),
     CateID INT,
+    Status NVARCHAR(20), -- 'Active', 'Inactive'
     FOREIGN KEY (CateID) REFERENCES Category(CateID)
 );
--- insert product data
-INSERT INTO Product (ProductID, ProductName, Price, Description, Status, CateID) 
-VALUES
-(1, N'Ktom K116 waterproof pants', 390000.0, N'An improved version of the K56 waterproof pants with better water resistance and fabric quality. It features an elegant design that provides the wearer with confidence and comfort.', N'Available', 1),
-(2, N'Ktom K112 quick-dry pants with detachable legs ', 520000.0, N'Ktom K112 climbing pants are detachable pants with the advantages of quick drying, lightweight, and good UV resistance.', N'Available', 1),
-(3, N'Ktom K155 quick-dry men''s pants ', 590000.0, N'The K155 quick-dry connecting pants are very suitable for trekking, equipped with a small zippered pocket on the top of the right side pocket, this small pocket is intended to hold small necessary items and accessories.', N'Available', 1),
-(4, N'Ktom K154 men''s stretch trekking pants', 580000.0, N'With a very practical design, combining thick, abrasion-resistant fleece fabric in areas that frequently experience friction such as the buttocks, knees, and pant legs, with quick-drying and stretchy fabric in active joint areas like the crotch, back, and knee.', N'Available', 1),
-(5, N'Ktom K109 quick-dry shorts', 270000.0, N'Quick-drying shorts are made from fabric with quick-dry technology, helping you feel more comfortable during physical activities.', N'Available', 1),
-(6, N'K128 men''s quick-dry shirt (long sleeve) ', 460000.0, N'Men''s quick-dry shirt (long sleeve) k128 is suitable for days with unpredictable weather or simply if you prefer lightweight and breathable apparel. The fabric is quick-drying, has good UV protection, and the comfortable design is suitable for use.', N'Available', 2),
-(7, N'Ktom K142 women''s quick-dry shirt', 355000.0, N'The Ktom K142 women''s quick-dry shirt is made from high-quality fabric with UV protection technology that blocks harmful sunlight during the summer.', N'Available', 2),
-(8, N'Ktom K151 UV protection quick-dry outdoor jacket', 565000.0, N'The Ktom K151 quick-dry UV protection jacket for outdoor use is made from sun-proof fabric that protects your skin from UV rays.', N'Available', 2),
-(9, N'KTOM K129 men''s quick-dry short-sleeve shirt ', 420000.0, N'using materials mainly made of breathable, quick-drying fabric that is UV resistant.', N'Available', 2),
-(10, N'COLUMBIA WOMEN''S QUICK DRY LONG SLEEVE SHIRT', 380000.0, N'Columbia women''s hoodie is made of 100% cotton, providing all-day comfort for the user.', N'Available', 2),
-(11, N'Jack Wolfskin moab', 680000.0, N'Lightweight durable  backpack', N'Available', 3),
-(12, N'Naturehike NH18Y045-Q 45L ', 1585000.0, N'Spacious hiking backpack with multiple pockets        ', N'Available', 3),
-(13, N'Naturehike NH16Y065-Q 65L Mountaineering Backpack', 1861000.0, N'Large capacity backpack for long trips', N'Available', 3),
-(14, N'Naturehike NH16Y065-Q 65L Mountaineering Backpack', 1962000.0, N'Extra large hiking backpack with durable fabric', N'Available', 3),
-(15, N'Matador Beast 28 Ultralight Mountaineering Backpack MATBE28001BK', 4299000.0, N'Ultra-light backpack designed for minimalists', N'Available', 3),
-(16, N' Victorinox Trailmaster 0.8463', 1584000.0, N'Victorinox Trailmaster 0.8463 multi-purpose knife is a multi-purpose knife suitable for camping, picnicking, traveling or daily use. With special steel from Vicorinox - You can rest assured about the quality, and the product''s rust resistance, sharpness retention and significant abrasion resistance.', N'Available', 4),
-(17, N'Morakniv Outdoor classic Kit - 12096', 1839200.0, N'The Morakniv Outdoor classic Kit​ survival kit is a pair of Morakniv Lightweight Axe 12058 and Morakniv 2000 knife. Chopping trees and splitting firewood is easy with the axe, and light cutting is so simple with the Mora 2000. Buy the Outdoor classic Kit Combo now to make your trips easier and more convenient!', N'Available', 4),
-(18, N'Camo Form LT Gear Aid 2,44m', 385000.0, N'Camo Form LT Gear Aid 2.44m Ultra-Light Elastic Camouflage Tape - A product of Gear Aid with the effect of camouflaging guns, binoculars,... helps protect objects from scratches and environmental impacts while supporting camouflage in tactical games,...', N'Available', 4),
-(19, N' VICTORINOX PIONEER HARVESTER', 1432000.0, N'VICTORINOX Pioneer Harvester 7-function multi-purpose knife belongs to the Pioneer travel folding knife line of Victorinox, suitable for travel, picnics, or as a gift for relatives and friends.', N'Available', 4),
-(20, N'Coghlans Multi-Pack Biners 0355', 85150.0, N'There is no description for this product yet.', N'Available', 4),
-(21, N'Naturehike MG NH21ZP001 3-4 person hexagonal camping tent', 7442000.0, N'Naturehike MG NH21ZP001 3-4 person hexagonal camping tent, a hexagonal camping tent model, creates a large space for 3 to 4 people. Outstanding with a ventilation door system that brings a feeling of closeness to nature and the surrounding environment.', N'Available', 5),
-(22, N'Madfox Trekker 1 2023 1 Person 2 Layer Camping Tent', 1690000.0, N'Madfox Trekker 1 2-layer 1-person camping tent 2023 improved 1-person tent model with 2 convenient doors. The tent is designed with 2 layers with the inner layer using more than 80% mesh, helping you feel submerged in nature even when lying in the tent, enjoying the trip in the most interesting way!', N'Available', 5),
-(23, N'BlackDog BD-ZP003 3-4 person hexagonal pyramid glamping tent', 3100000.0, N'BlackDog BD-ZP003 3-4 person hexagonal pyramid glamping tent - Genuine high-end glamping tent model with the main black color for a mysterious and interesting camping space. The tent is designed in a pyramid style with a wide bottom for you to freely arrange and decorate items inside the tent, the high top of the tower gives a spacious and comfortable interior space. With a height of 2m, you can enter and exit the tent and live in the tent comfortably without having to bend over.', N'Available', 5),
-(24, N'NATUREHIKE CAMPING TENT NH21ZP005', 2130000.0, N'NatureHike NH21ZP005 Camping Toilet Tent or also known by the shorter name "Toilet Tent" - suitable for changing clothes, bathing, personal hygiene... making your trip more convenient. Your relatives, especially women, will no longer be shy and feel inconvenient about finding a place to go to the toilet during camping trips in the forest. Naturehike''s tent overcomes most of the disadvantages of toilet tents currently on the market with too narrow or too low area, causing difficulties for users during use.', N'Available', 5),
-(25, N'Madfox Footprint 2021 6 Person Tent Floor Mat', 380000.0, N'Waterproof fabric, typically Oxford, PU-coated, or polyester with silver coating. Resistant to dirt and easy to clean.', N'Available', 5),
-(26, N'5.11 Tactical Flag Bearer Cap', 209000.0, N'The hat is equipped with a verlo velcro to adjust to fit many head sizes. The front and back of the hat have a place to stick patches according to your preference. Using cotton canvas material - soft material but still ensures good shape retention', N'Available', 6),
-(27, N'5.11 Tactical Hi-VIS Foldable Uniform Cap', 209000.0, N'The hat is equipped with a Velcro closure to adjust to fit many head sizes. The soft, sweat-absorbent brim is padded with foam for the most comfortable feeling. The visor is designed to be folded in half, making it easy to fold the hat without fear of breaking the brim.', N'Available', 6),
-(28, N'KTOM K52 sun protection baseball cap', 200000.0, N'Using imported quick-drying fabric. The fabric uses Omni-wick technology to help evaporate quickly, giving a very cool and comfortable feeling. Omni-shade technology helps block UV rays (UPF 50+), protecting you better when outdoors.', N'Available', 6),
-(29, N'Ranger Tactical Cap', 250000.0, N'The hat is made of cotton and polyester fabric that absorbs sweat well. Designed with many ventilation holes to prevent feeling hot when wearing the hat. Simple design, but no less fashionable and individual.', N'Available', 6),
-(30, N'KTOM K120 sun protection bucket hat', 180000.0, N'The brim is not as large as a wide-brimmed hat but is enough to protect you from the sun when climbing, picnicking, etc. The hat is designed with a compact strap, helping to fix the hat in a neatly folded state. The hat is made of soft, quick-drying material with the ability to absorb sweat and dry quickly.', N'Available', 6),
-(31, N'Vultura VTR-GS2401 Foldable Outdoor Gas Stove with Piezo Ignition and Windshield', 395000.0, N'A gas stove saves time on fire-starting, especially in wet weather when dry wood is hard to find. It features a wind guard for a stable flame in light wind and a built-in Piezo ignition for easy, match-free lighting.', N'Available', 7),
-(32, N'Vultura VTR-GS2402 Ultra-Compact Outdoor Gas Stove with Piezo Ignition', 249000.0, N'A compact gas stove designed for solo cooking needs. It features built-in ignition for easy use and a foldable design that saves valuable backpack space.', N'Available', 7),
-(33, N'Blackdog CBD2450CF010 Outdoor Charcoal BBQ Grill', 480000.0, N'The double-layer design with multiple ventilation holes helps maintain consistent heat, ensuring your grilled food cooks quickly and evenly. Heat-resistant wooden handles on both sides make it easy to move the grill when needed. The separate charcoal tray allows for easy cleaning and extends the product''s lifespan compared to standard single-layer models.', N'Available', 7),
-(34, N'Naturehike CNH22CJ008 Mini Cassette Gas Stove', 1049000.0, N'This vintage-style outdoor gas stove features a compact design, perfect for camping and outdoor trips. With a 2100W output, it ensures fast cooking while remaining fuel-efficient thanks to its blue flame. The adjustable knob lets you control the flame size to suit your cooking needs.', N'Available', 7),
-(35, N'Naturehike CNH22CJ007 Multi-Purpose Camping Gas Stove', 1692000.0, N'A new gas grill from Naturehike offers a quick, clean, and stylish outdoor BBQ experience. It can also be easily converted into a convenient hot pot stove without the need to start a fire.With a powerful 2300W heat output, it meets top cooking performance standards. The flame is evenly distributed on both sides of the stove, ensuring even heating of the grill or hot pot tray.', N'Available', 7);
+INSERT INTO Product (ProductName, Description, CateID, Status) VALUES 
+(N'Ktom K116 waterproof pants', N'An improved version of the K56 waterproof pants with better water resistance and fabric quality. It features an elegant design that provides the wearer with confidence and comfort.', 1, N'Active'),
+(N'Ktom K112 quick-dry pants with detachable legs ', N'Ktom K112 climbing pants are detachable pants with the advantages of quick drying, lightweight, and good UV resistance.', 1, N'Active'),
+(N'Ktom K155 quick-dry men''s pants ', N'The K155 quick-dry connecting pants are very suitable for trekking, equipped with a small zippered pocket on the top of the right side pocket, this small pocket is intended to hold small necessary items and accessories.', 1, N'Active'),
+(N'Ktom K154 men''s stretch trekking pants', N'With a very practical design, combining thick, abrasion-resistant fleece fabric in areas that frequently experience friction such as the buttocks, knees, and pant legs, with quick-drying and stretchy fabric in active joint areas like the crotch, back, and knee.', 1, N'Active'),
+(N'Ktom K109 quick-dry shorts', N'Quick-drying shorts are made from fabric with quick-dry technology, helping you feel more comfortable during physical activities.', 1, N'Active'),
+(N'K128 men''s quick-dry shirt (long sleeve) ', N'Men''s quick-dry shirt (long sleeve) k128 is suitable for days with unpredictable weather or simply if you prefer lightweight and breathable apparel. The fabric is quick-drying, has good UV protection, and the comfortable design is suitable for use.', 2, N'Active'),
+(N'Ktom K142 women''s quick-dry shirt', N'The Ktom K142 women''s quick-dry shirt is made from high-quality fabric with UV protection technology that blocks harmful sunlight during the summer.', 2, N'Active'),
+(N'Ktom K151 UV protection quick-dry outdoor jacket', N'The Ktom K151 quick-dry UV protection jacket for outdoor use is made from sun-proof fabric that protects your skin from UV rays.', 2, N'Active'),
+(N'KTOM K129 men''s quick-dry short-sleeve shirt ', N'using materials mainly made of breathable, quick-drying fabric that is UV resistant.', 2, N'Active'),
+(N'COLUMBIA WOMEN''S QUICK DRY LONG SLEEVE SHIRT', N'Columbia women''s hoodie is made of 100% cotton, providing all-day comfort for the user.', 2, N'Active'),
+(N'Jack Wolfskin moab', N'Lightweight durable  backpack', 3, N'Active'),
+(N'Naturehike NH18Y045-Q 45L ', N'Spacious hiking backpack with multiple pockets ', 3, N'Active'),
+(N'Naturehike NH16Y065-Q 55L Mountaineering Backpack', N'Large capacity backpack for long trips', 3, N'Active'),
+(N'Naturehike NH16Y065-Q 65L Mountaineering Backpack', N'Extra large hiking backpack with durable fabric', 3, N'Active'),
+(N'Matador Beast 28 Ultralight Mountaineering Backpack MATBE28001BK', N'Ultra-light backpack designed for minimalists', 3, N'Active'),
+(N' Victorinox Trailmaster 0.8463', N'Victorinox Trailmaster 0.8463 multi-purpose knife is a multi-purpose knife suitable for camping, picnicking, traveling or daily use. With special steel from Vicorinox - You can rest assured about the quality, and the product''s rust resistance, sharpness retention and significant abrasion resistance.', 4, N'Active'),
+(N'Morakniv Outdoor classic Kit - 12096', N'The Morakniv Outdoor classic Kit​ survival kit is a pair of Morakniv Lightweight Axe 12058 and Morakniv 2000 knife. Chopping trees and splitting firewood is easy with the axe, and light cutting is so simple with the Mora 2000. Buy the Outdoor classic Kit Combo now to make your trips easier and more convenient!', 4, N'Active'),
+(N'Camo Form LT Gear Aid 2,44m', N'Camo Form LT Gear Aid 2.44m Ultra-Light Elastic Camouflage Tape - A product of Gear Aid with the effect of camouflaging guns, binoculars,... helps protect objects from scratches and environmental impacts while supporting camouflage in tactical games,...', 4, N'Active'),
+(N' VICTORINOX PIONEER HARVESTER', N'VICTORINOX Pioneer Harvester 7-function multi-purpose knife belongs to the Pioneer travel folding knife line of Victorinox, suitable for travel, picnics, or as a gift for relatives and friends.', 4, N'Active'),
+(N'Coghlans Multi-Pack Biners 0355', N'There is no description for this product yet.', 4, N'Available'),
+(N'Naturehike MG NH21ZP001 3-4 person hexagonal camping tent', N'Naturehike MG NH21ZP001 3-4 person hexagonal camping tent, a hexagonal camping tent model, creates a large space for 3 to 4 people. Outstanding with a ventilation door system that brings a feeling of closeness to nature and the surrounding environment.', 5, N'Active'),
+(N'Madfox Trekker 1 2023 1 Person 2 Layer Camping Tent', N'Madfox Trekker 1 2-layer 1-person camping tent 2023 improved 1-person tent model with 2 convenient doors. The tent is designed with 2 layers with the inner layer using more than 80% mesh, helping you feel submerged in nature even when lying in the tent, enjoying the trip in the most interesting way!', 5, N'Active'),
+(N'BlackDog BD-ZP003 3-4 person hexagonal pyramid glamping tent', N'BlackDog BD-ZP003 3-4 person hexagonal pyramid glamping tent - Genuine high-end glamping tent model with the main black color for a mysterious and interesting camping space. The tent is designed in a pyramid style with a wide bottom for you to freely arrange and decorate items inside the tent, the high top of the tower gives a spacious and comfortable interior space. With a height of 2m, you can enter and exit the tent and live in the tent comfortably without having to bend over.', 5, N'Active'),
+(N'NATUREHIKE CAMPING TENT NH21ZP005', N'NatureHike NH21ZP005 Camping Toilet Tent or also known by the shorter name "Toilet Tent" - suitable for changing clothes, bathing, personal hygiene... making your trip more convenient. Your relatives, especially women, will no longer be shy and feel inconvenient about finding a place to go to the toilet during camping trips in the forest. Naturehike''s tent overcomes most of the disadvantages of toilet tents currently on the market with too narrow or too low area, causing difficulties for users during use.', 5, N'Active'),
+(N'Madfox Footprint 2021 6 Person Tent Floor Mat', N'Waterproof fabric, typically Oxford, PU-coated, or polyester with silver coating. Resistant to dirt and easy to clean.', 5, N'Active'),
+(N'5.11 Tactical Flag Bearer Cap', N'The hat is equipped with a verlo velcro to adjust to fit many head sizes. The front and back of the hat have a place to stick patches according to your preference. Using cotton canvas material - soft material but still ensures good shape retention', 6, N'Active'),
+(N'5.11 Tactical Hi-VIS Foldable Uniform Cap', N'The hat is equipped with a Velcro closure to adjust to fit many head sizes. The soft, sweat-absorbent brim is padded with foam for the most comfortable feeling. The visor is designed to be folded in half, making it easy to fold the hat without fear of breaking the brim.', 6, N'Active'),
+(N'KTOM K52 sun protection baseball cap', N'Using imported quick-drying fabric. The fabric uses Omni-wick technology to help evaporate quickly, giving a very cool and comfortable feeling. Omni-shade technology helps block UV rays (UPF 50+), protecting you better when outdoors.', 6, N'Active'),
+(N'Ranger Tactical Cap', N'The hat is made of cotton and polyester fabric that absorbs sweat well. Designed with many ventilation holes to prevent feeling hot when wearing the hat. Simple design, but no less fashionable and individual.', 6, N'Active'),
+(N'KTOM K120 sun protection bucket hat', N'The brim is not as large as a wide-brimmed hat but is enough to protect you from the sun when climbing, picnicking, etc. The hat is designed with a compact strap, helping to fix the hat in a neatly folded state. The hat is made of soft, quick-drying material with the ability to absorb sweat and dry quickly.', 6, N'Active'),
+(N'Vultura VTR-GS2401 Foldable Outdoor Gas Stove with Piezo Ignition and Windshield', N'A gas stove saves time on fire-starting, especially in wet weather when dry wood is hard to find. It features a wind guard for a stable flame in light wind and a built-in Piezo ignition for easy, match-free lighting.', 7, N'Active'),
+(N'Vultura VTR-GS2402 Ultra-Compact Outdoor Gas Stove with Piezo Ignition', N'A compact gas stove designed for solo cooking needs. It features built-in ignition for easy use and a foldable design that saves valuable backpack space.', 7, N'Active'),
+(N'Blackdog CBD2450CF010 Outdoor Charcoal BBQ Grill', N'The double-layer design with multiple ventilation holes helps maintain consistent heat, ensuring your grilled food cooks quickly and evenly. Heat-resistant wooden handles on both sides make it easy to move the grill when needed. The separate charcoal tray allows for easy cleaning and extends the product''s lifespan compared to standard single-layer models.', 7, N'Active'),
+(N'Naturehike CNH22CJ008 Mini Cassette Gas Stove', N'This vintage-style outdoor gas stove features a compact design, perfect for camping and outdoor trips. With a 2100W output, it ensures fast cooking while remaining fuel-efficient thanks to its blue flame. The adjustable knob lets you control the flame size to suit your cooking needs.', 7, N'Active'),
+(N'Naturehike CNH22CJ007 Multi-Purpose Camping Gas Stove', N'A new gas grill from Naturehike offers a quick, clean, and stylish outdoor BBQ experience. It can also be easily converted into a convenient hot pot stove without the need to start a fire.With a powerful 2300W heat output, it meets top cooking performance standards. The flame is evenly distributed on both sides of the stove, ensuring even heating of the grill or hot pot tray.', 7, N'Active');
 
--- PRODUCT IMAGES
-CREATE TABLE ProductImages (
+-- COLOR
+CREATE TABLE Color (
+    ColorID INT PRIMARY KEY IDENTITY(1,1),
+    ColorName NVARCHAR(50)
+);
+-- Insert color 
+INSERT INTO Color (ColorName) VALUES
+(N'Black'),
+(N'Red'),
+(N'Blue');
+
+-- SIZE
+CREATE TABLE Size (
+    SizeID INT PRIMARY KEY IDENTITY (1,1),
+    SizeName NVARCHAR(20) -- 'S', 'M', 'L', '5L', '15L', etc.
+);
+-- Insert size
+INSERT INTO Size (SizeName) VALUES
+(N'S'),
+(N'M'),
+(N'L'),
+(N'5L'),
+(N'15L'),
+(N'small'),
+(N'big');
+
+-- VARIANT (ATTRIBUTE)
+CREATE TABLE ProductVariant (
+    AttributeID INT PRIMARY KEY ,
+    ProductID INT,
+    ColorID INT,
+    SizeID INT,
+    Price DECIMAL(10,2),
+    Quantity INT,
+    FOREIGN KEY (ProductID) REFERENCES Product(ProductID),
+    FOREIGN KEY (ColorID) REFERENCES Color(ColorID),
+    FOREIGN KEY (SizeID) REFERENCES Size(SizeID)
+);
+-- Insert Variant
+INSERT INTO ProductVariant (AttributeID, ProductID, ColorID, SizeID, Price, Quantity) VALUES
+(1.0, 1.0, 3.0, 1.0, 632871.03, 26.0),
+(2.0, 1.0, 3.0, 2.0, 820785.64, 36.0),
+(3.0, 1.0, 3.0, 3.0, 347834.92, 22.0),
+(4.0, 1.0, 2.0, 1.0, 231489.95, 21.0),
+(5.0, 1.0, 2.0, 2.0, 519319.51, 15.0),
+(6.0, 1.0, 2.0, 3.0, 494464.06, 33.0),
+(7.0, 2.0, 2.0, 1.0, 935402.95, 43.0),
+(8.0, 2.0, 2.0, 2.0, 375473.57, 28.0),
+(9.0, 2.0, 2.0, 3.0, 514884.47, 17.0),
+(10.0, 2.0, 3.0, 1.0, 604125.58, 31.0),
+(11.0, 2.0, 3.0, 2.0, 125413.96, 39.0),
+(12.0, 2.0, 3.0, 3.0, 200244.24, 21.0),
+(13.0, 3.0, 1.0, 1.0, 666646.23, 41.0),
+(14.0, 3.0, 1.0, 2.0, 244759.24, 12.0),
+(15.0, 3.0, 1.0, 3.0, 777438.08, 28.0),
+(16.0, 3.0, 2.0, 1.0, 456666.91, 39.0),
+(17.0, 3.0, 2.0, 2.0, 281044.39, 34.0),
+(18.0, 3.0, 2.0, 3.0, 616440.81, 8.0),
+(19.0, 4.0, 3.0, 1.0, 414410.11, 28.0),
+(20.0, 4.0, 3.0, 2.0, 424007.39, 20.0),
+(21.0, 4.0, 3.0, 3.0, 351640.59, 12.0),
+(22.0, 4.0, 2.0, 1.0, 998223.04, 23.0),
+(23.0, 4.0, 2.0, 2.0, 189982.27, 5.0),
+(24.0, 4.0, 2.0, 3.0, 513420.11, 23.0),
+(25.0, 5.0, 3.0, 1.0, 791443.4, 48.0),
+(26.0, 5.0, 3.0, 2.0, 554889.16, 24.0),
+(27.0, 5.0, 3.0, 3.0, 316955.26, 46.0),
+(28.0, 5.0, 2.0, 1.0, 690333.66, 33.0),
+(29.0, 5.0, 2.0, 2.0, 710953.59, 14.0),
+(30.0, 5.0, 2.0, 3.0, 857007.85, 10.0),
+(31.0, 6.0, 3.0, 1.0, 912081.7, 27.0),
+(32.0, 6.0, 3.0, 2.0, 440180.25, 26.0),
+(33.0, 6.0, 3.0, 3.0, 908286.45, 16.0),
+(34.0, 6.0, 2.0, 1.0, 757582.28, 23.0),
+(35.0, 6.0, 2.0, 2.0, 539248.04, 47.0),
+(36.0, 6.0, 2.0, 3.0, 489163.54, 9.0),
+(37.0, 7.0, 3.0, 1.0, 509875.13, 44.0),
+(38.0, 7.0, 3.0, 2.0, 252720.8, 43.0),
+(39.0, 7.0, 3.0, 3.0, 218376.89, 16.0),
+(40.0, 7.0, 2.0, 1.0, 129220.34, 49.0),
+(41.0, 7.0, 2.0, 2.0, 717448.99, 16.0),
+(42.0, 7.0, 2.0, 3.0, 733874.85, 17.0),
+(43.0, 8.0, 1.0, 1.0, 686453.13, 32.0),
+(44.0, 8.0, 1.0, 2.0, 826132.06, 22.0),
+(45.0, 8.0, 1.0, 3.0, 215174.32, 28.0),
+(46.0, 8.0, 2.0, 1.0, 338851.32, 41.0),
+(47.0, 8.0, 2.0, 2.0, 713724.46, 49.0),
+(48.0, 8.0, 2.0, 3.0, 338904.66, 19.0),
+(49.0, 9.0, 3.0, 1.0, 252959.23, 30.0),
+(50.0, 9.0, 3.0, 2.0, 612145.56, 36.0),
+(51.0, 9.0, 3.0, 3.0, 777865.02, 9.0),
+(52.0, 9.0, 2.0, 1.0, 557326.74, 44.0),
+(53.0, 9.0, 2.0, 2.0, 939427.94, 33.0),
+(54.0, 9.0, 2.0, 3.0, 920317.96, 45.0),
+(55.0, 10.0, 2.0, 1.0, 465789.02, 32.0),
+(56.0, 10.0, 2.0, 2.0, 698149.23, 11.0),
+(57.0, 10.0, 2.0, 3.0, 653334.02, 34.0),
+(58.0, 10.0, 3.0, 1.0, 314437.2, 42.0),
+(59.0, 10.0, 3.0, 2.0, 448695.69, 18.0),
+(60.0, 10.0, 3.0, 3.0, 997252.68, 45.0),
+(61.0, 11.0, 3.0, 1.0, 732710.36, 31.0),
+(62.0, 11.0, 3.0, 2.0, 650520.11, 21.0),
+(63.0, 11.0, 3.0, 3.0, 516082.72, 38.0),
+(64.0, 11.0, 2.0, 1.0, 678733.63, 31.0),
+(65.0, 11.0, 2.0, 2.0, 373838.43, 27.0),
+(66.0, 11.0, 2.0, 3.0, 506114.29, 10.0),
+(67.0, 12.0, 2.0, 4.0, 157955.15, 49.0),
+(68.0, 12.0, 2.0, 5.0, 666506.07, 17.0),
+(69.0, 12.0, 1.0, 4.0, 122952.86, 5.0),
+(70.0, 12.0, 1.0, 5.0, 165370.6, 30.0),
+(71.0, 13.0, 3.0, 1.0, 887661.38, 44.0),
+(72.0, 13.0, 3.0, 2.0, 892863.6, 10.0),
+(73.0, 13.0, 3.0, 3.0, 931532.62, 47.0),
+(74.0, 13.0, 1.0, 1.0, 866110.24, 44.0),
+(75.0, 13.0, 1.0, 2.0, 769768.52, 23.0),
+(76.0, 13.0, 1.0, 3.0, 594697.17, 43.0),
+(77.0, 14.0, 1.0, 1.0, 892818.81, 17.0),
+(78.0, 14.0, 1.0, 2.0, 382217.05, 40.0),
+(79.0, 14.0, 1.0, 3.0, 387059.75, 25.0),
+(80.0, 14.0, 3.0, 1.0, 454097.01, 9.0),
+(81.0, 14.0, 3.0, 2.0, 781774.67, 28.0),
+(82.0, 14.0, 3.0, 3.0, 671767.1, 24.0),
+(83.0, 15.0, 3.0, 6.0, 991548.33, 26.0),
+(84.0, 15.0, 3.0, 7.0, 119517.98, 25.0),
+(85.0, 15.0, 2.0, 6.0, 688197.96, 33.0),
+(86.0, 15.0, 2.0, 7.0, 708129.84, 48.0),
+(87.0, 16.0, 1.0, 1.0, 595309.55, 27.0),
+(88.0, 16.0, 1.0, 2.0, 895838.52, 7.0),
+(89.0, 16.0, 1.0, 3.0, 192683.29, 19.0),
+(90.0, 16.0, 3.0, 1.0, 879051.34, 12.0),
+(91.0, 16.0, 3.0, 2.0, 169674.57, 18.0),
+(92.0, 16.0, 3.0, 3.0, 201640.9, 46.0),
+(93.0, 17.0, 3.0, 1.0, 970761.57, 18.0),
+(94.0, 17.0, 3.0, 2.0, 698853.43, 36.0),
+(95.0, 17.0, 3.0, 3.0, 159012.52, 37.0),
+(96.0, 17.0, 2.0, 1.0, 675160.97, 19.0),
+(97.0, 17.0, 2.0, 2.0, 476416.78, 25.0),
+(98.0, 17.0, 2.0, 3.0, 102381.56, 12.0),
+(99.0, 18.0, 3.0, 1.0, 868063.28, 7.0),
+(100.0, 18.0, 3.0, 2.0, 651623.99, 31.0),
+(101.0, 18.0, 3.0, 3.0, 531808.72, 32.0),
+(102.0, 18.0, 1.0, 1.0, 757604.53, 42.0),
+(103.0, 18.0, 1.0, 2.0, 415657.51, 19.0),
+(104.0, 18.0, 1.0, 3.0, 922271.23, 10.0),
+(105.0, 19.0, 3.0, 1.0, 713176.05, 30.0),
+(106.0, 19.0, 3.0, 2.0, 820011.92, 29.0),
+(107.0, 19.0, 3.0, 3.0, 889893.33, 8.0),
+(108.0, 19.0, 1.0, 1.0, 273407.72, 7.0),
+(109.0, 19.0, 1.0, 2.0, 722065.78, 28.0),
+(110.0, 19.0, 1.0, 3.0, 962003.95, 41.0),
+(111.0, 20.0, 3.0, 1.0, 615242.64, 26.0),
+(112.0, 20.0, 3.0, 2.0, 143848.02, 9.0),
+(113.0, 20.0, 3.0, 3.0, 875444.37, 8.0),
+(114.0, 20.0, 2.0, 1.0, 527672.95, 20.0),
+(115.0, 20.0, 2.0, 2.0, 640564.77, 30.0),
+(116.0, 20.0, 2.0, 3.0, 834212.65, 37.0),
+(117.0, 21.0, 3.0, 6.0, 527069.32, 41.0),
+(118.0, 21.0, 3.0, 7.0, 845566.88, 47.0),
+(119.0, 21.0, 1.0, 6.0, 203881.3, 11.0),
+(120.0, 21.0, 1.0, 7.0, 793513.68, 14.0),
+(121.0, 22.0, 3.0, 6.0, 740611.4, 43.0),
+(122.0, 22.0, 3.0, 7.0, 190320.86, 31.0),
+(123.0, 22.0, 1.0, 6.0, 427187.85, 36.0),
+(124.0, 22.0, 1.0, 7.0, 738632.01, 50.0),
+(125.0, 23.0, 2.0, 6.0, 911464.25, 34.0),
+(126.0, 23.0, 2.0, 7.0, 530601.33, 44.0),
+(127.0, 23.0, 1.0, 6.0, 136852.12, 39.0),
+(128.0, 23.0, 1.0, 7.0, 520100.63, 8.0),
+(129.0, 24.0, 2.0, 6.0, 875777.72, 40.0),
+(130.0, 24.0, 2.0, 7.0, 488243.53, 12.0),
+(131.0, 24.0, 3.0, 6.0, 893608.67, 33.0),
+(132.0, 24.0, 3.0, 7.0, 334372.81, 5.0),
+(133.0, 25.0, 2.0, 6.0, 842941.51, 15.0),
+(134.0, 25.0, 2.0, 7.0, 842804.59, 14.0),
+(135.0, 25.0, 1.0, 6.0, 868649.34, 31.0),
+(136.0, 25.0, 1.0, 7.0, 287540.27, 41.0),
+(137.0, 26.0, 3.0, 1.0, 484927.18, 15.0),
+(138.0, 26.0, 3.0, 2.0, 187291.92, 28.0),
+(139.0, 26.0, 3.0, 3.0, 552999.07, 37.0),
+(140.0, 26.0, 1.0, 1.0, 635689.6, 47.0),
+(141.0, 26.0, 1.0, 2.0, 406145.12, 31.0),
+(142.0, 26.0, 1.0, 3.0, 912385.8, 33.0),
+(143.0, 27.0, 3.0, 1.0, 359112.89, 47.0),
+(144.0, 27.0, 3.0, 2.0, 314597.74, 25.0),
+(145.0, 27.0, 3.0, 3.0, 584725.5, 22.0),
+(146.0, 27.0, 2.0, 1.0, 506370.31, 30.0),
+(147.0, 27.0, 2.0, 2.0, 577636.49, 11.0),
+(148.0, 27.0, 2.0, 3.0, 103485.63, 43.0),
+(149.0, 28.0, 2.0, 1.0, 708066.25, 21.0),
+(150.0, 28.0, 2.0, 2.0, 965644.15, 8.0),
+(151.0, 28.0, 2.0, 3.0, 980767.85, 44.0),
+(152.0, 28.0, 1.0, 1.0, 789800.83, 35.0),
+(153.0, 28.0, 1.0, 2.0, 536425.05, 30.0),
+(154.0, 28.0, 1.0, 3.0, 173026.01, 17.0),
+(155.0, 29.0, 2.0, 1.0, 331647.19, 21.0),
+(156.0, 29.0, 2.0, 2.0, 358160.93, 29.0),
+(157.0, 29.0, 2.0, 3.0, 356902.58, 31.0),
+(158.0, 29.0, 1.0, 1.0, 719824.52, 11.0),
+(159.0, 29.0, 1.0, 2.0, 249829.51, 36.0),
+(160.0, 29.0, 1.0, 3.0, 353900.3, 17.0),
+(161.0, 30.0, 3.0, 1.0, 212347.67, 37.0),
+(162.0, 30.0, 3.0, 2.0, 416989.09, 21.0),
+(163.0, 30.0, 3.0, 3.0, 291166.22, 40.0),
+(164.0, 30.0, 2.0, 1.0, 265964.33, 25.0),
+(165.0, 30.0, 2.0, 2.0, 179738.04, 38.0),
+(166.0, 30.0, 2.0, 3.0, 511456.15, 35.0),
+(167.0, 31.0, 1.0, 6.0, 454244.05, 36.0),
+(168.0, 31.0, 1.0, 7.0, 684571.31, 23.0),
+(169.0, 31.0, 2.0, 6.0, 753163.36, 50.0),
+(170.0, 31.0, 2.0, 7.0, 275672.45, 45.0),
+(171.0, 32.0, 3.0, 6.0, 116035.62, 14.0),
+(172.0, 32.0, 3.0, 7.0, 597127.66, 16.0),
+(173.0, 32.0, 1.0, 6.0, 720827.54, 35.0),
+(174.0, 32.0, 1.0, 7.0, 477855.48, 21.0),
+(175.0, 33.0, 3.0, 6.0, 539131.34, 34.0),
+(176.0, 33.0, 3.0, 7.0, 575562.04, 10.0),
+(177.0, 33.0, 2.0, 6.0, 340502.99, 40.0),
+(178.0, 33.0, 2.0, 7.0, 913324.02, 29.0),
+(179.0, 34.0, 2.0, 6.0, 359612.36, 34.0),
+(180.0, 34.0, 2.0, 7.0, 549159.89, 35.0),
+(181.0, 34.0, 3.0, 6.0, 593984.45, 42.0),
+(182.0, 34.0, 3.0, 7.0, 871244.08, 33.0),
+(183.0, 35.0, 2.0, 6.0, 983462.16, 14.0),
+(184.0, 35.0, 2.0, 7.0, 559251.18, 43.0),
+(185.0, 35.0, 1.0, 6.0, 589422.21, 18.0),
+(186.0, 35.0, 1.0, 7.0, 264790.44, 49.0);
+
+-- IMAGE
+CREATE TABLE ProductImage (
     ImageID INT PRIMARY KEY,
     ImageURL NVARCHAR(MAX),
-    ProductID INT,
+	ProductID INT,
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
--- insert image 
-INSERT INTO ProductImages (ImageID, ImageURL, ProductID) VALUES
+
+INSERT INTO ProductImage (ImageID, ImageURL, ProductID) VALUES
 (1, N'https://product.hstatic.net/200000467803/product/fanfan-quan-chong-tham-ktom-k116-02_0071549_7f2467d3be8d41eeafc5f6060a1923b0.png', 1),
 (2, N'https://product.hstatic.net/200000467803/product/fanfan-quan-nhanh-kho-thao-ong-ktom-k112-be-4_6dd54c5c858c43fa85d6337293e9d4a2.jpg', 2),
 (3, N'https://product.hstatic.net/200000467803/product/thiet_ke_chua_co_ten__4__f2d9e86070214587993e8d2f42bf43b2.png', 3),
@@ -132,230 +379,158 @@ INSERT INTO ProductImages (ImageID, ImageURL, ProductID) VALUES
 (34, N'https://product.hstatic.net/200000467803/product/fanfan-bep-gas-mini-cassette-naturehike-cnh22cj008-__5__36df06ae69a34b27a6db7ede54b28b13_1024x1024.png', 34),
 (35, N'https://product.hstatic.net/200000467803/product/fanfan-bep-gas-cam-trai-da-nang-naturehike-cnh22cj007-__5__8453275383ed4737b7f03273ec169e9c_1024x1024.jpg', 35);
 
--- PRODUCT ATTRIBUTE
-CREATE TABLE ProductAttribute (
-    AttributeID INT PRIMARY KEY ,
-	ProductID INT,
-    Color NVARCHAR(50),
-    Size NVARCHAR(50),
-	Stock INT,
-    FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
-);
--- insert attribute
-INSERT INTO ProductAttribute (AttributeID, ProductID, Color, Size, Stock) VALUES
-(1, 3, N'Black', N'M', 9),
-(2, 34, N'Navy', N'L', 45),
-(3, 15, N'Green', N'M', 26),
-(4, 4, N'Green', N'L', 27),
-(5, 5, N'Red', N'S', 33),
-(6, 17, N'Green', N'XL', 35),
-(7, 17, N'Green', N'XXL', 48),
-(8, 17, N'Gray', N'M', 42),
-(9, 35, N'Green', N'S', 21),
-(10, 35, N'Red', N'XL', 19),
-(11, 6, N'Red', N'XL', 28),
-(12, 31, N'Gray', N'One Size', 48),
-(13, 34, N'Green', N'M', 39),
-(14, 23, N'Gray', N'XL', 43),
-(15, 2, N'Green', N'M', 38),
-(16, 24, N'Navy', N'XL', 22),
-(17, 10, N'Red', N'XL', 46),
-(18, 22, N'Red', N'M', 13),
-(19, 12, N'Green', N'One Size', 9),
-(20, 31, N'Green', N'M', 46),
-(21, 25, N'Gray', N'M', 33),
-(22, 34, N'Green', N'M', 22),
-(23, 24, N'Black', N'XXL', 38),
-(24, 9, N'Green', N'XL', 16),
-(25, 12, N'Black', N'L', 46),
-(26, 1, N'Black', N'S', 40),
-(27, 16, N'Green', N'L', 33),
-(28, 30, N'Gray', N'L', 16),
-(29, 3, N'Gray', N'XXL', 26),
-(30, 3, N'Navy', N'XXL', 11),
-(31, 9, N'Gray', N'XL', 18),
-(32, 35, N'Red', N'S', 10),
-(33, 35, N'Red', N'XL', 5),
-(34, 3, N'Black', N'One Size', 48),
-(35, 11, N'Navy', N'One Size', 48),
-(36, 10, N'Red', N'L', 46),
-(37, 27, N'Black', N'XXL', 31),
-(38, 7, N'Gray', N'XXL', 49),
-(39, 29, N'Green', N'One Size', 27),
-(40, 29, N'Navy', N'S', 37),
-(41, 7, N'Green', N'L', 38),
-(42, 12, N'Black', N'S', 40),
-(43, 31, N'Gray', N'One Size', 17),
-(44, 18, N'Black', N'XXL', 14),
-(45, 1, N'Gray', N'L', 40),
-(46, 33, N'Black', N'XL', 11),
-(47, 28, N'Navy', N'M', 7),
-(48, 6, N'Gray', N'M', 23),
-(49, 13, N'Red', N'S', 37),
-(50, 17, N'Navy', N'S', 37);
-
--- ACCOUNT
-CREATE TABLE Account (
-    UserID INT PRIMARY KEY IDENTITY(1,1),
-    FullName NVARCHAR(100),
-    Address NVARCHAR(255),
-    Password NVARCHAR(100),
-    Phone NVARCHAR(20),
-    Email NVARCHAR(100),
-    Role NVARCHAR(50)
-);
--- Insert Account Data
-INSERT INTO Account (FullName, Address, Password, Phone, Email, Role) VALUES
-(N'Admin 1', N'', N'12345678', N'', N'admin@gmail.com', N'Admin'),
-(N'Khang Lanh', N'Nguyen Xi, Binh Thanh', N'12345', N'0834283177', N'khanglanhh@gmail.com', N'User'),
-(N'Thanh Dat', N'Tran Hung Dao, Quan 1', N'12345', N'0389680199', N'thanhdat@gmail.com', N'User'),
-(N'Khanh Ly', N'Pham Van Dong, Thu Duc', N'12345', N'0386357809', N'khanhly@gmail.com', N'Staff'),
-(N'Nhat Anh', N'Dien Bien Phu, Quan 1', N'12345', N'0797906979', N'nhatanh@gmail.com', N'Staff'),
-(N'Thu Ha', N'Le Van Viet, Quan 9', N'12345', N'0886167163', N'thuha@gmail.com', N'Staff'),
-(N'Minh Hai', N'Vo Van Ngan, Quan 9', N'12345', N'0968974611', N'minhhai@gmail.com', N'User');
-
-
--- CART
-CREATE TABLE Cart (
-    CartID INT PRIMARY KEY IDENTITY(1,1),
-    UserID INT,
-    AttributeID INT,
-    Quantity INT,
-    FOREIGN KEY (UserID) REFERENCES Account(UserID),
-    FOREIGN KEY (AttributeID) REFERENCES ProductAttribute(AttributeID)
-);
--- add cart 
-INSERT INTO Cart ( UserID, AttributeID, Quantity) VALUES
-( 1, 1, 3),
-( 2, 5, 3),
-( 1, 6, 1),
-( 3, 10, 2),
-( 1, 14, 1),
-( 1, 17, 1),
-( 3, 4, 3),
-( 2, 19, 2),
-( 1, 25, 1),
-(
-3, 16, 1);
 
 -- VOUCHER
 CREATE TABLE Voucher (
-    VoucherID INT PRIMARY KEY IDENTITY(1,1),
+    VoucherID INT PRIMARY KEY,
     VoucherCode NVARCHAR(50) UNIQUE,
-    DiscountValue FLOAT
+    DiscountValue DECIMAL(10,2),
+    ExpiryDate DATE,
+    Status NVARCHAR(20) -- 'Active', 'Inactive'
 );
--- add voucher
-INSERT INTO Voucher (VoucherCode, DiscountValue) VALUES
-('FANFAN10', 10.0),
-('TREK5OFF', 5.0),
-('NEWCUSTOMER', 15.0),
-('FLASHSALE20', 20.0),
-('CAMPING15', 15.0),
-('HIKER2025', 12.5),
-('WELCOMEBACK', 8.0),
-('MOUNTAINLOVE', 18.0),
-('SPRINGDEAL', 7.5),
-('LIMITED50', 50.0);
 
---  ORDER 
-CREATE TABLE [Order] (
-    OrderID INT PRIMARY KEY IDENTITY(1,1),
-    OrderDate DATE,
-    OrderStatus NVARCHAR(50),
-    Total DECIMAL(10, 2),
+INSERT INTO Voucher (VoucherID, VoucherCode, DiscountValue, ExpiryDate , Status) VALUES
+(1, 'FANFAN10', 10.0, '2025-12-31', 'Active'),
+(2, 'TREK5OFF', 5.0, '2025-09-30', 'Active'),
+(3, 'NEWCUSTOMER', 15.0, '2026-01-01', 'Active'),
+(4, 'FLASHSALE20', 20.0, '2025-06-20', 'Inactive'),
+(5, 'CAMPING15', 15.0, '2025-12-15', 'Active'),
+(6, 'HIKER2025', 12.5, '2025-11-01', 'Active'),
+(7, 'WELCOMEBACK', 8.0, '2025-07-15', 'Active'),
+(8, 'MOUNTAINLOVE', 18.0, '2025-08-31', 'Active'),
+(9, 'SPRINGDEAL', 7.5, '2026-03-31', 'Active'),
+(10, 'LIMITED50', 50.0, '2025-06-18', 'Inactive');
+
+
+-- ORDER
+CREATE TABLE Orders(
+    OrderID INT PRIMARY KEY,
     UserID INT,
-    VoucherID INT,
+    OrderDate DATE,
+    Status NVARCHAR(20),
+    TotalAmount DECIMAL(10,2),
+	ShipFee DECIMAL(10,2),
+    VoucherID INT NULL,
     FOREIGN KEY (UserID) REFERENCES Account(UserID),
     FOREIGN KEY (VoucherID) REFERENCES Voucher(VoucherID)
 );
--- add order
-INSERT INTO [Order] (OrderDate, OrderStatus, Total, UserID, VoucherID) VALUES
-('2025-06-01', N'Pending', 1500000, 1, 1),
-('2025-06-02', N'Processing', 2450000, 2, 2),
-('2025-06-03', N'Shipping', 980000, 3, NULL),
-('2025-06-04', N'Delivered', 1850000, 1, 4),
-('2025-06-05', N'Canceled', 1200000, 2, NULL),
-('2025-06-06', N'Completed', 990000, 3, 3),
-('2025-06-07', N'Pending', 1125000, 1, 5),
-('2025-06-08', N'Delivered', 750000, 2, NULL),
-('2025-06-09', N'Processing', 2020000, 3, 6),
-('2025-06-10', N'Completed', 1675000, 1, NULL);
+-- Insert Orrder
+INSERT INTO Orders (OrderID, UserID, OrderDate, Status, TotalAmount, ShipFee, VoucherID) VALUES
+(1, 6, '2025-04-18', N'Shipped', 3238778.38, 24449.34, 9),
+(2, 7, '2025-03-19', N'Delivered', 3191459.01, 25821.39, 6),
+(3, 7, '2025-05-31', N'Delivered', 1007636.38, 36874.81, 5),
+(4, 3, '2025-02-21', N'Shipped', 3605221.5, 31756.93, 2),
+(5, 6, '2025-06-06', N'Delivered', 531693.25, 42529.71, 1),
+(6, 5, '2025-03-09', N'Shipped', 675610.83, 46736.43, 5),
+(7, 3, '2025-04-18', N'Cancelled', 764372.8, 31662.44, 9),
+(8, 6, '2025-04-07', N'Processing', 3040691.71, 39095.64, 7),
+(9, 3, '2025-05-06', N'Cancelled', 3799832.36, 49567.2, 7),
+(10, 6, '2025-03-01', N'Delivered', 3119799.55, 22936.17, 2),
+(11, 3, '2025-01-11', N'Delivered', 3970272.0, 22151.76, 2),
+(12, 3, '2025-05-09', N'Shipped', 938358.35, 29870.25, NULL),
+(13, 3, '2025-06-06', N'Cancelled', 2614000.42, 32512.95, 2),
+(14, 3, '2025-03-05', N'Cancelled', 3720228.09, 30700.19, 5),
+(15, 4, '2025-06-01', N'Delivered', 1510988.1, 43022.99, 1),
+(16, 7, '2025-02-22', N'Shipped', 2464326.45, 40104.89, 8),
+(17, 5, '2025-02-11', N'Processing', 2246775.68, 24225.65, 7),
+(18, 7, '2025-06-03', N'Cancelled', 2195108.16, 26316.56, 8),
+(19, 5, '2025-03-11', N'Processing', 663648.56, 34774.16, 6),
+(20, 6, '2025-05-14', N'Cancelled', 4567855.13, 36178.77, 5);
 
-
--- PAYMENT 
-CREATE TABLE Payment (
-    PaymentID INT PRIMARY KEY IDENTITY(1,1),
-	OrderID INT UNIQUE,
-    PaymentMethod NVARCHAR(50),
-    PaymentStatus NVARCHAR(50),
-    FOREIGN KEY (OrderID) REFERENCES [Order](OrderID)
-);
--- add payment
-INSERT INTO Payment (OrderID, PaymentMethod, PaymentStatus)
-VALUES 
-(1, 'QR', 'Paid'),
-(2, 'QR', 'Paid'),
-(3, 'QR', 'Pending'),
-(4, 'QR', 'Paid'),
-(5, 'QR', 'Pending'),
-(6, 'QR', 'Paid'),
-(7, 'QR', 'Paid'),
-(8, 'QR', 'Pending'),
-(9, 'QR', 'Paid'),
-(10, 'QR', 'Pending');
-
--- ORDER DETAILS 
-CREATE TABLE OrderDetails (
+-- ORDER DETAILS
+CREATE TABLE OrderDetail (
     OrderDetailID INT PRIMARY KEY,
     OrderID INT,
     AttributeID INT,
     Quantity INT,
-    Total DECIMAL(10, 2),
-    FOREIGN KEY (OrderID) REFERENCES [Order](OrderID),
-    FOREIGN KEY (AttributeID) REFERENCES ProductAttribute(AttributeID)
+    UnitPrice DECIMAL(10,2),
+    FOREIGN KEY (OrderID) REFERENCES Orders(OrderID),
+    FOREIGN KEY (AttributeID) REFERENCES ProductVariant(AttributeID)
 );
--- them dlieu vao order details
-INSERT INTO OrderDetails (OrderDetailID, OrderID, AttributeID, Quantity, Total) VALUES 
-(1, 1, 10, 2, 940000.00),
-(2, 1, 10, 1, 520000.00),
-(3, 2, 10, 3, 1290000.00),
-(4, 3, 10, 1, 310000.00),
-(5, 4, 10, 2, 640000.00),
-(6, 5, 10, 1, 480000.00),
-(7, 6, 10, 1, 360000.00),
-(8, 6, 10, 2, 720000.00),
-(9, 7, 10, 1, 690000.00),
-(10, 8, 10, 2, 880000.00),
-(11, 9, 10, 1, 560000.00),
-(12, 10, 10, 1, 750000.00);
+-- Insert OrderDetail
+INSERT INTO OrderDetail (OrderDetailID, OrderID, AttributeID, Quantity, UnitPrice) VALUES
+(1.0, 1.0, 170.0, 2.0, 275672.45),
+(2.0, 1.0, 71.0, 3.0, 887661.38),
+(3.0, 2.0, 1.0, 3.0, 632871.03),
+(4.0, 2.0, 139.0, 1.0, 552999.07),
+(5.0, 2.0, 119.0, 3.0, 203881.3),
+(6.0, 2.0, 98.0, 1.0, 102381.56),
+(7.0, 3.0, 93.0, 1.0, 970761.57),
+(8.0, 4.0, 103.0, 1.0, 415657.51),
+(9.0, 4.0, 23.0, 1.0, 189982.27),
+(10.0, 4.0, 18.0, 3.0, 616440.81),
+(11.0, 4.0, 184.0, 2.0, 559251.18),
+(12.0, 5.0, 36.0, 1.0, 489163.54),
+(13.0, 6.0, 58.0, 2.0, 314437.2),
+(14.0, 7.0, 61.0, 1.0, 732710.36),
+(15.0, 8.0, 58.0, 2.0, 314437.2),
+(16.0, 8.0, 139.0, 3.0, 552999.07),
+(17.0, 8.0, 47.0, 1.0, 713724.46),
+(18.0, 9.0, 80.0, 3.0, 454097.01),
+(19.0, 9.0, 57.0, 2.0, 653334.02),
+(20.0, 9.0, 96.0, 1.0, 675160.97),
+(21.0, 9.0, 141.0, 1.0, 406145.12),
+(22.0, 10.0, 120.0, 3.0, 793513.68),
+(23.0, 10.0, 12.0, 1.0, 200244.24),
+(24.0, 10.0, 58.0, 1.0, 314437.2),
+(25.0, 10.0, 92.0, 1.0, 201640.9),
+(26.0, 11.0, 77.0, 2.0, 892818.81),
+(27.0, 11.0, 173.0, 3.0, 720827.54),
+(28.0, 12.0, 167.0, 2.0, 454244.05),
+(29.0, 13.0, 137.0, 1.0, 484927.18),
+(30.0, 13.0, 94.0, 3.0, 698853.43),
+(31.0, 14.0, 53.0, 3.0, 939427.94),
+(32.0, 14.0, 182.0, 1.0, 871244.08),
+(33.0, 15.0, 83.0, 1.0, 991548.33),
+(34.0, 15.0, 97.0, 1.0, 476416.78),
+(35.0, 16.0, 51.0, 1.0, 777865.02),
+(36.0, 16.0, 29.0, 1.0, 710953.59),
+(37.0, 16.0, 7.0, 1.0, 935402.95),
+(38.0, 17.0, 109.0, 1.0, 722065.78),
+(39.0, 17.0, 162.0, 2.0, 416989.09),
+(40.0, 17.0, 68.0, 1.0, 666506.07),
+(41.0, 18.0, 170.0, 2.0, 275672.45),
+(42.0, 18.0, 12.0, 3.0, 200244.24),
+(43.0, 18.0, 48.0, 3.0, 338904.66),
+(44.0, 19.0, 58.0, 2.0, 314437.2),
+(45.0, 20.0, 38.0, 1.0, 252720.8),
+(46.0, 20.0, 50.0, 2.0, 612145.56),
+(47.0, 20.0, 65.0, 1.0, 373838.43),
+(48.0, 20.0, 131.0, 3.0, 893608.67);
 
+-- HISTORY
+CREATE TABLE UpdateHistory (
+    LogID INT PRIMARY KEY,
+    ActionType NVARCHAR(50),     -- 'UPDATE_PRICE', 'DELETE_USER', etc.
+    TableName NVARCHAR(50),      -- 'ProductVariant', 'UserAccount', etc.
+    RecordID INT,                -- Affected ID
+    OldValue NVARCHAR(MAX),      -- e.g., { "price": 60 }
+    NewValue NVARCHAR(MAX),      -- e.g., { "price": 70 }
+    PerformedBy INT,             -- FK to UserAccount(UserID)
+    PerformedAt DATETIME DEFAULT GETDATE(),
+    FOREIGN KEY (PerformedBy) REFERENCES Account(UserID)
+);
 
 -- REVIEW
 CREATE TABLE Review (
     ReviewID INT PRIMARY KEY IDENTITY(1,1),
-	UserID INT,
-	ProductID INT,
-    Rating INT,
+    UserID INT,
+    ProductID INT,
+    Rating INT CHECK (Rating BETWEEN 1 AND 5),
     Comment NVARCHAR(MAX),
-    ReviewDate DATE,
+    ReviewDate DATETIME DEFAULT GETDATE(),
     FOREIGN KEY (UserID) REFERENCES Account(UserID),
     FOREIGN KEY (ProductID) REFERENCES Product(ProductID)
 );
--- add review
+
 INSERT INTO Review (UserID, ProductID, Rating, Comment, ReviewDate) VALUES
-(1, 3, 5, N'Comfortable and dries quickly. Great for trekking.', '2025-05-20'),
+(4, 3, 5, N'Comfortable and dries quickly. Great for trekking.', '2025-05-20'),
 (2, 5, 4, N'Short pants are nice but stitching could be better.', '2025-05-21'),
 (3, 11, 5, N'Compact backpack, fits a lot. Ideal for hiking.', '2025-05-22'),
-(1, 16, 3, N'Sharp blade but lacks a carrying sheath.', '2025-05-23'),
+(4, 16, 3, N'Sharp blade but lacks a carrying sheath.', '2025-05-23'),
 (2, 21, 5, N'Spacious and easy-to-set-up tent. Very breathable.', '2025-05-24'),
 (3, 28, 4, N'Lightweight hat with good sun protection.', '2025-05-25'),
-(1, 33, 5, N'Great grill, easy to clean and cooks evenly.', '2025-05-26'),
+(5, 33, 5, N'Great grill, easy to clean and cooks evenly.', '2025-05-26'),
 (2, 6, 4, N'Comfortable shirt with quick-dry fabric.', '2025-05-26'),
 (3, 9, 3, N'Shirt is good but sizing runs a bit large.', '2025-05-27'),
-(1, 19, 5, N'Compact multi-tool. Perfect for camping trips.', '2025-05-28');
-
-
-CREATE INDEX idx_order_user ON [Order](UserID);
-CREATE INDEX idx_cart_user ON Cart(UserID);
-CREATE INDEX idx_product_cate ON Product(CateID);
-CREATE INDEX idx_attribute_product ON ProductAttribute(ProductID);
+(4, 19, 5, N'Compact multi-tool. Perfect for camping trips.', '2025-05-28');

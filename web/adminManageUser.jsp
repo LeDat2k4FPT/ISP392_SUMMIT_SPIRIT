@@ -58,14 +58,14 @@
             <td><%= u.getRole() %></td>
             <td>
                 <!-- Change Role Button -->
-                <form action="manageUserAction" method="post" style="display:inline;" onsubmit="return confirmChangeRole('<%= u.getFullName() %>', '<%= u.getRole() %>');">
+                <form action="manageUserActionController" method="post" style="display:inline;" onsubmit="return confirmChangeRole('<%= u.getFullName() %>', '<%= u.getRole() %>');">
                     <input type="hidden" name="userID" value="<%= u.getUserID() %>">
                     <input type="hidden" name="action" value="editRole">
                     <input type="submit" value="Change Role">
                 </form>
 
                 <!-- Deactivate Button -->
-                <form action="manageUserAction" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to deactivate this account?');">
+                <form action="manageUserActionController" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to deactivate this account?');">
                     <input type="hidden" name="userID" value="<%= u.getUserID() %>">
                     <input type="hidden" name="action" value="deactivate">
                     <input type="submit" value="Deactivate">
