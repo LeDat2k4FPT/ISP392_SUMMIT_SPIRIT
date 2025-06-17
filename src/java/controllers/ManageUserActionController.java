@@ -81,9 +81,9 @@ public class ManageUserActionController extends HttpServlet {
                 case "editRole":
                     dao.toggleRole(userID);
                     break;
-                case "deactivate":
-                    dao.setActive(userID, false); // Set status = 0 (inactive)
-                    break;
+                case "delete":
+                dao.deleteUser(userID); // Gọi phương thức mới trong DAO
+                break;
                 default:
                     request.setAttribute("ERROR", "Unknown action: " + action);
             }

@@ -19,9 +19,7 @@
         function confirmChangeRole(fullname, currentRole) {
             return confirm(`Are you sure to change role?`);
     }
-        function confirmDeactivate(fullname) {
-            return confirm(`Are you sure you want to deactivate "${fullname}"?`);
-        }
+        
         function confirmLogout() {
             if (confirm("Do you really want to logout?")) {
                 window.location.href = 'login.jsp';
@@ -64,12 +62,14 @@
                     <input type="submit" value="Change Role">
                 </form>
 
-                <!-- Deactivate Button -->
-                <form action="manageUserActionController" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to deactivate this account?');">
+                <!-- Delete Button with confirm -->
+                <form action="manageUserActionController" method="post" style="display:inline;"
+                      onsubmit="return confirm('Are you sure you want to permanently delete user <%= u.getFullName() %>?');">
                     <input type="hidden" name="userID" value="<%= u.getUserID() %>">
-                    <input type="hidden" name="action" value="deactivate">
-                    <input type="submit" value="Deactivate">
+                    <input type="hidden" name="action" value="delete">
+                    <input type="submit" value="Delete">
                 </form>
+
             </td>
 
         </tr>

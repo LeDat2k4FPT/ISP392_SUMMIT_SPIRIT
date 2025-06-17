@@ -339,16 +339,14 @@ public class UserDAO {
         e.printStackTrace();
     }
 }
-
-    public void setActive(int userID, boolean active) {
-    String sql = "UPDATE Account SET Status = ? WHERE UserID = ?";
-    try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, active ? 1 : 0); // 1 = active, 0 = inactive
-        ps.setInt(2, userID);
-        ps.executeUpdate();
-    } catch (Exception e) {
-        e.printStackTrace();
+    public void deleteUser(int userID) {
+        String sql = "DELETE FROM Account WHERE UserID = ?";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userID);
+            ps.executeUpdate();
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
     }
-}
-
 }
