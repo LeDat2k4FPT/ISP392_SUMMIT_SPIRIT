@@ -18,7 +18,7 @@ import java.io.PrintWriter;
  *
  * @author Hanne
  */
-@WebServlet(name = "ManageUserActionController", urlPatterns = {"/manageUserActionController"})
+@WebServlet(name = "ManageUserActionController", urlPatterns = {"/ManageUserActionController"})
 public class ManageUserActionController extends HttpServlet {
 
     /**

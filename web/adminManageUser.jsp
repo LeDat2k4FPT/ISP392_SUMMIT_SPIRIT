@@ -56,14 +56,14 @@
             <td><%= u.getRole() %></td>
             <td>
                 <!-- Change Role Button -->
-                <form action="manageUserActionController" method="post" style="display:inline;" onsubmit="return confirmChangeRole('<%= u.getFullName() %>', '<%= u.getRole() %>');">
+                <form action="ManageUserActionController" method="post" style="display:inline;" onsubmit="return confirmChangeRole('<%= u.getFullName() %>', '<%= u.getRole() %>');">
                     <input type="hidden" name="userID" value="<%= u.getUserID() %>">
                     <input type="hidden" name="action" value="editRole">
                     <input type="submit" value="Change Role">
                 </form>
 
                 <!-- Delete Button with confirm -->
-                <form action="manageUserActionController" method="post" style="display:inline;"
+                <form action="ManageUserActionController" method="post" style="display:inline;"
                       onsubmit="return confirm('Are you sure you want to permanently delete user <%= u.getFullName() %>?');">
                     <input type="hidden" name="userID" value="<%= u.getUserID() %>">
                     <input type="hidden" name="action" value="delete">
