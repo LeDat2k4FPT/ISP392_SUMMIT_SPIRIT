@@ -1,11 +1,7 @@
 package staff.management.product;
 
-import dao.ProductDAO;
-import dao.ProductImageDAO;
-import dao.ProductAttributeDAO;
-import dto.ProductDTO;
-import dto.ProductImageDTO;
-import dto.ProductAttributeDTO;
+import dao.*;
+import dto.*;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -25,62 +21,54 @@ public class AddProductController extends HttpServlet {
         String pName = request.getParameter("productName");
         String pDescription = request.getParameter("description");
         String pCateID_raw = request.getParameter("cateID");
-        String pPrice_raw = request.getParameter("price");
         String pStatus = request.getParameter("status");
 
-        String size = request.getParameter("size");
-        String color = request.getParameter("color");
-        String stock_raw = request.getParameter("stock");
+        String colorName = request.getParameter("color");
+        String sizeName = request.getParameter("size");
+        String price_raw = request.getParameter("price");
+        String quantity_raw = request.getParameter("stock");
 
-        String[] pImageURLs = request.getParameterValues("productImage"); // danh sách URL ảnh
+        String imageURL = request.getParameter("imageURL"); // ảnh sản phẩm
+        if (imageURL == null || imageURL.trim().isEmpty()) {
+            imageURL = "default.jpg";
+        }
 
         try {
             int cateID = Integer.parseInt(pCateID_raw);
-            double price = Double.parseDouble(pPrice_raw.replace(",", ""));
-            int stock = Integer.parseInt(stock_raw);
+            double price = Double.parseDouble(price_raw.replace(",", ""));
+            int quantity = Integer.parseInt(quantity_raw);
 
-            //1. Tạo đối tượng ProductDTO
-            ProductDTO product = new ProductDTO(
-                    0, // ID sẽ được sinh
-                    pName,
-                    null, // không cần productImage (ảnh lưu riêng)
-                    pDescription,
-                    null, // size nằm trong ProductAttribute
-                    price,
-                    pStatus,
-                    0, // stock nằm trong ProductAttribute
-                    cateID
-            );
-
-            // 2. Thêm sản phẩm → lấy ProductID
+            // 1. Insert product
+            ProductDTO product = new ProductDTO(0, pName, pDescription, cateID, pStatus);
             ProductDAO productDAO = new ProductDAO();
-            int newProductID = productDAO.insertAndReturnID(product);
+            int productID = productDAO.insertAndReturnID(product);
 
-            if (newProductID != -1) {
-                //3. Thêm ProductAttribute
-                ProductAttributeDTO attr = new ProductAttributeDTO(newProductID, color, size, stock);
-                ProductAttributeDAO attrDAO = new ProductAttributeDAO();
-                attrDAO.insertAttribute(attr);
+            if (productID != -1) {
+                // 2. Get or insert color
+                ColorDAO colorDAO = new ColorDAO();
+                int colorID = colorDAO.getOrInsertColor(colorName);
 
-                //4. Thêm ảnh nếu có
-                if (pImageURLs != null) {
-                    ProductImageDAO imageDAO = new ProductImageDAO();
-                    for (String imgUrl : pImageURLs) {
-                        if (imgUrl != null && !imgUrl.trim().isEmpty()) {
-                            ProductImageDTO image = new ProductImageDTO(imgUrl.trim(), newProductID);
-                            imageDAO.insertImage(image);
-                        }
-                    }
-                }
+                // 3. Get or insert size
+                SizeDAO sizeDAO = new SizeDAO();
+                int sizeID = sizeDAO.getOrInsertSize(sizeName);
+
+                // 4. Insert product variant
+                ProductVariantDTO variant = new ProductVariantDTO(productID, colorID, sizeID, price, quantity);
+                ProductVariantDAO variantDAO = new ProductVariantDAO();
+                variantDAO.insertVariant(variant);
+
+                // 5. Insert product image
+                ProductImageDTO imageDTO = new ProductImageDTO(imageURL, productID);
+                ProductImageDAO imageDAO = new ProductImageDAO();
+                imageDAO.insertImage(imageDTO);
             }
 
-            // ✅ 5. Thành công → chuyển trang
             response.sendRedirect("staff/productlist.jsp");
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi khi thêm sản phẩm: " + e.getMessage());
-            request.getRequestDispatcher("dashboard/mnproduct.jsp").forward(request, response);
+            request.getRequestDispatcher("staff/mnproduct.jsp").forward(request, response);
         }
     }
 
@@ -98,6 +86,6 @@ public class AddProductController extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Thêm sản phẩm đầy đủ với thuộc tính và ảnh";
+        return "Thêm sản phẩm đầy đủ với ảnh, màu, size, giá và tồn kho";
     }
 }

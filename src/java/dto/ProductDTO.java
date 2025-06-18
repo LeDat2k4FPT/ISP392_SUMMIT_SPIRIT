@@ -1,6 +1,7 @@
 package dto;
 
 public class ProductDTO {
+
     private int productID;
     private String productName;
     private String productImage;
@@ -14,7 +15,7 @@ public class ProductDTO {
     public ProductDTO() {
     }
 
-    public ProductDTO(int productID, String productName, String productImage, String description, 
+    public ProductDTO(int productID, String productName, String productImage, String description,
             String size, double price, String status, int stock, int cateID) {
         this.productID = productID;
         this.productName = productName;
@@ -25,6 +26,14 @@ public class ProductDTO {
         this.status = status;
         this.stock = stock;
         this.cateID = cateID;
+    }
+
+    public ProductDTO(int productID, String productName, String description, int cateID, String status) {
+        this.productID = productID;
+        this.productName = productName;
+        this.description = description;
+        this.cateID = cateID;
+        this.status = status;
     }
 
     public int getProductID() {
@@ -98,4 +107,4 @@ public class ProductDTO {
     public void setCateID(int cateID) {
         this.cateID = cateID;
     }
-} 
+}
