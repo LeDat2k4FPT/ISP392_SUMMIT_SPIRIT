@@ -331,7 +331,7 @@ public class UserDAO {
     return list;
 }
     public void toggleRole(int userID) {
-    String sql = "UPDATE Account SET Role = CASE WHEN Role = 'user' THEN 'staff' ELSE 'user' END WHERE UserID = ?";
+    String sql = "UPDATE Account SET Role = CASE WHEN Role = 'User' THEN 'Staff' ELSE 'User' END WHERE UserID = ?";
     try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
         ps.setInt(1, userID);
         ps.executeUpdate();

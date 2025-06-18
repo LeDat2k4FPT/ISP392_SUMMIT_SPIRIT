@@ -5,6 +5,11 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="dto.UserDTO"%>
+<%
+    UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+    String name = loginUser != null ? loginUser.getFullName() : "Guest";
+%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -12,10 +17,21 @@
         <title>JSP Page</title>
     </head>
     <body>
-        <h3>Admin Tools:</h3>
+        <div class="header">
+            Hello, <%= name %>
+        </div>
+        <h1>Admin Tools:</h1>
+        <script>
+            function confirmLogout() {
+                if (confirm("Are you sure you want to logout?")) {
+                    window.location.href = "MainController?action=Logout";
+                }
+            }
+        </script>
         <ul>
             <li><a href="manageUser">Manage User Accounts</a></li>
             <!-- có thể thêm các liên kết khác nếu có nhiều công cụ admin -->
+            <li><a href="#" onclick="confirmLogout()">Logout</a></li>
         </ul>
     </body>
 </html>
