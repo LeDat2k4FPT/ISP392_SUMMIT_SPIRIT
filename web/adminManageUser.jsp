@@ -18,8 +18,7 @@
     <script>
         function confirmChangeRole(fullname, currentRole) {
             return confirm(`Are you sure to change role?`);
-    }
-        
+    }        
         function confirmLogout() {
             if (confirm("Do you really want to logout?")) {
                 window.location.href = 'login.jsp';

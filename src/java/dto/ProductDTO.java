@@ -1,41 +1,39 @@
 package dto;
 
+import java.util.List;
+
 public class ProductDTO {
 
     private int productID;
     private String productName;
-    private String productImage;
     private String description;
-    private String size;
-    private double price;
     private String status;
-    private int stock;
     private int cateID;
+
+    private String productImage; // ảnh đại diện
+    private double price;        // giá của 1 biến thể mặc định hoặc thấp nhất
+    private String productVariant; // mô tả hiển thị ("Size M - Red") nếu có
+
+    // Danh sách tất cả biến thể của sản phẩm
+    private List<ProductVariantDTO> variants;
 
     public ProductDTO() {
     }
 
-    public ProductDTO(int productID, String productName, String productImage, String description,
-            String size, double price, String status, int stock, int cateID) {
+    public ProductDTO(int productID, String productName, String description, String status, int cateID,
+                      String productImage, double price, String productVariant, List<ProductVariantDTO> variants) {
         this.productID = productID;
         this.productName = productName;
+        this.description = description;
+        this.status = status;
+        this.cateID = cateID;
         this.productImage = productImage;
-        this.description = description;
-        this.size = size;
         this.price = price;
-        this.status = status;
-        this.stock = stock;
-        this.cateID = cateID;
+        this.productVariant = productVariant;
+        this.variants = variants;
     }
 
-    public ProductDTO(int productID, String productName, String description, int cateID, String status) {
-        this.productID = productID;
-        this.productName = productName;
-        this.description = description;
-        this.cateID = cateID;
-        this.status = status;
-    }
-
+    // Getters and Setters
     public int getProductID() {
         return productID;
     }
@@ -52,36 +50,12 @@ public class ProductDTO {
         this.productName = productName;
     }
 
-    public String getProductImage() {
-        return productImage;
-    }
-
-    public void setProductImage(String productImage) {
-        this.productImage = productImage;
-    }
-
     public String getDescription() {
         return description;
     }
 
     public void setDescription(String description) {
         this.description = description;
-    }
-
-    public String getSize() {
-        return size;
-    }
-
-    public void setSize(String size) {
-        this.size = size;
-    }
-
-    public double getPrice() {
-        return price;
-    }
-
-    public void setPrice(double price) {
-        this.price = price;
     }
 
     public String getStatus() {
@@ -92,19 +66,43 @@ public class ProductDTO {
         this.status = status;
     }
 
-    public int getStock() {
-        return stock;
-    }
-
-    public void setStock(int stock) {
-        this.stock = stock;
-    }
-
     public int getCateID() {
         return cateID;
     }
 
     public void setCateID(int cateID) {
         this.cateID = cateID;
+    }
+
+    public String getProductImage() {
+        return productImage;
+    }
+
+    public void setProductImage(String productImage) {
+        this.productImage = productImage;
+    }
+
+    public double getPrice() {
+        return price;
+    }
+
+    public void setPrice(double price) {
+        this.price = price;
+    }
+
+    public String getProductVariant() {
+        return productVariant;
+    }
+
+    public void setProductVariant(String productVariant) {
+        this.productVariant = productVariant;
+    }
+
+    public List<ProductVariantDTO> getVariants() {
+        return variants;
+    }
+
+    public void setVariants(List<ProductVariantDTO> variants) {
+        this.variants = variants;
     }
 }
