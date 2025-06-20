@@ -280,9 +280,32 @@ public class ProductDAO {
         return result;
     }
 
-    public ProductDTO getProductByID(int productID) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
+    public ProductDTO getProductByID(int productID) throws SQLException, ClassNotFoundException {
+    String sql = "SELECT p.ProductID, p.ProductName, p.Description, p.Status, p.CateID, " +
+                 "(SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, " +
+                 "(SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL " +
+                 "FROM Product p WHERE p.ProductID = ?";
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, productID);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                ProductDTO dto = new ProductDTO();
+                dto.setProductID(rs.getInt("ProductID"));
+                dto.setProductName(rs.getString("ProductName"));
+                dto.setDescription(rs.getString("Description"));
+                dto.setStatus(rs.getString("Status"));
+                dto.setCateID(rs.getInt("CateID"));
+                dto.setPrice(rs.getDouble("Price"));
+                String img = rs.getString("ImageURL");
+                dto.setProductImage(img != null ? img : "default.jpg");
+                return dto;
+            }
+        }
     }
+    return null;
+}
+
 public boolean updateProductByID(ProductDTO product) throws SQLException, ClassNotFoundException {
     String sql = "UPDATE Product SET ProductName = ?, Description = ?, Status = ?, CateID = ? WHERE ProductID = ?";
     try (

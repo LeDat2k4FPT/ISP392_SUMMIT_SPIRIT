@@ -132,7 +132,7 @@
                 <td><%= p.getStatus() %></td>
                 <td><%= p.getCateID() %></td>
                 <td>
-                    <a href="EditProductController?productID=<%= p.getProductID() %>" class="btn edit-btn">Edit</a>
+                    <a href="<%= request.getContextPath() %>/EditProductController?productID=<%= p.getProductID() %>" class="btn edit-btn">Edit</a>
                     <a href="<%= request.getContextPath() %>/DeleteProductController?productID=<%= p.getProductID() %>" 
                        onclick="return confirm('Are you sure you want to delete this product?')"
                        class="btn btn-danger">
