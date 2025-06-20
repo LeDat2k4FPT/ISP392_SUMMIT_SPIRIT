@@ -301,31 +301,31 @@
 
 <!-- Categories -->
 <div class="categories">
-    <a href="#" data-category="Shirts">
+    <a href="category.jsp?category=ao" data-category="Shirts">
         <img src="image/logo_ao.png" alt="Shirts">
         Shirts
     </a>
-    <a href="#" data-category="Pants">
+    <a href="category.jsp?category=quan" data-category="Pants">
         <img src="image/logo_quan.png" alt="Pants">
         Pants
     </a>
-    <a href="#" data-category="Backpacks">
+    <a href="category.jsp?category=balo" data-category="Backpacks">
         <img src="image/logo_balo.png" alt="Backpacks">
         Backpacks
     </a>
-    <a href="#" data-category="Camping Tools">
+    <a href="category.jsp?category=dungcu" data-category="Camping Tools">
         <img src="image/logo_tool.png" alt="Camping Tools">
         Camping Tools
     </a>
-    <a href="#" data-category="Tents">
+    <a href="category.jsp?category=trai" data-category="Tents">
         <img src="image/logo_leu.png" alt="Tents">
         Tents
     </a>
-    <a href="#" data-category="Hats">
+    <a href="category.jsp?category=mu" data-category="Hats">
         <i class="fa-solid fa-hat-cowboy"></i>
         Hats
     </a>
-    <a href="#" data-category="Camping Stove">
+    <a href="category.jsp?category=camping" data-category="Camping Stove">
         <i class="fa-solid fa-fire"></i>
         Camping Stove
     </a>
