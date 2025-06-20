@@ -48,9 +48,9 @@
 
         <div class="top-bar">
             Welcome, <%= user.getFullName() %> |
-            <form action="LogoutController" method="post" style="display:inline;">
-                <button type="submit">Logout</button>
-            </form>
+            <form action="<%= request.getContextPath() %>/LogoutController" method="post" style="display:inline;">
+            <button type="submit" class="btn logout-btn">🚪 Logout</button>
+        </form>
         </div>
 
         <a href="staffDashboard.jsp" class="back-btn">⬅ Back to Staff Menu</a>
