@@ -10,8 +10,6 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
-import java.util.ArrayList;
-import java.util.List;
 
 @WebServlet(name = "AddProductController", urlPatterns = {"/AddProductController"})
 public class AddProductController extends HttpServlet {
@@ -36,64 +34,42 @@ public class AddProductController extends HttpServlet {
         }
 
         try {
-    int cateID = Integer.parseInt(pCateID_raw);
-    double price = Double.parseDouble(price_raw.replace(",", ""));
-    int quantity = Integer.parseInt(quantity_raw);
+            int cateID = Integer.parseInt(pCateID_raw);
+            double price = Double.parseDouble(price_raw.replace(",", ""));
+            int quantity = Integer.parseInt(quantity_raw);
 
-    // 1. Insert product - khởi tạo trước với ID = 0 (vì tự tăng)
-    List<ProductVariantDTO> variants = new ArrayList<>();
+            // 1. Insert product
+            ProductDTO product = new ProductDTO(0, pName, pDescription, cateID, pStatus);
+            ProductDAO productDAO = new ProductDAO();
+            int productID = productDAO.insertAndReturnID(product);
 
-    // 2. Get or insert color
-    ColorDAO colorDAO = new ColorDAO();
-    int colorID = colorDAO.getOrInsertColor(colorName);
+            if (productID != -1) {
+                // 2. Get or insert color
+                ColorDAO colorDAO = new ColorDAO();
+                int colorID = colorDAO.getOrInsertColor(colorName);
 
-    // 3. Get or insert size
-    SizeDAO sizeDAO = new SizeDAO();
-    int sizeID = sizeDAO.getOrInsertSize(sizeName);
+                // 3. Get or insert size
+                SizeDAO sizeDAO = new SizeDAO();
+                int sizeID = sizeDAO.getOrInsertSize(sizeName);
 
-    // 4. Tạo biến thể đầu tiên và thêm vào danh sách
-    ProductVariantDTO variant = new ProductVariantDTO(0, colorID, sizeID, price, quantity);
-    variants.add(variant);
+                // 4. Insert product variant
+                ProductVariantDTO variant = new ProductVariantDTO(productID, colorID, sizeID, price, quantity);
+                ProductVariantDAO variantDAO = new ProductVariantDAO();
+                variantDAO.insertVariant(variant);
 
-    // 5. Mô tả biến thể ngắn gọn (hiển thị)
-    String variantDisplay = sizeName + " - " + colorName;
+                // 5. Insert product image
+                ProductImageDTO imageDTO = new ProductImageDTO(imageURL, productID);
+                ProductImageDAO imageDAO = new ProductImageDAO();
+                imageDAO.insertImage(imageDTO);
+            }
 
-    // 6. Khởi tạo sản phẩm với constructor đầy đủ
-    ProductDTO product = new ProductDTO(
-        0,                   // productID = 0 (DB tự tăng)
-        pName,
-        pDescription,
-        pStatus,
-        cateID,
-        imageURL,
-        price,
-        variantDisplay,
-        variants
-    );
+            response.sendRedirect("staff/productlist.jsp");
 
-    // 7. Insert vào DB
-    ProductDAO productDAO = new ProductDAO();
-    int productID = productDAO.insertAndReturnID(product); // bạn chỉ cần truyền các trường chính trong DAO
-
-    if (productID != -1) {
-        // 8. Insert product variant với productID thực tế
-        variant.setProductID(productID);
-        ProductVariantDAO variantDAO = new ProductVariantDAO();
-        variantDAO.insertVariant(variant);
-
-        // 9. Insert ảnh sản phẩm
-        ProductImageDTO imageDTO = new ProductImageDTO(imageURL, productID);
-        ProductImageDAO imageDAO = new ProductImageDAO();
-        imageDAO.insertImage(imageDTO);
-    }
-
-    response.sendRedirect("staff/productlist.jsp");
-
-} catch (Exception e) {
-    e.printStackTrace();
-    request.setAttribute("error", "Lỗi khi thêm sản phẩm: " + e.getMessage());
-    request.getRequestDispatcher("staff/mnproduct.jsp").forward(request, response);
-}
+        } catch (Exception e) {
+            e.printStackTrace();
+            request.setAttribute("error", "Lỗi khi thêm sản phẩm: " + e.getMessage());
+            request.getRequestDispatcher("staff/mnproduct.jsp").forward(request, response);
+        }
     }
 
     @Override

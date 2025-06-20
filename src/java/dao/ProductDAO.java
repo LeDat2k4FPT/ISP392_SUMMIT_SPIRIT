@@ -228,6 +228,8 @@ public class ProductDAO {
         dto.setProductName(rs.getString("ProductName"));
         dto.setDescription(rs.getString("Description"));
         dto.setPrice(Double.parseDouble(PRICE_FORMAT.format(rs.getDouble("Price"))));
+        dto.setSize(rs.getString("Size"));
+        dto.setStock(rs.getInt("Stock"));
         dto.setCateID(rs.getInt("CateID"));
         String image = rs.getString("ImageURL");
         dto.setProductImage(image != null ? image : "default.jpg");
