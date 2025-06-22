@@ -12,6 +12,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 /**
  *
@@ -21,7 +22,7 @@ import java.io.IOException;
 public class DeleteProductController extends HttpServlet {
 
     private static final String ERROR = "error.jsp";
-    private static final String SUCCESS = "staff/productlist.jsp";
+    private static final String SUCCESS = "staffDashboard.jsp?page=staff/productlist.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -41,8 +42,11 @@ public class DeleteProductController extends HttpServlet {
         } catch (Exception e) {
             log("Error at DeleteProductController: " + e.getMessage());
             request.setAttribute("error", "Error: " + e.getMessage());
+            request.getRequestDispatcher(ERROR).forward(request, response);
+            return;
         } finally {
-            request.getRequestDispatcher(url).forward(request, response);
+            String msg = URLEncoder.encode("Delete product successfully !", "UTF-8");
+            response.sendRedirect("staffDashboard.jsp?page=staff/productlist.jsp&msg=" + msg + "&type=sucess");
         }
     }
 

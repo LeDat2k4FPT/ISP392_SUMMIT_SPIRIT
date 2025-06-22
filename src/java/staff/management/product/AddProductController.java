@@ -10,6 +10,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.net.URLEncoder;
 
 @WebServlet(name = "AddProductController", urlPatterns = {"/AddProductController"})
 public class AddProductController extends HttpServlet {
@@ -62,13 +63,13 @@ public class AddProductController extends HttpServlet {
                 ProductImageDAO imageDAO = new ProductImageDAO();
                 imageDAO.insertImage(imageDTO);
             }
-
-            response.sendRedirect("staff/productlist.jsp");
+            String message = URLEncoder.encode("Add product successfully!", "UTF-8");
+            response.sendRedirect("staffDashboard.jsp?page=staff/productlist.jsp&msg=" + message + "&type=success");
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("error", "Lỗi khi thêm sản phẩm: " + e.getMessage());
-            request.getRequestDispatcher("staff/mnproduct.jsp").forward(request, response);
+            request.getRequestDispatcher("staff/productlist.jsp").forward(request, response);
         }
     }
 

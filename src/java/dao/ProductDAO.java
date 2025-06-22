@@ -172,10 +172,11 @@ public class ProductDAO {
     public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
         String sql
-                = "SELECT p.ProductID, p.ProductName, p.Description, p.Status, p.CateID, "
+                = "SELECT p.ProductID, p.ProductName, p.Description, p.Status, c.CateName, "
                 + "       (SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, "
                 + "       (SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL "
-                + "FROM Product p";
+                + "FROM Product p "
+                + "JOIN Category c ON p.CateID = c.CateID"; ///// o day nua
 
         try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql);  ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -184,7 +185,7 @@ public class ProductDAO {
                 p.setProductName(rs.getString("ProductName"));
                 p.setDescription(rs.getString("Description"));
                 p.setStatus(rs.getString("Status"));
-                p.setCateID(rs.getInt("CateID"));
+                p.setCateName(rs.getString("CateName"));  ////// Khang Lanh them vao cho nay nhe
 
                 double price = rs.getDouble("Price");
                 p.setPrice(price);
@@ -281,45 +282,41 @@ public class ProductDAO {
     }
 
     public ProductDTO getProductByID(int productID) throws SQLException, ClassNotFoundException {
-    String sql = "SELECT p.ProductID, p.ProductName, p.Description, p.Status, p.CateID, " +
-                 "(SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, " +
-                 "(SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL " +
-                 "FROM Product p WHERE p.ProductID = ?";
-    try (Connection conn = DBUtils.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, productID);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                ProductDTO dto = new ProductDTO();
-                dto.setProductID(rs.getInt("ProductID"));
-                dto.setProductName(rs.getString("ProductName"));
-                dto.setDescription(rs.getString("Description"));
-                dto.setStatus(rs.getString("Status"));
-                dto.setCateID(rs.getInt("CateID"));
-                dto.setPrice(rs.getDouble("Price"));
-                String img = rs.getString("ImageURL");
-                dto.setProductImage(img != null ? img : "default.jpg");
-                return dto;
+        String sql = "SELECT p.ProductID, p.ProductName, p.Description, p.Status, p.CateID, "
+                + "(SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, "
+                + "(SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL "
+                + "FROM Product p WHERE p.ProductID = ?";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productID);
+            try ( ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    ProductDTO dto = new ProductDTO();
+                    dto.setProductID(rs.getInt("ProductID"));
+                    dto.setProductName(rs.getString("ProductName"));
+                    dto.setDescription(rs.getString("Description"));
+                    dto.setStatus(rs.getString("Status"));
+                    dto.setCateID(rs.getInt("CateID"));
+                    dto.setPrice(rs.getDouble("Price"));
+                    String img = rs.getString("ImageURL");
+                    dto.setProductImage(img != null ? img : "default.jpg");
+                    return dto;
+                }
             }
         }
+        return null;
     }
-    return null;
-}
 
-public boolean updateProductByID(ProductDTO product) throws SQLException, ClassNotFoundException {
-    String sql = "UPDATE Product SET ProductName = ?, Description = ?, Status = ?, CateID = ? WHERE ProductID = ?";
-    try (
-        Connection conn = DBUtils.getConnection();
-        PreparedStatement ps = conn.prepareStatement(sql)
-    ) {
-        ps.setString(1, product.getProductName());
-        ps.setString(2, product.getDescription());
-        ps.setString(3, product.getStatus());
-        ps.setInt(4, product.getCateID());
-        ps.setInt(5, product.getProductID());
-        return ps.executeUpdate() > 0;
+    public boolean updateProductByID(ProductDTO product) throws SQLException, ClassNotFoundException {
+        String sql = "UPDATE Product SET ProductName = ?, Description = ?, Status = ?, CateID = ? WHERE ProductID = ?";
+        try (
+                 Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, product.getProductName());
+            ps.setString(2, product.getDescription());
+            ps.setString(3, product.getStatus());
+            ps.setInt(4, product.getCateID());
+            ps.setInt(5, product.getProductID());
+            return ps.executeUpdate() > 0;
+        }
     }
-}
-
 
 }
