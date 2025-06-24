@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, dao.ProductDAO, dto.ProductDTO" %>
+<%@ page import="java.util.*, dao.ProductDAO, dto.ProductDTO, dto.CartDTO, dto.UserDTO" %>
 
 <%
     String category = request.getParameter("category");
@@ -37,6 +37,10 @@
     } catch (Exception e) {
         e.printStackTrace();
     }
+
+    UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+    CartDTO cart = (CartDTO) session.getAttribute("CART");
+    int totalQuantity = (cart != null) ? cart.getTotalQuantity() : 0;
 %>
 
 <!DOCTYPE html>
@@ -45,13 +49,59 @@
     <title>Category - <%= categoryName %></title>
     <style>
         body { font-family: Arial, sans-serif; margin: 0; padding: 0; }
+
+        /* Header Layout */
         .header {
             padding: 20px;
             background-color: #f4f4f4;
             display: flex;
+            justify-content: space-between;
+            align-items: center;
+            gap: 30px;
+        }
+
+        .search-form-left {
+            display: flex;
+            gap: 10px;
+        }
+        .search-form-left input {
+            padding: 6px;
+            border-radius: 4px;
+            border: 1px solid #ccc;
+            width: 200px;
+        }
+        .search-form-left button {
+            padding: 6px 12px;
+            background-color: #007bff;
+            color: white;
+            border: none;
+            border-radius: 4px;
+            cursor: pointer;
+        }
+
+        .header-right {
+            display: flex;
+            gap: 30px;
             align-items: center;
         }
-        .logo { font-size: 24px; font-weight: bold; color: #1a1a1a; }
+        .header-right a {
+            text-decoration: none;
+            color: black;
+            font-size: 16px;
+        }
+        .header-right span {
+            font-weight: bold;
+            font-size: 16px;
+        }
+        .cart-count {
+            background: red;
+            color: white;
+            border-radius: 50%;
+            padding: 2px 6px;
+            font-size: 12px;
+            margin-left: 4px;
+        }
+
         .main { padding: 40px; }
         h2 { font-size: 28px; margin-bottom: 20px; }
         .sort-options {
@@ -67,6 +117,7 @@
             text-decoration: underline;
             color: #007bff;
         }
+
         .product-list {
             display: flex;
             gap: 40px;
@@ -99,41 +150,68 @@
         }
         .product p { font-size: 14px; color: #666; }
         .product strong { display: block; margin-top: 10px; font-size: 16px; color: #000; }
-        .search-form {
-            margin-left: auto;
+
+        /* Category Navigation */
+        .categories {
             display: flex;
-            gap: 10px;
+            justify-content: center;
+            gap: 30px;
+            padding: 15px 0;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ccc;
         }
-        .search-form input {
-            padding: 6px;
-            border-radius: 4px;
-            border: 1px solid #ccc;
-            width: 200px;
+        .categories a {
+            text-decoration: none;
+            font-size: 16px;
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 5px;
         }
-        .search-form button {
-            padding: 6px 12px;
+        .categories a:hover,
+        .categories a.active {
             background-color: #007bff;
             color: white;
-            border: none;
-            border-radius: 4px;
-            cursor: pointer;
         }
     </style>
 </head>
 <body>
 
+<!-- Header -->
 <div class="header">
-    <div class="logo">SUMMIT SPIRIT</div>
-    <form method="get" action="category.jsp" class="search-form">
+    <!-- SEARCH BÊN TRÁI -->
+    <form method="get" action="category.jsp" class="search-form-left">
         <input type="hidden" name="category" value="<%= category %>"/>
         <input type="text" name="keyword" placeholder="Search..." value="<%= keyword != null ? keyword : "" %>" />
         <button type="submit">Search</button>
     </form>
+
+    <!-- HOME | CART | USER BÊN PHẢI -->
+    <div class="header-right">
+        <a href="homepage.jsp">Home</a>
+        <a href="cart.jsp">
+            Cart
+            <span class="cart-count"><%= totalQuantity %></span>
+        </a>
+        <% if (loginUser != null) { %>
+            <span><%= loginUser.getFullName() %></span>
+        <% } %>
+    </div>
+</div>
+
+<!-- Category Navigation -->
+<div class="categories">
+    <a href="category.jsp?category=ao" class="<%= "ao".equals(category) ? "active" : "" %>">Shirts</a>
+    <a href="category.jsp?category=quan" class="<%= "quan".equals(category) ? "active" : "" %>">Pants</a>
+    <a href="category.jsp?category=balo" class="<%= "balo".equals(category) ? "active" : "" %>">Backpacks</a>
+    <a href="category.jsp?category=dungcu" class="<%= "dungcu".equals(category) ? "active" : "" %>">Camping Tools</a>
+    <a href="category.jsp?category=trai" class="<%= "trai".equals(category) ? "active" : "" %>">Tents</a>
+    <a href="category.jsp?category=mu" class="<%= "mu".equals(category) ? "active" : "" %>">Hats</a>
+    <a href="category.jsp?category=camping" class="<%= "camping".equals(category) ? "active" : "" %>">Camping Stove</a>
 </div>
 
 <div class="main">
 
-    <!-- BREADCRUMB -->
+    <!-- Breadcrumb -->
     <div style="font-size: 14px; margin-bottom: 10px; color: #555;">
         <a href="homepage.jsp" style="text-decoration: none; color: #888;">Home</a>
         <span style="margin: 0 5px;">/</span>
