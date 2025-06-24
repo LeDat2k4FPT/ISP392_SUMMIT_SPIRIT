@@ -11,6 +11,7 @@ public class ProductDTO {
     private String status;
     private int stock;
     private int cateID;
+    private String cateName;
 
     public ProductDTO() {
     }
@@ -35,6 +36,15 @@ public class ProductDTO {
         this.cateID = cateID;
         this.status = status;
     }
+    
+    public String getCateName() {
+        return cateName;
+    }
+
+    public void setCateName(String cateName) {
+        this.cateName = cateName;
+    }
+    
 
     public int getProductID() {
         return productID;

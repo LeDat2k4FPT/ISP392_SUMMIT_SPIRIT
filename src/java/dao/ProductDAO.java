@@ -11,24 +11,24 @@ public class ProductDAO {
 
     private static final DecimalFormat PRICE_FORMAT = new DecimalFormat("#.000");
 
-    private static final String BASE_SELECT
-            = "SELECT p.ProductID, p.ProductName, p.Description, "
-            + "MIN(pv.Price) AS Price, MIN(pv.Quantity) AS Stock, "
-            + "MIN(s.SizeName) AS Size, MIN(i.ImageURL) AS ImageURL, p.CateID ";
+    private static final String BASE_SELECT =
+        "SELECT p.ProductID, p.ProductName, p.Description, " +
+        "MIN(pv.Price) AS Price, MIN(pv.Quantity) AS Stock, " +
+        "MIN(s.SizeName) AS Size, MIN(i.ImageURL) AS ImageURL, p.CateID ";
 
-    private static final String BASE_FROM
-            = "FROM Product p "
-            + "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID "
-            + "LEFT JOIN Size s ON pv.SizeID = s.SizeID "
-            + "LEFT JOIN ProductImage i ON p.ProductID = i.ProductID ";
+    private static final String BASE_FROM =
+        "FROM Product p " +
+        "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID " +
+        "LEFT JOIN Size s ON pv.SizeID = s.SizeID " +
+        "LEFT JOIN ProductImage i ON p.ProductID = i.ProductID ";
 
     public List<ProductDTO> getProductsByCategorySorted(int cateID, String sortOrder)
             throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String query = BASE_SELECT + BASE_FROM
-                + "WHERE p.CateID = ? AND p.Status = 'Active' "
-                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID "
-                + "ORDER BY Price " + ("asc".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
+        String query = BASE_SELECT + BASE_FROM +
+            "WHERE p.CateID = ? AND p.Status = 'Active' " +
+            "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID " +
+            "ORDER BY Price " + ("asc".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
 
         try (Connection conn = DBUtils.getConnection(); PreparedStatement ptm = conn.prepareStatement(query)) {
             ptm.setInt(1, cateID);
@@ -44,9 +44,9 @@ public class ProductDAO {
     public ProductDTO getFullProductByID(int productID)
             throws SQLException, ClassNotFoundException {
         ProductDTO dto = null;
-        String sql = BASE_SELECT + BASE_FROM
-                + "WHERE p.ProductID = ? AND p.Status = 'Active' "
-                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
+        String sql = BASE_SELECT + BASE_FROM +
+            "WHERE p.ProductID = ? AND p.Status = 'Active' " +
+            "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
 
         try (Connection conn = DBUtils.getConnection(); PreparedStatement ptm = conn.prepareStatement(sql)) {
             ptm.setInt(1, productID);
@@ -62,9 +62,9 @@ public class ProductDAO {
     public List<ProductDTO> getTopNProductsByIDs(int[] ids)
             throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String sql = BASE_SELECT + BASE_FROM
-                + "WHERE p.ProductID = ? AND p.Status = 'Active' "
-                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
+        String sql = BASE_SELECT + BASE_FROM +
+            "WHERE p.ProductID = ? AND p.Status = 'Active' " +
+            "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
 
         try (Connection conn = DBUtils.getConnection()) {
             for (int id : ids) {
@@ -83,9 +83,9 @@ public class ProductDAO {
 
     public List<ProductDTO> getTop3Products() throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String sql = "SELECT TOP 3 " + BASE_SELECT.substring(7) + BASE_FROM
-                + "WHERE p.Status = 'Active' "
-                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
+        String sql = "SELECT TOP 3 " + BASE_SELECT.substring(7) + BASE_FROM +
+            "WHERE p.Status = 'Active' " +
+            "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
 
         try (Connection conn = DBUtils.getConnection(); PreparedStatement ptm = conn.prepareStatement(sql); ResultSet rs = ptm.executeQuery()) {
             while (rs.next()) {
@@ -98,8 +98,8 @@ public class ProductDAO {
     public List<ProductDTO> getProductsByCategoryDistinct(int cateID)
             throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String sql = "SELECT DISTINCT " + BASE_SELECT.substring(7) + BASE_FROM
-                + "WHERE p.CateID = ? AND p.Status = 'Active'";
+        String sql = "SELECT DISTINCT " + BASE_SELECT.substring(7) + BASE_FROM +
+            "WHERE p.CateID = ? AND p.Status = 'Active'";
 
         try (Connection conn = DBUtils.getConnection(); PreparedStatement ptm = conn.prepareStatement(sql)) {
             ptm.setInt(1, cateID);
@@ -132,11 +132,12 @@ public class ProductDAO {
 
     public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String sql
-                = "SELECT p.ProductID, p.ProductName, p.Description, p.Status, p.CateID, "
-                + "       (SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, "
-                + "       (SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL "
-                + "FROM Product p WHERE p.Status = 'Active'";
+        String sql =
+            "SELECT p.ProductID, p.ProductName, p.Description, p.Status, c.CateName, " +
+            "(SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, " +
+            "(SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL " +
+            "FROM Product p " +
+            "JOIN Category c ON p.CateID = c.CateID";
 
         try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
@@ -145,7 +146,7 @@ public class ProductDAO {
                 p.setProductName(rs.getString("ProductName"));
                 p.setDescription(rs.getString("Description"));
                 p.setStatus(rs.getString("Status"));
-                p.setCateID(rs.getInt("CateID"));
+                p.setCateName(rs.getString("CateName"));
 
                 double price = rs.getDouble("Price");
                 p.setPrice(price);
@@ -162,10 +163,10 @@ public class ProductDAO {
     public List<ProductDTO> getTopSalesFromCategory(int cateID, int limit)
             throws SQLException, ClassNotFoundException {
         List<ProductDTO> result = new ArrayList<>();
-        String sql = "SELECT TOP (?) " + BASE_SELECT.substring(7) + BASE_FROM
-                + "WHERE p.CateID = ? AND p.Sold > 0 AND p.Status = 'Active' "
-                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID "
-                + "ORDER BY p.Sold DESC";
+        String sql = "SELECT TOP (?) " + BASE_SELECT.substring(7) + BASE_FROM +
+            "WHERE p.CateID = ? AND p.Sold > 0 AND p.Status = 'Active' " +
+            "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID " +
+            "ORDER BY p.Sold DESC";
 
         try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, limit);
@@ -238,8 +239,7 @@ public class ProductDAO {
                      "(SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, " +
                      "(SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL " +
                      "FROM Product p WHERE p.ProductID = ?";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productID);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
@@ -261,10 +261,7 @@ public class ProductDAO {
 
     public boolean updateProductByID(ProductDTO product) throws SQLException, ClassNotFoundException {
         String sql = "UPDATE Product SET ProductName = ?, Description = ?, Status = ?, CateID = ? WHERE ProductID = ?";
-        try (
-            Connection conn = DBUtils.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, product.getProductName());
             ps.setString(2, product.getDescription());
             ps.setString(3, product.getStatus());
@@ -276,10 +273,7 @@ public class ProductDAO {
 
     public int getStockByProductID(int productID) throws SQLException, ClassNotFoundException {
         String sql = "SELECT SUM(Quantity) AS Stock FROM ProductVariant WHERE ProductID = ?";
-        try (
-            Connection conn = DBUtils.getConnection();
-            PreparedStatement ps = conn.prepareStatement(sql)
-        ) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productID);
             try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {

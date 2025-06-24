@@ -172,6 +172,28 @@
             background-color: #007bff;
             color: white;
         }
+
+        /* Category Navigation (text only) */
+        .categories {
+            display: flex;
+            justify-content: center;
+            gap: 30px;
+            padding: 15px 0;
+            background-color: #f9f9f9;
+            border-bottom: 1px solid #ccc;
+        }
+        .categories a {
+            text-decoration: none;
+            font-size: 16px;
+            color: #333;
+            padding: 8px 12px;
+            border-radius: 5px;
+        }
+        .categories a:hover,
+        .categories a.active {
+            background-color: #007bff;
+            color: white;
+        }
     </style>
 </head>
 <body>
@@ -199,6 +221,17 @@
 </div>
 
 <!-- Category Navigation -->
+<div class="categories">
+    <a href="category.jsp?category=ao" class="<%= "ao".equals(category) ? "active" : "" %>">Shirts</a>
+    <a href="category.jsp?category=quan" class="<%= "quan".equals(category) ? "active" : "" %>">Pants</a>
+    <a href="category.jsp?category=balo" class="<%= "balo".equals(category) ? "active" : "" %>">Backpacks</a>
+    <a href="category.jsp?category=dungcu" class="<%= "dungcu".equals(category) ? "active" : "" %>">Camping Tools</a>
+    <a href="category.jsp?category=trai" class="<%= "trai".equals(category) ? "active" : "" %>">Tents</a>
+    <a href="category.jsp?category=mu" class="<%= "mu".equals(category) ? "active" : "" %>">Hats</a>
+    <a href="category.jsp?category=camping" class="<%= "camping".equals(category) ? "active" : "" %>">Camping Stove</a>
+</div>
+
+<!-- Text-based Categories Navigation -->
 <div class="categories">
     <a href="category.jsp?category=ao" class="<%= "ao".equals(category) ? "active" : "" %>">Shirts</a>
     <a href="category.jsp?category=quan" class="<%= "quan".equals(category) ? "active" : "" %>">Pants</a>
