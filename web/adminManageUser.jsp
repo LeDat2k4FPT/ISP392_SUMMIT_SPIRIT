@@ -19,12 +19,7 @@
         function confirmChangeRole(fullname, currentRole) {
             return confirm(`Are you sure to change role?`);
     }
-        
-        function confirmLogout() {
-            if (confirm("Do you really want to logout?")) {
-                window.location.href = 'login.jsp';
-            }
-        }
+
     </script>
 </head>
 <body>
@@ -33,7 +28,6 @@
     <input type="text" name="keyword" value="<%= keyword %>" placeholder="Search by name, email, address, or role...">
     <input type="submit" value="Search">
     <button type="button" onclick="window.location.href='createUserAccount.jsp'">Create New Account</button>
-    <button type="button" onclick="confirmLogout()">Logout</button>
     <button type="button" onclick="window.location.href='admin.jsp'">Back</button>
     
 </form>
