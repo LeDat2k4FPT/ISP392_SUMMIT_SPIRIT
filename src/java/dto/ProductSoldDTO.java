@@ -12,6 +12,7 @@ public class ProductSoldDTO {
     private String productName;
     private String color;
     private int quantity;
+    private double totalRevenue;
 
     public String getProductName() {
         return productName;
@@ -37,5 +38,11 @@ public class ProductSoldDTO {
     this.quantity = quantity;
 }
 
-    
+    public double getTotalRevenue() {
+        return totalRevenue;
+    }
+
+    public void setTotalRevenue(double totalRevenue) {
+        this.totalRevenue = totalRevenue;
+    }
 }

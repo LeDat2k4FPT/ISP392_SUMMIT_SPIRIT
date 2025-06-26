@@ -5,8 +5,10 @@
 package controllers;
 
 import dao.RevenueDAO;
+import dao.CategoryDAO;
 import dto.ProductSoldDTO;
 import dto.RevenueLineDTO;
+import dto.CategoryDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -44,23 +46,48 @@ public class ViewRevenueController extends HttpServlet {
             String selectedMonth = request.getParameter("monthValue");
             String selectedYear = request.getParameter("yearValue");
             String selectedCategory = request.getParameter("category");
+            String selectedStatus = request.getParameter("orderStatus");
+            if (selectedStatus == null || selectedStatus.isEmpty()) selectedStatus = "All";
 
             // Set default values if not provided
             if (selectedDay == null) selectedDay = "all";
             if (selectedMonth == null) selectedMonth = "all";
             if (selectedYear == null) selectedYear = "all";
             if (selectedCategory == null || selectedCategory.isEmpty()) {
-                selectedCategory = "Clothing"; // Default category
+                selectedCategory = "all";
+            }
+
+            // Định dạng lại ngày/tháng/năm cho truy vấn SQL
+            if ("day".equals(filterType) && !"all".equals(selectedDay) && !"all".equals(selectedMonth) && !"all".equals(selectedYear)) {
+                // Định dạng yyyy-MM-dd
+                selectedDay = String.format("%s-%02d-%02d", selectedYear, Integer.parseInt(selectedMonth), Integer.parseInt(selectedDay));
+            } else if ("month".equals(filterType) && !"all".equals(selectedMonth) && !"all".equals(selectedYear)) {
+                // Định dạng yyyy-MM
+                selectedMonth = String.format("%s-%02d", selectedYear, Integer.parseInt(selectedMonth));
             }
 
             // 3. Retrieve data using DAO
             RevenueDAO dao = new RevenueDAO();
+            CategoryDAO cateDao = new CategoryDAO();
+            List<CategoryDTO> categoryList = cateDao.getAllCategories();
+            CategoryDTO allCate = new CategoryDTO();
+            allCate.setCateName("all");
+            categoryList.add(0, allCate);
 
             // Line chart: sales quantity by time
-            List<RevenueLineDTO> lineData = dao.getLineChartData(filterType, selectedDay, selectedMonth, selectedYear);
+            List<RevenueLineDTO> lineData = dao.getLineChartData(filterType, selectedDay, selectedMonth, selectedYear, selectedCategory, selectedStatus);
 
             // Pie chart: sales quantity by product & color for a category
-            List<ProductSoldDTO> pieData = dao.getPieChartData(selectedCategory);
+            List<ProductSoldDTO> pieData = dao.getPieChartData(selectedCategory, filterType, selectedDay, selectedMonth, selectedYear, selectedStatus);
+
+            // Tổng số đơn hàng, tổng sản phẩm bán ra, số đơn đã giao, số đơn bị hủy
+            int totalOrders = dao.countOrders(selectedDay, selectedMonth, selectedYear, selectedCategory, selectedStatus);
+            int totalProducts = dao.countProductsSold(selectedDay, selectedMonth, selectedYear, selectedCategory, selectedStatus);
+            int deliveredOrders = dao.countOrders(selectedDay, selectedMonth, selectedYear, selectedCategory, "Delivered");
+            int cancelledOrders = dao.countOrders(selectedDay, selectedMonth, selectedYear, selectedCategory, "Cancelled");
+
+            // Top products
+            List<ProductSoldDTO> topProducts = dao.getTopSellingProducts(selectedDay, selectedMonth, selectedYear, selectedCategory, selectedStatus, 5);
 
             // 4. Set data attributes for JSP
             request.setAttribute("lineData", lineData);
@@ -70,6 +97,13 @@ public class ViewRevenueController extends HttpServlet {
             request.setAttribute("selectedDay", selectedDay);
             request.setAttribute("selectedMonth", selectedMonth);
             request.setAttribute("selectedYear", selectedYear);
+            request.setAttribute("categoryList", categoryList);
+            request.setAttribute("selectedStatus", selectedStatus);
+            request.setAttribute("totalOrders", totalOrders);
+            request.setAttribute("totalProducts", totalProducts);
+            request.setAttribute("deliveredOrders", deliveredOrders);
+            request.setAttribute("cancelledOrders", cancelledOrders);
+            request.setAttribute("topProducts", topProducts);
 
             // 5. Forward to JSP page
             request.getRequestDispatcher("viewRevenue.jsp").forward(request, response);

@@ -14,6 +14,7 @@ public class RevenueLineDTO {
     private String category;
     private String timeLabel;
     private int totalQuantity;
+    private double totalRevenue;
 
     public String getCategory() {
         return category;
@@ -37,5 +38,13 @@ public class RevenueLineDTO {
 
     public void setTotalQuantity(int totalQuantity) {
         this.totalQuantity = totalQuantity;
+    }
+
+    public double getTotalRevenue() {
+        return totalRevenue;
+    }
+
+    public void setTotalRevenue(double totalRevenue) {
+        this.totalRevenue = totalRevenue;
     }
 }
