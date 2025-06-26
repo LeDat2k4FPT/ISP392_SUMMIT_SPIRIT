@@ -29,12 +29,13 @@ public class ProductSoldDTO {
         this.color = color;
     }
 
-    public int getQuantity() {
-        return quantity;
-    }
+    public int getQuantitySold() {
+    return quantity;
+}
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
-    }
+    public void setQuantitySold(int quantity) {
+    this.quantity = quantity;
+}
+
     
 }

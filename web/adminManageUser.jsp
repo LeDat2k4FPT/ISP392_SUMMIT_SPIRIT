@@ -12,8 +12,7 @@
     List<UserDTO> users = (List<UserDTO>) request.getAttribute("users");
     String keyword = request.getAttribute("keyword") != null ? (String) request.getAttribute("keyword") : "";
 %>
-<html>
-<head>
+
     <title>Manage User Accounts</title>
     <script>
         function confirmChangeRole(fullname, currentRole) {
@@ -26,8 +25,7 @@
             }
         }
     </script>
-</head>
-<body>
+
 <h2>Manage User Accounts</h2>
 <form method="get" action="manageUser">
     <input type="text" name="keyword" value="<%= keyword %>" placeholder="Search by name, email, address, or role...">
@@ -47,33 +45,34 @@
         <th>Role</th>
         <th>Action</th>
     </tr>
-    <% for (UserDTO u : users) { %>
-        <tr>
-            <td><%= u.getUserID() %></td>
-            <td><%= u.getFullName() %></td>
-            <td><%= u.getEmail() %></td>
-            <td><%= u.getAddress() %></td>
-            <td><%= u.getRole() %></td>
-            <td>
-                <!-- Change Role Button -->
-                <form action="ManageUserActionController" method="post" style="display:inline;" onsubmit="return confirmChangeRole('<%= u.getFullName() %>', '<%= u.getRole() %>');">
-                    <input type="hidden" name="userID" value="<%= u.getUserID() %>">
-                    <input type="hidden" name="action" value="editRole">
-                    <input type="submit" value="Change Role">
-                </form>
+    <% if (users != null) { 
+       for (UserDTO u : users) { %>
+    <tr>
+        <td><%= u.getUserID() %></td>
+        <td><%= u.getFullName() %></td>
+        <td><%= u.getEmail() %></td>
+        <td><%= u.getAddress() %></td>
+        <td><%= u.getRole() %></td>
+        <td>
+            <!-- Change Role -->
+            <form action="ManageUserActionController" method="post" style="display:inline;" 
+                  onsubmit="return confirm('Are you sure to change role?');">
+                <input type="hidden" name="userID" value="<%= u.getUserID() %>">
+                <input type="hidden" name="action" value="editRole">
+                <input type="submit" value="Change Role">
+            </form>
 
-                <!-- Delete Button with confirm -->
-                <form action="ManageUserActionController" method="post" style="display:inline;"
-                      onsubmit="return confirm('Are you sure you want to permanently delete user <%= u.getFullName() %>?');">
-                    <input type="hidden" name="userID" value="<%= u.getUserID() %>">
-                    <input type="hidden" name="action" value="delete">
-                    <input type="submit" value="Delete">
-                </form>
-
-            </td>
-
-        </tr>
-    <% } %>
+            <!-- Delete -->
+            <form action="ManageUserActionController" method="post" style="display:inline;" 
+                  onsubmit="return confirm('Are you sure you want to permanently delete user <%= u.getFullName() %>?');">
+                <input type="hidden" name="userID" value="<%= u.getUserID() %>">
+                <input type="hidden" name="action" value="delete">
+                <input type="submit" value="Delete">
+            </form>
+        </td>
+    </tr>
+<%     } 
+   } else { %>
+    <tr><td colspan="6">No users found or error loading users.</td></tr>
+<% } %>
 </table>
-</body>
-</html>

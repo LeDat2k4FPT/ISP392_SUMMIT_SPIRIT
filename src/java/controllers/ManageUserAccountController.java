@@ -18,7 +18,7 @@ import java.util.List;
  *
  * @author Hanne
  */
-@WebServlet("/manageUser")
+@WebServlet(name = "ManageUserAccountController", urlPatterns = {"/ManageUserAccountController"})
 public class ManageUserAccountController extends HttpServlet {
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

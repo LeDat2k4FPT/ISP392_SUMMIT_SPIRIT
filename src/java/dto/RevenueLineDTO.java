@@ -8,10 +8,12 @@ package dto;
  *
  * @author Hanne
  */
+
+
 public class RevenueLineDTO {
     private String category;
-    private String period;
-    private int quantity;
+    private String timeLabel;
+    private int totalQuantity;
 
     public String getCategory() {
         return category;
@@ -21,20 +23,19 @@ public class RevenueLineDTO {
         this.category = category;
     }
 
-    public String getPeriod() {
-        return period;
+    public String getTimeLabel() {
+        return timeLabel;
     }
 
-    public void setPeriod(String period) {
-        this.period = period;
+    public void setTimeLabel(String timeLabel) {
+        this.timeLabel = timeLabel;
     }
 
-    public int getQuantity() {
-        return quantity;
+    public int getTotalQuantity() {
+        return totalQuantity;
     }
 
-    public void setQuantity(int quantity) {
-        this.quantity = quantity;
+    public void setTotalQuantity(int totalQuantity) {
+        this.totalQuantity = totalQuantity;
     }
-    
 }

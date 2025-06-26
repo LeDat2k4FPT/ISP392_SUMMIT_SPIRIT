@@ -38,6 +38,9 @@ public class MainController extends HttpServlet {
     private static final String VERIFY_OTP_CONTROLLER = "VerifyOtpController";
     private static final String RESET_PASSWORD = "ResetPassword";
     private static final String RESET_PASSWORD_CONTROLLER = "ResetPasswordController";
+    private static final String MANAGE_USER_ACCOUNT = "ManageUser";
+    private static final String MANAGE_USER_ACCOUNT_CONTROLLER = "ManageUserAccountController";
+
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -65,6 +68,8 @@ public class MainController extends HttpServlet {
                 url = VERIFY_OTP_CONTROLLER;
             } else if (RESET_PASSWORD.equals(action)) {
                 url = RESET_PASSWORD_CONTROLLER;
+            } else if (MANAGE_USER_ACCOUNT.equals(action)) {
+                url = MANAGE_USER_ACCOUNT_CONTROLLER;
             }
         } catch (Exception e) {
             log("error at MainController: " + e.toString());
