@@ -48,7 +48,7 @@
 
     <div class="btns">
         <input type="submit" value="Create">
-        <button type="button" onclick="window.location.href='manageUser'">Cancel</button>
+        <button type="button" onclick="window.location.href='../ManageUserAccountController'">Cancel</button>
     </div>
 </form>
 

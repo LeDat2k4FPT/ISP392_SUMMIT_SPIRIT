@@ -35,6 +35,6 @@ public class ManageUserAccountController extends HttpServlet {
 
         request.setAttribute("users", userList);
         request.setAttribute("keyword", keyword);
-        request.getRequestDispatcher("adminManageUser.jsp").forward(request, response);
+        request.getRequestDispatcher("admin/adminManageUser.jsp").forward(request, response);
     }
 }

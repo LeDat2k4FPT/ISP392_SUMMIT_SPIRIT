@@ -19,7 +19,7 @@ import java.io.PrintWriter;
 @WebServlet(name = "AdminCreateUserController", urlPatterns = {"/AdminCreateUserController"})
 public class AdminCreateUserController extends HttpServlet {
 
-    private static final String ERROR = "createUserAccount.jsp";
+    private static final String ERROR = "admin/createUserAccount.jsp";
     private static final String SUCCESS = "manageUser";
 
     @Override

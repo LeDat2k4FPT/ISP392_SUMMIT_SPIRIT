@@ -30,9 +30,9 @@
 <form method="get" action="manageUser">
     <input type="text" name="keyword" value="<%= keyword %>" placeholder="Search by name, email, address, or role...">
     <input type="submit" value="Search">
-    <button type="button" onclick="window.location.href='createUserAccount.jsp'">Create New Account</button>
+    <button type="button" onclick="window.location.href='admin/createUserAccount.jsp'">Create New Account</button>
     <button type="button" onclick="confirmLogout()">Logout</button>
-    <button type="button" onclick="window.location.href='admin.jsp'">Back</button>
+    <button type="button" onclick="window.location.href='admin/admin.jsp'">Back</button>
     
 </form>
 <br>
