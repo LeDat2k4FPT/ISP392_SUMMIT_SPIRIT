@@ -11,30 +11,28 @@ public class ProductDAO {
 
     private static final DecimalFormat PRICE_FORMAT = new DecimalFormat("#.000");
 
-    private static final String BASE_SELECT
-            = "SELECT p.ProductID, p.ProductName, p.Description, "
-            + "MIN(pv.Price) AS Price, MIN(pv.Quantity) AS Stock, "
-            + "MIN(s.SizeName) AS Size, MIN(i.ImageURL) AS ImageURL, p.CateID ";
+    private static final String BASE_SELECT =
+        "SELECT p.ProductID, p.ProductName, p.Description, " +
+        "MIN(pv.Price) AS Price, MIN(pv.Quantity) AS Stock, " +
+        "MIN(s.SizeName) AS Size, MIN(i.ImageURL) AS ImageURL, p.CateID ";
 
-    private static final String BASE_FROM
-            = "FROM Product p "
-            + "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID "
-            + "LEFT JOIN Size s ON pv.SizeID = s.SizeID "
-            + "LEFT JOIN ProductImage i ON p.ProductID = i.ProductID ";
+    private static final String BASE_FROM =
+        "FROM Product p " +
+        "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID " +
+        "LEFT JOIN Size s ON pv.SizeID = s.SizeID " +
+        "LEFT JOIN ProductImage i ON p.ProductID = i.ProductID ";
 
-    // 1. Sắp xếp theo danh mục
     public List<ProductDTO> getProductsByCategorySorted(int cateID, String sortOrder)
             throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String query = BASE_SELECT + BASE_FROM
-                + "WHERE p.CateID = ? "
-                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID "
-                + "ORDER BY Price " + ("asc".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
+        String query = BASE_SELECT + BASE_FROM +
+            "WHERE p.CateID = ? AND p.Status = 'Active' " +
+            "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID " +
+            "ORDER BY Price " + ("asc".equalsIgnoreCase(sortOrder) ? "ASC" : "DESC");
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ptm = conn.prepareStatement(query)) {
-
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ptm = conn.prepareStatement(query)) {
             ptm.setInt(1, cateID);
-            try ( ResultSet rs = ptm.executeQuery()) {
+            try (ResultSet rs = ptm.executeQuery()) {
                 while (rs.next()) {
                     list.add(extractProduct(rs));
                 }
@@ -43,17 +41,16 @@ public class ProductDAO {
         return list;
     }
 
-    // 2. Chi tiết sản phẩm
     public ProductDTO getFullProductByID(int productID)
             throws SQLException, ClassNotFoundException {
         ProductDTO dto = null;
-        String sql = BASE_SELECT + BASE_FROM
-                + "WHERE p.ProductID = ? "
-                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
+        String sql = BASE_SELECT + BASE_FROM +
+            "WHERE p.ProductID = ? AND p.Status = 'Active' " +
+            "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ptm = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ptm = conn.prepareStatement(sql)) {
             ptm.setInt(1, productID);
-            try ( ResultSet rs = ptm.executeQuery()) {
+            try (ResultSet rs = ptm.executeQuery()) {
                 if (rs.next()) {
                     dto = extractProduct(rs);
                 }
@@ -62,19 +59,18 @@ public class ProductDAO {
         return dto;
     }
 
-    // 3. Lấy theo mảng ID
     public List<ProductDTO> getTopNProductsByIDs(int[] ids)
             throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String sql = BASE_SELECT + BASE_FROM
-                + "WHERE p.ProductID = ? "
-                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
+        String sql = BASE_SELECT + BASE_FROM +
+            "WHERE p.ProductID = ? AND p.Status = 'Active' " +
+            "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
 
-        try ( Connection conn = DBUtils.getConnection()) {
+        try (Connection conn = DBUtils.getConnection()) {
             for (int id : ids) {
-                try ( PreparedStatement ptm = conn.prepareStatement(sql)) {
+                try (PreparedStatement ptm = conn.prepareStatement(sql)) {
                     ptm.setInt(1, id);
-                    try ( ResultSet rs = ptm.executeQuery()) {
+                    try (ResultSet rs = ptm.executeQuery()) {
                         if (rs.next()) {
                             list.add(extractProduct(rs));
                         }
@@ -85,13 +81,13 @@ public class ProductDAO {
         return list;
     }
 
-    // 4. Lấy 3 sản phẩm mặc định
     public List<ProductDTO> getTop3Products() throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String sql = "SELECT TOP 3 " + BASE_SELECT.substring(7) + BASE_FROM
-                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
+        String sql = "SELECT TOP 3 " + BASE_SELECT.substring(7) + BASE_FROM +
+            "WHERE p.Status = 'Active' " +
+            "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ptm = conn.prepareStatement(sql);  ResultSet rs = ptm.executeQuery()) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ptm = conn.prepareStatement(sql); ResultSet rs = ptm.executeQuery()) {
             while (rs.next()) {
                 list.add(extractProduct(rs));
             }
@@ -99,16 +95,15 @@ public class ProductDAO {
         return list;
     }
 
-    // 5. Lấy theo danh mục - DISTINCT
     public List<ProductDTO> getProductsByCategoryDistinct(int cateID)
             throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String sql = "SELECT DISTINCT " + BASE_SELECT.substring(7) + BASE_FROM
-                + "WHERE p.CateID = ?";
+        String sql = "SELECT DISTINCT " + BASE_SELECT.substring(7) + BASE_FROM +
+            "WHERE p.CateID = ? AND p.Status = 'Active'";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ptm = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ptm = conn.prepareStatement(sql)) {
             ptm.setInt(1, cateID);
-            try ( ResultSet rs = ptm.executeQuery()) {
+            try (ResultSet rs = ptm.executeQuery()) {
                 while (rs.next()) {
                     list.add(extractProduct(rs));
                 }
@@ -117,75 +112,41 @@ public class ProductDAO {
         return list;
     }
 
-    // 6. Insert sản phẩm AddProductController
     public int insertAndReturnID(ProductDTO product) throws SQLException, ClassNotFoundException {
         String sql = "INSERT INTO Product (ProductName, Description, CateID, Status) VALUES (?, ?, ?, ?)";
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql, Statement.RETURN_GENERATED_KEYS)) {
             ps.setString(1, product.getProductName());
             ps.setString(2, product.getDescription());
             ps.setInt(3, product.getCateID());
             ps.setString(4, product.getStatus());
             ps.executeUpdate();
 
-            try ( ResultSet rs = ps.getGeneratedKeys()) {
+            try (ResultSet rs = ps.getGeneratedKeys()) {
                 if (rs.next()) {
-                    return rs.getInt(1); // trả về ProductID mới tạo
+                    return rs.getInt(1);
                 }
             }
         }
         return -1;
     }
 
-    // 7. Lấy ID tiếp theo
-    private int getNextProductID() throws SQLException, ClassNotFoundException {
-        String sql = "SELECT ISNULL(MAX(ProductID), 0) + 1 FROM Product";
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql);  ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt(1);
-            }
-        }
-        return 1;
-    }
-
-//    // 8. Lấy tất cả sản phẩm (chỉ từ bảng Product)
-//    public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
-//        List<ProductDTO> list = new ArrayList<>();
-//        String sql = "SELECT * FROM Product";
-//        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql);  ResultSet rs = ps.executeQuery()) {
-//            while (rs.next()) {
-//                ProductDTO p = new ProductDTO(
-//                        rs.getInt("ProductID"),
-//                        rs.getString("ProductName"),
-//                        null,
-//                        rs.getString("Description"),
-//                        null,
-//                        0.0,
-//                        rs.getString("Status"),
-//                        0,
-//                        rs.getInt("CateID")
-//                );
-//                list.add(p);
-//            }
-//        }
-//        return list;
-//    }
     public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String sql
-                = "SELECT p.ProductID, p.ProductName, p.Description, p.Status, c.CateName, "
-                + "       (SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, "
-                + "       (SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL "
-                + "FROM Product p "
-                + "JOIN Category c ON p.CateID = c.CateID"; ///// o day nua
+        String sql =
+            "SELECT p.ProductID, p.ProductName, p.Description, p.Status, c.CateName, " +
+            "(SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, " +
+            "(SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL " +
+            "FROM Product p " +
+            "JOIN Category c ON p.CateID = c.CateID";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql);  ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 ProductDTO p = new ProductDTO();
                 p.setProductID(rs.getInt("ProductID"));
                 p.setProductName(rs.getString("ProductName"));
                 p.setDescription(rs.getString("Description"));
                 p.setStatus(rs.getString("Status"));
-                p.setCateName(rs.getString("CateName"));  ////// Khang Lanh them vao cho nay nhe
+                p.setCateName(rs.getString("CateName"));
 
                 double price = rs.getDouble("Price");
                 p.setPrice(price);
@@ -199,19 +160,18 @@ public class ProductDAO {
         return list;
     }
 
-    // 9. Top bán chạy theo danh mục
     public List<ProductDTO> getTopSalesFromCategory(int cateID, int limit)
             throws SQLException, ClassNotFoundException {
         List<ProductDTO> result = new ArrayList<>();
-        String sql = "SELECT TOP (?) " + BASE_SELECT.substring(7) + BASE_FROM
-                + "WHERE p.CateID = ? AND p.Sold > 0 "
-                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID "
-                + "ORDER BY p.Sold DESC";
+        String sql = "SELECT TOP (?) " + BASE_SELECT.substring(7) + BASE_FROM +
+            "WHERE p.CateID = ? AND p.Sold > 0 AND p.Status = 'Active' " +
+            "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID " +
+            "ORDER BY p.Sold DESC";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, limit);
             ps.setInt(2, cateID);
-            try ( ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     result.add(extractProduct(rs));
                 }
@@ -220,9 +180,6 @@ public class ProductDAO {
         return result;
     }
 
-    // ============================
-    // HÀM TIỆN ÍCH DÙNG CHUNG
-    // ============================
     private ProductDTO extractProduct(ResultSet rs) throws SQLException {
         ProductDTO dto = new ProductDTO();
         dto.setProductID(rs.getInt("ProductID"));
@@ -244,28 +201,25 @@ public class ProductDAO {
 
         try {
             con = DBUtils.getConnection();
-            con.setAutoCommit(false); // Bắt đầu transaction
+            con.setAutoCommit(false);
 
-            // 1. Xóa variant
             ProductVariantDAO variantDAO = new ProductVariantDAO();
             variantDAO.deleteByProductID(productID);
 
-            // 2. Xóa ảnh
             ProductImageDAO imageDAO = new ProductImageDAO();
             imageDAO.deleteByProductID(productID);
 
-            // 3. Xóa sản phẩm
             String sql = "DELETE FROM Product WHERE ProductID = ?";
             ps = con.prepareStatement(sql);
             ps.setInt(1, productID);
             int rows = ps.executeUpdate();
 
-            con.commit(); // commit nếu mọi thứ thành công
+            con.commit();
             result = rows > 0;
 
         } catch (Exception e) {
             if (con != null) {
-                con.rollback(); // rollback nếu lỗi
+                con.rollback();
             }
             throw e;
         } finally {
@@ -274,21 +228,20 @@ public class ProductDAO {
             }
             if (con != null) {
                 con.setAutoCommit(true);
+                con.close();
             }
-            con.close();
         }
-
         return result;
     }
 
     public ProductDTO getProductByID(int productID) throws SQLException, ClassNotFoundException {
-        String sql = "SELECT p.ProductID, p.ProductName, p.Description, p.Status, p.CateID, "
-                + "(SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, "
-                + "(SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL "
-                + "FROM Product p WHERE p.ProductID = ?";
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT p.ProductID, p.ProductName, p.Description, p.Status, p.CateID, " +
+                     "(SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, " +
+                     "(SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL " +
+                     "FROM Product p WHERE p.ProductID = ?";
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productID);
-            try ( ResultSet rs = ps.executeQuery()) {
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     ProductDTO dto = new ProductDTO();
                     dto.setProductID(rs.getInt("ProductID"));
@@ -308,8 +261,7 @@ public class ProductDAO {
 
     public boolean updateProductByID(ProductDTO product) throws SQLException, ClassNotFoundException {
         String sql = "UPDATE Product SET ProductName = ?, Description = ?, Status = ?, CateID = ? WHERE ProductID = ?";
-        try (
-                 Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, product.getProductName());
             ps.setString(2, product.getDescription());
             ps.setString(3, product.getStatus());
@@ -319,4 +271,16 @@ public class ProductDAO {
         }
     }
 
+    public int getStockByProductID(int productID) throws SQLException, ClassNotFoundException {
+        String sql = "SELECT SUM(Quantity) AS Stock FROM ProductVariant WHERE ProductID = ?";
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("Stock");
+                }
+            }
+        }
+        return 0;
+    }
 }

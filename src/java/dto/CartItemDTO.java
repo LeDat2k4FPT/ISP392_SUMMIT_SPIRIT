@@ -24,4 +24,14 @@ public class CartItemDTO {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
+
+    // ✅ Getter tiện dụng để truy xuất size từ product
+    public String getSize() {
+        return product.getSize();
+    }
+
+    // ✅ Getter tiện dụng để truy xuất productID
+    public int getProductID() {
+        return product.getProductID();
+    }
 }
