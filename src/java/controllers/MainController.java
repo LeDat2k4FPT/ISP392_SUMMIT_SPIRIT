@@ -68,13 +68,10 @@ public class MainController extends HttpServlet {
                 url = VERIFY_OTP_CONTROLLER;
             } else if (RESET_PASSWORD.equals(action)) {
                 url = RESET_PASSWORD_CONTROLLER;
-<<<<<<< HEAD
             } else if (MANAGE_USER_ACCOUNT.equals(action)) {
                 url = MANAGE_USER_ACCOUNT_CONTROLLER;
-=======
             } else if ("GoToShipping".equals(action)) {
                 url = "GoToShippingServlet";
->>>>>>> b61119caee035f16bc00652d92afa9db06813b2a
             }
 
         } catch (Exception e) {

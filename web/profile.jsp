@@ -1,82 +1,16 @@
-<%--
-    Document   : profile
-    Created on : Jun 15, 2025, 12:19:33 AM
-    Author     : gmt
---%>
-
 <%@page import="dto.UserDTO" %>
 <%@page import="user.UserError" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%--<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>--%>
 <!DOCTYPE html>
 <html>
     <head>
-        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
         <title>User Profile</title>
-        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <style>
-            body {
-                background-color: #f8f9fa;
-            }
-            .login-container {
-                max-width: 400px;
-                margin: 100px auto;
-                padding: 20px;
-                background-color: white;
-                border-radius: 10px;
-                box-shadow: 0 0 10px rgba(0,0,0,0.1);
-            }
-            .login-title {
-                text-align: center;
-                margin-bottom: 20px;
-                color: #333;
-            }
-            .form-control {
-                margin-bottom: 15px;
-            }
-            .btn-login {
-                width: 100%;
-                background-color: #007bff;
-                border: none;
-            }
-            .btn-login:hover {
-                background-color: #0056b3;
-            }
-            .register-link {
-                text-align: center;
-                margin-top: 15px;
-            }
-            .user-dropdown {
-                position: relative;
-                display: inline-block;
-                font-family: Arial;
-            }
-            .user-name {
-                cursor: pointer;
-                font-weight: bold;
-                padding: 10px;
-            }
-            .dropdown-menu {
-                display: none;
-                position: absolute;
-                top: 100%;
-                left: 0;
-                background-color: white;
-                min-width: 160px;
-                box-shadow: 0 8px 16px rgba(0,0,0,0.2);
-                border-radius: 4px;
-                z-index: 1000;
-            }
-            .dropdown-menu a {
-                padding: 12px 16px;
-                display: block;
-                text-decoration: none;
-                color: black;
-            }
-            .dropdown-menu a:hover {
-                background-color: #f1f1f1;
-            }
-        </style>
+        <meta charset="UTF-8">
+        <!-- CSS & Icons -->
+        <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" >
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
+        <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
+        <link rel="stylesheet" href="css/profile.css">
     </head>
     <body>
         <%
@@ -85,89 +19,76 @@
                 response.sendRedirect("login.jsp");
                 return;
             }
+            UserError userError = (UserError) request.getAttribute("USER_ERROR");
+            if (userError == null) userError = new UserError();
         %>
-        <div class="header">
-            <div class="logo">SUMMIT SPIRIT</div>
-            <a href="homepage.jsp" class="btn btn-primary me-2">Home</a>
-            <a href="cart.jsp" class="btn btn-secondary me-2">Cart</a>
-            <div class="user-dropdown">
-                <div class="user-name" onclick="toggleMenu()">
-                    <%= loginUser.getFullName()%>
-                </div>
-                <div id="dropdown" class="dropdown-menu">
-                    <a href="profile.jsp">User Profile</a>
-                    <a href="MainController?action=Logout">Logout</a>
-                </div>
+
+        <!-- Topbar  -->
+        <div class="topbar d-flex justify-content-between align-items-center px-4 py-3">
+            <div class="logo">
+                <img src="image/summit_logo.png" alt="Logo">
             </div>
-            <script>
-                function toggleMenu() {
-                    const menu = document.getElementById("dropdown");
-                    menu.style.display = menu.style.display === "block" ? "none" : "block";
-                }
-                document.addEventListener("click", function (event) {
-                    const dropdown = document.getElementById("dropdown");
-                    const userBtn = document.querySelector(".user-name");
-                    if (!dropdown.contains(event.target) && !userBtn.contains(event.target)) {
-                        dropdown.style.display = "none";
-                    }
-                });
-            </script>
-        </div>
-        <div class="container">
-            <div class="login-container">
-                <h2 class="login-title">Your information</h2>
-                <%
-                   String message = (String) request.getAttribute("MESSAGE");
-                   if (message != null && !message.isEmpty()) {
-                %>
-                <p style="color:red; text-align:center;"><%= message %></p>
-                <%
-                    }
-                %>
-                <%
-                    UserError userError = (UserError) request.getAttribute("USER_ERROR");
-                    if (userError == null) {
-                        userError = new UserError();
-                    }
-                %>
-                <form action="MainController" method="POST">
-                    <input type="hidden" name="action" value="EditProfile">
-                    <input type="hidden" name="userID" value="<%= loginUser.getUserID()%>">
-                    <div class="mb-3">
-                        <label for="fullName" class="form-label">Full Name</label>
-                        <input type="text" class="form-control" name="fullName" value="<%= loginUser.getFullName()%>">
-                    </div>
-                    <div class="mb-3">
-                        <label for="address" class="form-label">Address</label>
-                        <input type="text" class="form-control" name="address" value="<%= loginUser.getAddress()%>">
-                    </div>
-                    <div class="mb-3">
-                        <label for="email" class="form-label">Email</label>
-                        <input type="text" class="form-control" name="email" value="<%= loginUser.getEmail()%>">
-                    </div>
-                    <div class="text-danger">
-                        <%= userError.getEmail() %>
-                    </div>
-                    <div class="mb-3">
-                        <label for="phone" class="form-label">Phone Number</label>
-                        <input type="text" class="form-control" name="phone" value="<%= loginUser.getPhone()%>" minlength="10" maxlength="11">
-                    </div>
-                    <div class="text-danger">
-                        <%= userError.getPhone() %>
-                    </div>
-                    <input type="hidden" class="form-control" name="role" value="<%= loginUser.getRole()%>">
-                    <div class="d-flex justify-content-between">
-                        <button type="submit" class="btn btn-primary">Edit Information</button>
-                    </div>
-                </form>
-                <form action="changePassword.jsp" method="GET">
-                    <button type="submit" name="action" value="ChangePassword" class="btn btn-secondary">Change Password</button>
-                </form>
-                <div class="text-danger">
-                    <%= userError.getErrorMessage()%>
-                </div>
+            <div class="nav-icons">
+                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="cart.jsp"><i class="fas fa-shopping-cart"></i></a>
+                <a href="profile.jsp"><i class="fas fa-user"></i></a>
             </div>
         </div>
-        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/js/bootstrap.bundle.min.js"></script>
+
+        <!-- Main content -->
+        <div class="wrapper d-flex">
+            <!-- Sidebar -->
+            <aside class="sidebar">
+                <nav class="menu">
+                    <a href="profile.jsp" class="menu-link active">My Profile</a>
+                    <a href="orderHistory.jsp" class="menu-link">Orders History</a>
+                </nav>
+            </aside>
+            <!-- Profile form -->
+            <main class="main-content">
+                <div class="profile-form">
+                    <h2 class="title">User Profile</h2>
+                    <h4 class="username"><%= loginUser.getFullName().toUpperCase() %></h4>
+
+                    <form action="MainController" method="POST">
+                        <input type="hidden" name="action" value="EditProfile">
+                        <input type="hidden" name="userID" value="<%= loginUser.getUserID()%>">
+
+                        <label class="form-label">Full Name</label>
+                        <input type="text" name="fullName" class="form-input" value="<%= loginUser.getFullName() %>">
+
+                        <div class="row">
+                            <div class="col-md-6">
+                                <label class="form-label">Email</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-envelope"></i>
+                                    <input type="text" name="email" class="form-input" value="<%= loginUser.getEmail() %>">
+                                </div>
+                                <div class="error"><%= userError.getEmail() %></div>
+                            </div>
+                            <div class="col-md-6">
+                                <label class="form-label">Phone Number</label>
+                                <div class="input-icon">
+                                    <i class="fas fa-mobile-alt"></i>
+                                    <input type="text" name="phone" class="form-input" value="<%= loginUser.getPhone() %>">
+                                </div>
+                                <div class="error"><%= userError.getPhone() %></div>
+                            </div>
+                        </div>
+
+                        <label class="form-label">Address</label>
+                        <div class="input-icon">
+                            <i class="fas fa-map-marker-alt"></i>
+                            <input type="text" name="address" class="form-input" value="<%= loginUser.getAddress() %>">
+                        </div>
+
+                        <div class="btn-group">
+                            <a href="homepage.jsp" class="btn btn-outline">Cancel</a>
+                            <a href="changePassword.jsp" class="btn btn-secondary">Change Password</a>
+                            <button type="submit" class="btn btn-primary">Save Changes</button>
+                        </div>
+                    </form>
+                </div>
+            </main>
+        </div>
     </body>
-</html>
