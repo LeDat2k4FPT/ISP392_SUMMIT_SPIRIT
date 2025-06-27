@@ -1,8 +1,6 @@
 package controllers;
 
 import dto.CartDTO;
-import dto.UserDTO;
-
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -20,25 +18,23 @@ public class RemoveFromCartServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
+            // Lấy productID và size từ URL
+            int productID = Integer.parseInt(request.getParameter("id"));
+            String size = request.getParameter("size");
+
             HttpSession session = request.getSession();
+            CartDTO cart = (CartDTO) session.getAttribute("CART");
 
-            // ✅ Kiểm tra đăng nhập
-            UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
-            if (user == null) {
-                response.sendRedirect("login.jsp");
-                return;
-            }
-
-            String pidParam = request.getParameter("productID");
-
-            if (pidParam != null) {
-                int productID = Integer.parseInt(pidParam);
-                CartDTO cart = (CartDTO) session.getAttribute("CART");
-
-                if (cart != null) {
+            if (cart != null) {
+                if (size != null && !size.isEmpty()) {
+                    // ✅ Xoá đúng một biến thể (theo size cụ thể)
+                    cart.removeFromCart(productID, size);
+                } else {
+                    // 🔁 Trường hợp không truyền size → xoá toàn bộ biến thể
                     cart.removeFromCart(productID);
-                    session.setAttribute("CART", cart);
                 }
+
+                session.setAttribute("CART", cart);
             }
 
             response.sendRedirect("cart.jsp");

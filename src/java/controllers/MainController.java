@@ -45,7 +45,7 @@ public class MainController extends HttpServlet {
         String url = WELCOME;
         try {
             String action = request.getParameter("action");
-            if (action == null) {
+                        if (action == null) {
                 url = WELCOME;
             } else if (LOGIN.equals(action)) {
                 url = LOGIN_CONTROLLER;
@@ -65,7 +65,10 @@ public class MainController extends HttpServlet {
                 url = VERIFY_OTP_CONTROLLER;
             } else if (RESET_PASSWORD.equals(action)) {
                 url = RESET_PASSWORD_CONTROLLER;
+            } else if ("GoToShipping".equals(action)) {
+                url = "GoToShippingServlet";
             }
+
         } catch (Exception e) {
             log("error at MainController: " + e.toString());
         } finally {

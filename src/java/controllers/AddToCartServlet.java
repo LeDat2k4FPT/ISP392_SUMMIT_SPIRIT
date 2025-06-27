@@ -24,7 +24,7 @@ public class AddToCartServlet extends HttpServlet {
         try {
             int productID = Integer.parseInt(request.getParameter("productID"));
             int quantity = Integer.parseInt(request.getParameter("quantity"));
-            String size = request.getParameter("size");
+            String size = request.getParameter("size"); // ✅ lấy size từ form
 
             if (quantity <= 0) {
                 response.sendRedirect("productDetail.jsp?id=" + productID + "&error=invalid_quantity");
@@ -39,7 +39,8 @@ public class AddToCartServlet extends HttpServlet {
                 return;
             }
 
-            product.setSize(size);
+            product.setSize(size); // ✅ gán size vào đối tượng Product
+
             int stock = dao.getStockByProductID(productID);
 
             HttpSession session = request.getSession();
@@ -68,7 +69,7 @@ public class AddToCartServlet extends HttpServlet {
                 return;
             }
 
-            cart.addToCart(product, quantity);
+            cart.addToCart(product, quantity); // ✅ vẫn dùng product (đã có size gán vào)
             session.setAttribute("CART", cart);
 
             response.sendRedirect("productDetail.jsp?id=" + productID);

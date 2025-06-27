@@ -1,7 +1,12 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="dto.CartDTO, dto.CartItemDTO, dto.ProductDTO" %>
+<%@ page contentType="text/html; charset=UTF-8" pageEncoding="UTF-8" %>
+<%@ page import="dto.CartDTO, dto.CartItemDTO, dto.ProductDTO, dto.UserDTO" %>
 <%
     CartDTO cart = (CartDTO) session.getAttribute("CART");
+    UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+    if (loginUser == null) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
     double discountPercent = 0.0;
     if (session.getAttribute("DISCOUNT_PERCENT") != null) {
         discountPercent = (double) session.getAttribute("DISCOUNT_PERCENT");
@@ -15,72 +20,77 @@
 <html>
 <head>
     <title>Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
     <style>
-        body { font-family: Arial, sans-serif; margin: 0; background-color: #f9f9f9; }
+        body { font-family: 'Kumbh Sans', sans-serif; margin: 0; background-color: #f9f9f9; }
         .header { background-color: #004080; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; color: white; }
         .header .logo { font-size: 24px; font-weight: bold; color: white; text-decoration: none; }
-        .back-btn { padding: 15px 30px; }
-        .back-btn button { padding: 10px 20px; font-size: 14px; background-color: #007bff; color: white; border: none; border-radius: 4px; cursor: pointer; }
-        .main-container { display: flex; padding: 40px; gap: 40px; }
-        .left-panel, .right-panel { background: #fff; padding: 30px; border-radius: 10px; }
-        .left-panel { flex: 1; }
-        .right-panel { flex: 1; }
-        .form-group { margin-bottom: 15px; }
-        .form-group input { width: 100%; padding: 10px; font-size: 14px; border-radius: 4px; border: 1px solid #ccc; }
-        .discount-area { display: flex; gap: 10px; margin: 20px 0; }
-        .discount-area input { flex: 1; }
-        .discount-area button { background-color: #333; color: white; padding: 10px 20px; border: none; border-radius: 4px; }
-        .cart-item { display: flex; gap: 20px; align-items: center; border-bottom: 1px solid #ddd; padding: 20px 0; }
+        .nav-links a { color: white; margin: 0 10px; text-decoration: none; font-size: 16px; }
+        .user-dropdown { position: relative; display: inline-block; }
+        .user-name { cursor: pointer; font-weight: bold; }
+        .dropdown-menu { display: none; position: absolute; background-color: white; box-shadow: 0px 8px 16px rgba(0,0,0,0.2); z-index: 1; right: 0; }
+        .dropdown-menu a { display: block; padding: 10px; text-decoration: none; color: #333; }
+        .dropdown-menu a:hover { background-color: #eee; }
+
+        .main-wrapper { display: flex; justify-content: space-between; padding: 40px; gap: 20px; }
+        .cart-section { flex: 3; }
+        .summary-section { flex: 1; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); height: fit-content; }
+
+        .cart-item { display: flex; gap: 20px; align-items: center; border-bottom: 1px solid #ddd; padding: 20px 0; background-color: #fff; border-radius: 10px; margin-bottom: 20px; }
         .cart-item img { width: 100px; }
         .cart-info { flex: 1; }
-        .cart-info h3 { margin: 0; }
-        .price { font-weight: bold; }
+        .cart-info h3 { margin: 0; font-size: 18px; }
+        .price { font-weight: bold; min-width: 120px; text-align: right; }
+
         .quantity-box { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-        .quantity-box button { width: 30px; height: 30px; font-size: 16px; border: none; border-radius: 50%; background-color: #f0f0f0; cursor: pointer; }
+        .quantity-box button { width: 30px; height: 30px; font-size: 16px; border: none; border-radius: 6px; background-color: #f0f0f0; cursor: pointer; }
         .quantity-box input { width: 40px; text-align: center; border: 1px solid #ccc; }
-        .delete-link { font-size: 20px; color: red; text-decoration: none; }
+
+        .delete-link { font-size: 18px; color: #888; text-decoration: none; margin-left: 10px; }
+
         .summary-line { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px; }
-        .total-line { font-weight: bold; font-size: 18px; color: green; }
-        .btn-continue { width: 100%; padding: 15px; background-color: #28a745; color: white; border: none; font-size: 16px; border-radius: 5px; cursor: pointer; }
+        .total-line { font-weight: bold; font-size: 18px; color: #222; border-top: 1px solid #ccc; padding-top: 10px; }
+        .btn-continue { width: 100%; padding: 15px; background-color: #849e98; color: white; border: none; font-size: 16px; border-radius: 5px; cursor: pointer; margin-top: 20px; }
         .empty-cart { text-align: center; font-size: 20px; padding: 80px 0; }
     </style>
 </head>
 <body>
 <div class="header">
     <a href="homepage.jsp" class="logo">🏕 Summit Spirit</a>
+    <div class="nav-links">
+        <a href="homepage.jsp">Home</a>
+        <a href="cart.jsp">Cart</a>
+        <div class="user-dropdown">
+            <div class="user-name" onclick="toggleMenu()"><%= loginUser.getFullName() %></div>
+            <div id="dropdown" class="dropdown-menu">
+                <a href="profile.jsp">User Profile</a>
+                <a href="MainController?action=Logout">Logout</a>
+            </div>
+        </div>
+    </div>
 </div>
-<div class="back-btn">
-    <button onclick="history.back()">← Return to previous page</button>
-</div>
+<script>
+    function toggleMenu() {
+        const menu = document.getElementById("dropdown");
+        menu.style.display = menu.style.display === "block" ? "none" : "block";
+    }
+    document.addEventListener("click", function (event) {
+        const dropdown = document.getElementById("dropdown");
+        const userBtn = document.querySelector(".user-name");
+        if (!dropdown.contains(event.target) && !userBtn.contains(event.target)) {
+            dropdown.style.display = "none";
+        }
+    });
+</script>
+
 <% if (cart == null || cart.isEmpty()) { %>
 <div class="empty-cart">Your cart is empty.</div>
 <% } else { double total = 0; %>
-<div class="main-container">
-    <div class="left-panel">
-        <h2>Shipping Address</h2>
-        <form action="checkout.jsp" method="post" id="cartForm">
-            <div class="form-group"><input type="text" placeholder="Country/Region"></div>
-            <div class="form-group"><input type="text" placeholder="Full Name"></div>
-            <div class="form-group"><input type="text" placeholder="Phone"></div>
-            <div class="form-group"><input type="email" placeholder="Email"></div>
-            <div class="form-group"><input type="text" placeholder="Address"></div>
-            <div class="form-group"><input type="text" placeholder="District"></div>
-            <div class="form-group"><input type="text" placeholder="City"></div>
-            <div class="discount-area">
-                <form action="ApplyDiscountServlet" method="post">
-                    <input type="text" name="discountCode" placeholder="Discount code..." value="<%= discountCode != null ? discountCode : "" %>">
-                    <button type="submit">Apply</button>
-                </form>
-            </div>
-            <% if (discountError != null) { %>
-                <p style="color: red;"><%= discountError %></p>
-                <% session.removeAttribute("DISCOUNT_ERROR"); %>
-            <% } %>
-            <button type="submit" class="btn-continue">Continue To Pay</button>
-        </form>
-    </div>
-    <div class="right-panel">
-        <h2>Your Cart</h2>
+<div class="main-wrapper">
+    <div class="cart-section">
+        <h2>Shopping cart</h2>
+        <p>You have <%= cart.getTotalQuantity() %> item<%= cart.getTotalQuantity() > 1 ? "s" : "" %> in your cart</p>
         <% for (CartItemDTO item : cart.getCartItems()) {
             ProductDTO p = item.getProduct();
             String uniqueKey = p.getProductID() + "_" + p.getSize();
@@ -99,32 +109,45 @@
                     <button type="button" onclick="decrease('<%= uniqueKey %>')">−</button>
                     <input type="number" name="quantity_<%= uniqueKey %>" id="qty_<%= uniqueKey %>" value="<%= quantity %>" min="1" max="<%= stock %>" onchange="handleManualInput('<%= uniqueKey %>', <%= stock %>)">
                     <button type="button" onclick="increase('<%= uniqueKey %>', <%= stock %>)">+</button>
+                    <a href="RemoveFromCartServlet?id=<%= p.getProductID() %>&size=<%= p.getSize() %>" class="delete-link"><i class="fa fa-trash"></i></a>
                 </div>
-                <% if ("overstock".equals(error) && pidError != null && pidError.equals(uniqueKey)) { %>
-                    <p style="color: red; font-size: 14px; margin-top: 5px;">Sản phẩm đã vượt quá tồn kho</p>
-                <% } %>
             </div>
-            <div class="price"><%= String.format("%,.0f", lineTotal) %>₫</div>
-            <a href="RemoveFromCartServlet?productID=<%= p.getProductID() %>&size=<%= p.getSize() %>" class="delete-link">×</a>
+            <div class="price"><%= String.format("%,.0f", lineTotal) %> VND</div>
         </div>
         <% } %>
+    </div>
+    <div class="summary-section">
+        <h3>ORDER SUMMARY</h3>
         <% double shipFee = 30000;
            double discountAmount = total * discountPercent / 100;
            double grandTotal = total + shipFee - discountAmount; %>
-        <div class="summary-line">Subtotal: <span><%= String.format("%,.0f", total) %>₫</span></div>
-        <div class="summary-line">Shipping: <span><%= String.format("%,.0f", shipFee) %>₫</span></div>
+        <div class="summary-line">Subtotal: <span><%= String.format("%,.0f", total) %></span></div>
+        <div class="summary-line">Shipping: <span><%= String.format("%,.0f", shipFee) %></span></div>
         <% if (discountPercent > 0) { %>
-            <div class="summary-line">Discount (<%= discountPercent %>%): <span>-<%= String.format("%,.0f", discountAmount) %>₫</span></div>
+            <div class="summary-line">Discount (<%= discountPercent %>%): <span>-<%= String.format("%,.0f", discountAmount) %></span></div>
         <% } %>
-        <div class="summary-line total-line">Total: <span id="grandTotal"><%= String.format("%,.0f", grandTotal) %>₫</span></div>
+        <div class="summary-line total-line">TOTAL <span id="grandTotal"><%= String.format("%,.0f", grandTotal) %> VND</span></div>
+
+        <!-- ✅ Updated form action -->
+        <form action="GoToShippingServlet" method="post">
+            <% for (CartItemDTO item : cart.getCartItems()) {
+                ProductDTO p = item.getProduct();
+                String uniqueKey = p.getProductID() + "_" + p.getSize();
+                int quantity = item.getQuantity();
+            %>
+                <input type="hidden" name="quantity_<%= uniqueKey %>" value="<%= quantity %>" id="hidden_qty_<%= uniqueKey %>">
+            <% } %>
+            <button type="submit" class="btn-continue">CONTINUE</button>
+        </form>
     </div>
 </div>
+
 <script>
     function increase(id, stock) {
         const input = document.getElementById("qty_" + id);
         let value = parseInt(input.value);
         if (value >= stock) {
-            alert("Sản phẩm đã vượt quá tồn kho");
+            alert("Product quantity exceeds stock");
             input.value = stock;
             return;
         }
@@ -132,6 +155,7 @@
         updateQuantityOnServer(id, input.value);
         updateTotal();
     }
+
     function decrease(id) {
         const input = document.getElementById("qty_" + id);
         let value = parseInt(input.value);
@@ -145,11 +169,12 @@
             updateTotal();
         }
     }
+
     function handleManualInput(id, stock) {
         const input = document.getElementById("qty_" + id);
         let value = parseInt(input.value);
         if (value > stock) {
-            alert("Sản phẩm đã vượt quá tồn kho");
+            alert("Product quantity exceeds stock");
             input.value = stock;
         } else if (value < 1 || isNaN(value)) {
             input.value = 1;
@@ -157,6 +182,7 @@
         updateQuantityOnServer(id, input.value);
         updateTotal();
     }
+
     function updateTotal() {
         let cartItems = document.querySelectorAll(".cart-item");
         let subTotal = 0;
@@ -170,8 +196,9 @@
         const discountAmount = subTotal * discountPercent / 100;
         const ship = 30000;
         const grandTotal = subTotal + ship - discountAmount;
-        document.getElementById("grandTotal").innerText = grandTotal.toLocaleString() + "₫";
+        document.getElementById("grandTotal").innerText = grandTotal.toLocaleString() + " VND";
     }
+
     function updateQuantityOnServer(productKey, quantity) {
         fetch('UpdateQuantityServlet', {
             method: 'POST',
@@ -179,6 +206,17 @@
             body: 'key=' + productKey + '&quantity=' + quantity
         }).catch(err => console.error("Error updating quantity:", err));
     }
+
+    document.querySelector('.btn-continue').addEventListener('click', function () {
+        document.querySelectorAll('.cart-item').forEach(item => {
+            const pid = item.getAttribute("data-id");
+            const currentQty = document.getElementById("qty_" + pid).value;
+            const hiddenInput = document.getElementById("hidden_qty_" + pid);
+            if (hiddenInput) {
+                hiddenInput.value = currentQty;
+            }
+        });
+    });
 </script>
 <% } %>
 </body>
