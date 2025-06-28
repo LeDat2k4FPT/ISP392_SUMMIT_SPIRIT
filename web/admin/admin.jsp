@@ -19,9 +19,72 @@
     <head>
         <meta charset="UTF-8">
         <title>Admin Dashboard</title>
+        <!-- Bootstrap CSS -->
+        <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="css/staff.css">
+        <link rel="stylesheet" href="../css/staff.css">
+        <style>
+            .sidebar-custom {
+                background: #fff;
+                min-height: 100vh;
+                color: #234C45;
+                display: flex;
+                flex-direction: column;
+                justify-content: space-between;
+                padding: 0;
+            }
+            .sidebar-custom .nav {
+                background: transparent;
+                box-shadow: none;
+                border-radius: 0;
+                padding: 32px 0 0 0;
+            }
+            .sidebar-custom .nav-link {
+                color: #234C45;
+                background: transparent;
+                border-radius: 0;
+                margin: 0 0 16px 0;
+                font-weight: 500;
+                font-size: 18px;
+                padding: 8px 24px;
+                transition: background 0.2s, color 0.2s;
+            }
+            .sidebar-custom .nav-link.active, .sidebar-custom .nav-link:hover {
+                background: #f0f0f0;
+                color: #234C45 !important;
+            }
+            .top-bar-custom {
+                background: #39504A;
+                color: #fff;
+                padding: 1.2rem 2rem;
+                font-weight: bold;
+                font-size: 20px;
+            }
+            .logout-btn {
+                background: #39504A;
+                color: #fff;
+                border: none;
+                width: 90%;
+                margin: 24px auto 16px auto;
+                padding: 12px 0;
+                border-radius: 6px;
+                font-weight: bold;
+                display: block;
+                font-size: 16px;
+            }
+            .logout-btn:hover {
+                background: #234C45;
+            }
+            body {
+                background-color: #f7f7f7;
+            }
+            .main-content {
+                background: #f7f7f7;
+                min-height: 100vh;
+                padding: 48px 48px 0 48px;
+            }
+        </style>
         <script>
             function loadContent(page, msg, type = 'success') {
                 fetch(page)
@@ -30,7 +93,7 @@
                             const mainContent = document.getElementById("main-content");
                             let alertBox = "";
                             if (msg) {
-                                alertBox = '<div class="alert alert-' + type + '">' + msg + '</div>';
+                                alertBox = '<div class="alert alert-' + type + ' mt-2">' + msg + '</div>';
                             }
                             mainContent.innerHTML = alertBox + html;
 
@@ -51,35 +114,37 @@
                 }
             });
         </script>
-
     </head>
-    <body>
-        <div class="top-bar">
-            <span>Hello, <%= loginUser.getFullName() %></span>         
+    <body style="background-color: #f0f0f0;">
+        <div class="top-bar-custom d-flex justify-content-between align-items-center">
+            <span>Hello, <%= loginUser.getFullName() %></span>
+            <button class="btn btn-light btn-sm" onclick="if(confirm('Are you sure you want to logout?')){window.location.href='MainController?action=Logout';}"><i class="bi bi-box-arrow-right"></i> Logout</button>
         </div>
-        <script>
-            function confirmLogout() {
-                if (confirm("Are you sure you want to logout?")) {
-                    window.location.href = "MainController?action=Logout";
-                }
-            }
-        </script>
-        <div class="layout">
-            <aside class="sidebar">
-                <nav class="menu">
-                    <button onclick="loadContent('adminHome.jsp')">Home</button>
-                    <button onclick="loadContent('viewRevenue.jsp')">View Revenue</button>
-                    <button onclick="loadContent('MainController?action=ManageUser')">Manage User Account</button>
+        <div class="container-fluid">
+            <div class="row flex-nowrap">
+                <nav class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 sidebar-custom d-flex flex-column align-items-stretch py-3">
+                    <ul class="nav nav-pills flex-column mb-auto gap-2">
+                        <li class="nav-item">
+                            <button class="nav-link text-start w-100" onclick="loadContent('adminHome.jsp')"><i class="bi bi-house"></i> Home</button>
+                        </li>
+                        <li>
+                            <button class="nav-link text-start w-100" onclick="loadContent('viewRevenue.jsp')"><i class="bi bi-bar-chart"></i> View Revenue</button>
+                        </li>
+                        <li>
+                            <button class="nav-link text-start w-100" onclick="loadContent('MainController?action=ManageUser')"><i class="bi bi-people"></i> Manage User Account</button>
+                        </li>
+                    </ul>
+                    <form action="LogoutController" method="post" class="mt-auto">
+                        <button class="logout-btn mt-3"><i class="bi bi-box-arrow-right"></i> Logout</button>
+                    </form>
                 </nav>
-                <form action="LogoutController" method="post">
-                    <button class="logout-btn">Logout</button>
-                </form>
-            </aside>
-            <main id="main-content" class="main-content">
-                <h2>Welcome to Admin Dashboard</h2>
-                <p>Select a menu on the left to manage the system.</p>
-            </main>
+                <main id="main-content" class="col py-4 main-content">
+                    <h2>Welcome to Admin Dashboard</h2>
+                    <p>Select a menu on the left to manage the system.</p>
+                </main>
+            </div>
         </div>
-        
+        <!-- Bootstrap JS -->
+        <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
     </body>
 </html>
