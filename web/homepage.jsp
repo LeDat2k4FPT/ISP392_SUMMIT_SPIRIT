@@ -1,5 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.util.*, dao.ProductDAO, dto.ProductDTO, dto.UserDTO" %>
+<%@ page import="java.util.*, dao.ProductDAO, dto.ProductDTO, dto.UserDTO , dto.CartDTO" %>
 
 <%
     UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
@@ -41,6 +41,8 @@
     } catch (Exception e) {
         e.printStackTrace();
     }
+    CartDTO cart = (CartDTO) session.getAttribute("CART");
+    int cartItemCount = (cart != null) ? cart.getCartItems().size() : 0;
 %>
 <!DOCTYPE html>
 <html>
@@ -59,8 +61,12 @@
             </a>
             <div class="nav-links">
                 <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                <a href="cart.jsp"><i class="fas fa-shopping-cart"></i></a>
-
+                <a href="cart.jsp" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <% if (cartItemCount > 0) { %>
+                    <span class="cart-badge"><%= cartItemCount %></span>
+                    <% } %>
+                </a>
                 <div class="user-dropdown">
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
