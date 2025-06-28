@@ -25,6 +25,7 @@ body {
 
 .header img {
     height: 60px;
+    cursor: pointer;
 }
 
 .nav-links {
@@ -173,7 +174,7 @@ h2 {
 .product-list {
     display: flex;
     flex-wrap: wrap;
-    justify-content: center;
+    justify-content: flex-start;
     gap: 30px;
 }
 

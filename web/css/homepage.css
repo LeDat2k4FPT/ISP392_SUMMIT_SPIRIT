@@ -16,7 +16,7 @@ body {
 
 .header {
     padding: 10px 40px;
-    background-color: #ffffff;
+    background-color: #195181;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -25,6 +25,7 @@ body {
 
 .header img {
     height: 60px;
+    cursor: pointer;
 }
 
 .nav-links {
@@ -35,7 +36,7 @@ body {
 
 .nav-links a {
     text-decoration: none;
-    color: #333;
+    color: #ffffff;
     font-weight: 500;
 }
 
@@ -47,6 +48,7 @@ body {
     cursor: pointer;
     font-weight: bold;
     padding: 10px;
+    color: #ffffff;
 }
 
 .dropdown-menu {
