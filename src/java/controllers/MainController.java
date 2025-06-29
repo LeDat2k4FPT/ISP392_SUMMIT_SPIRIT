@@ -69,9 +69,16 @@ public class MainController extends HttpServlet {
             } else if (RESET_PASSWORD.equals(action)) {
                 url = RESET_PASSWORD_CONTROLLER;
 
+
             } else if (MANAGE_USER_ACCOUNT.equals(action)) {
                 url = MANAGE_USER_ACCOUNT_CONTROLLER;
 
+            } else if ("GoToShipping".equals(action)) {
+                url = "GoToShippingServlet";
+
+
+            } else if (MANAGE_USER_ACCOUNT.equals(action)) {
+                url = MANAGE_USER_ACCOUNT_CONTROLLER;
             } else if ("GoToShipping".equals(action)) {
                 url = "GoToShippingServlet";
 

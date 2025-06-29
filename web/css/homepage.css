@@ -16,7 +16,7 @@ body {
 
 .header {
     padding: 10px 40px;
-    background-color: #ffffff;
+    background-color: #195181;
     display: flex;
     align-items: center;
     justify-content: space-between;
@@ -25,6 +25,7 @@ body {
 
 .header img {
     height: 60px;
+    cursor: pointer;
 }
 
 .nav-links {
@@ -35,8 +36,27 @@ body {
 
 .nav-links a {
     text-decoration: none;
-    color: #333;
+    color: #ffffff;
     font-weight: 500;
+}
+.cart-icon {
+    position: relative;
+    display: inline-block;
+    font-size: 20px;
+    color: #000;
+    margin-left: 15px;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: #e53935;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
 }
 
 .user-dropdown {
@@ -47,6 +67,7 @@ body {
     cursor: pointer;
     font-weight: bold;
     padding: 10px;
+    color: #ffffff;
 }
 
 .dropdown-menu {
