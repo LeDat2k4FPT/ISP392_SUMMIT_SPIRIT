@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="dao.ProductDAO, dto.ProductDTO, dto.CartDTO, dto.UserDTO" %>
 <%@ page import="dao.ProductVariantDAO, dao.ReviewDAO" %>
@@ -106,17 +107,20 @@
                     <input type="hidden" name="productName" value="<%= product.getProductName() %>">
                     <input type="hidden" name="productImage" value="<%= product.getProductImage() %>">
                     <input type="hidden" name="price" value="<%= product.getPrice() %>">
+
+                    <% if (sizeList != null && !sizeList.isEmpty()) { %>
                     <div class="select-group">
                         <label for="size">Size:</label>
                         <select name="size" id="size">
-                            <% if (sizeList != null && !sizeList.isEmpty()) {
-                                for (String size : sizeList) { %>
-                                    <option value="<%= size %>"><%= size %></option>
-                            <% } } else { %>
-                                <option disabled selected>No sizes available</option>
+                            <% for (String size : sizeList) { %>
+                                <option value="<%= size %>"><%= size %></option>
                             <% } %>
                         </select>
                     </div>
+                    <% } else { %>
+                        <input type="hidden" name="size" value="">
+                    <% } %>
+
                     <div class="select-group">
                         <label for="quantity">Quantity:</label>
                         <div class="quantity-controls">

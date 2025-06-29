@@ -23,49 +23,55 @@ public class UpdateQuantityServlet extends HttpServlet {
             // ✅ Check login
             UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
             if (user == null) {
-                response.sendRedirect("login.jsp");
+                response.sendError(HttpServletResponse.SC_UNAUTHORIZED);
                 return;
             }
 
-            int productID = Integer.parseInt(request.getParameter("productID"));
-            int newQuantity = Integer.parseInt(request.getParameter("quantity"));
+            // ✅ Lấy tham số productID, size, quantity từ AJAX
+            String productIDStr = request.getParameter("productID");
+            String size = request.getParameter("size");
+            String quantityStr = request.getParameter("quantity");
+
+            if (productIDStr == null || size == null || quantityStr == null) {
+                response.sendError(HttpServletResponse.SC_BAD_REQUEST);
+                return;
+            }
+
+            int productID = Integer.parseInt(productIDStr);
+            int newQuantity = Integer.parseInt(quantityStr);
 
             CartDTO cart = (CartDTO) session.getAttribute("CART");
 
-            if (cart == null || cart.getCartItem(productID) == null) {
-                response.sendRedirect("cart.jsp?error=not_found");
+            if (cart == null || cart.getCartItem(productID, size) == null) {
+                response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
-            // ❌ Remove if quantity <= 0
+            // ✅ Nếu số lượng <= 0 → xóa khỏi giỏ hàng
             if (newQuantity <= 0) {
-                cart.removeFromCart(productID);
+                cart.removeFromCart(productID, size);
                 session.setAttribute("CART", cart);
-                response.sendRedirect("cart.jsp?removed=true");
                 return;
             }
 
-            // ✅ Check stock
+            // ✅ Kiểm tra tồn kho
             ProductDAO dao = new ProductDAO();
             int stock = dao.getStockByProductID(productID);
             if (newQuantity > stock) {
-                // Pass productID as parameter for error display
-                response.sendRedirect("cart.jsp?error=overstock&pid=" + productID);
+                response.sendError(HttpServletResponse.SC_CONFLICT, "Quantity exceeds stock");
                 return;
             }
 
-            // ✅ Update quantity
-            CartItemDTO item = cart.getCartItem(productID);
-            item.setQuantity(newQuantity);
+            // ✅ Cập nhật số lượng
+            cart.updateQuantity(productID, size, newQuantity);
             session.setAttribute("CART", cart);
-            response.sendRedirect("cart.jsp?updated=true");
 
         } catch (NumberFormatException e) {
             e.printStackTrace();
-            response.sendRedirect("cart.jsp?error=invalid_input");
+            response.sendError(HttpServletResponse.SC_BAD_REQUEST, "Invalid number format");
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp");
+            response.sendError(HttpServletResponse.SC_INTERNAL_SERVER_ERROR);
         }
     }
 }

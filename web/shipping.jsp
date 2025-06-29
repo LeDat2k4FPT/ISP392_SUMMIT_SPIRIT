@@ -1,6 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.sql.*, java.text.DecimalFormat, dto.CartDTO, dto.CartItemDTO, dto.ProductDTO, dto.UserDTO" %>
-<%@ page import="utils.DBUtils" %> <!-- ✅ Thêm để sử dụng kết nối chung -->
+<%@ page import="utils.DBUtils" %>
 
 <%
     CartDTO cart = (CartDTO) session.getAttribute("CART");
@@ -22,7 +22,7 @@
         discountCode = request.getParameter("discountCode");
         if (discountCode != null && !discountCode.trim().isEmpty()) {
             try {
-                Connection conn = DBUtils.getConnection(); // ✅ Dùng DBUtils thay vì DriverManager
+                Connection conn = DBUtils.getConnection();
                 String sql = "SELECT DiscountValue FROM Voucher WHERE VoucherCode = ? AND Status = 'Active' AND ExpiryDate >= GETDATE()";
                 PreparedStatement ps = conn.prepareStatement(sql);
                 ps.setString(1, discountCode.trim());
@@ -106,7 +106,7 @@
     </div>
 </div>
 
-<form method="post">
+<form method="post" action="checkout.jsp" onsubmit="return validateForm()">
 <div class="container">
     <div class="form-section">
         <h3>Shipping Address</h3>
@@ -134,7 +134,8 @@
 
         <div class="footer-buttons">
             <a href="cart.jsp" class="back-btn">← Return To Cart</a>
-            <a href="checkout.jsp" class="pay-btn">Continue To Pay</a>
+            <!-- ✅ Đây là button gửi form và sẽ bị chặn nếu chưa hợp lệ -->
+            <button type="submit" class="pay-btn">Continue To Pay</button>
         </div>
     </div>
 
@@ -152,8 +153,10 @@
             <img src="<%= p.getProductImage() %>" alt="">
             <div class="cart-info">
                 <h4><%= p.getProductName() %></h4>
-                <p>Size: <%= p.getSize() %></p>
-                <div class="quantity-box"><span>−</span><span><%= quantity %></span><span>+</span></div>
+                <% if (p.getSize() != null && !p.getSize().isEmpty()) { %>
+                    <p>Size: <%= p.getSize() %></p>
+                <% } %>
+                <div class="quantity-box"><span><%= quantity %></span></div>
             </div>
             <div><%= String.format("%,.0f", lineTotal) %></div>
         </div>
@@ -172,5 +175,20 @@
     <% } %>
 </div>
 </form>
+
+<script>
+function validateForm() {
+    const phone = document.querySelector('input[name="phone"]').value.trim();
+    const phonePattern = /^\d{10,12}$/;
+
+    if (!phonePattern.test(phone)) {
+        alert("Phone number must be 10 to 12 digits.");
+        return false;
+    }
+
+    return true;
+}
+</script>
+
 </body>
 </html>

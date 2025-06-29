@@ -70,6 +70,7 @@
         </div>
     </div>
 </div>
+
 <script>
     function toggleMenu() {
         const menu = document.getElementById("dropdown");
@@ -93,7 +94,8 @@
         <p>You have <%= cart.getTotalQuantity() %> item<%= cart.getTotalQuantity() > 1 ? "s" : "" %> in your cart</p>
         <% for (CartItemDTO item : cart.getCartItems()) {
             ProductDTO p = item.getProduct();
-            String uniqueKey = p.getProductID() + "_" + p.getSize();
+            String sizeStr = (p.getSize() != null) ? p.getSize().trim() : "";
+            String uniqueKey = p.getProductID() + "_" + sizeStr;
             int quantity = item.getQuantity();
             int stock = p.getStock();
             double price = p.getPrice();
@@ -104,12 +106,14 @@
             <img src="<%= p.getProductImage() %>" alt="">
             <div class="cart-info">
                 <h3><%= p.getProductName() %></h3>
-                <p>Size: <%= p.getSize() %></p>
+                <% if (!sizeStr.isEmpty()) { %>
+                    <p>Size: <%= sizeStr %></p>
+                <% } %>
                 <div class="quantity-box">
                     <button type="button" onclick="decrease('<%= uniqueKey %>')">−</button>
                     <input type="number" name="quantity_<%= uniqueKey %>" id="qty_<%= uniqueKey %>" value="<%= quantity %>" min="1" max="<%= stock %>" onchange="handleManualInput('<%= uniqueKey %>', <%= stock %>)">
                     <button type="button" onclick="increase('<%= uniqueKey %>', <%= stock %>)">+</button>
-                    <a href="RemoveFromCartServlet?id=<%= p.getProductID() %>&size=<%= p.getSize() %>" class="delete-link"><i class="fa fa-trash"></i></a>
+                    <a href="RemoveFromCartServlet?productID=<%= p.getProductID() %>&size=<%= p.getSize() %>" class="delete-link"><i class="fa fa-trash"></i></a>
                 </div>
             </div>
             <div class="price"><%= String.format("%,.0f", lineTotal) %> VND</div>
@@ -121,14 +125,13 @@
         <% double shipFee = 30000;
            double discountAmount = total * discountPercent / 100;
            double grandTotal = total + shipFee - discountAmount; %>
-        <div class="summary-line">Subtotal: <span><%= String.format("%,.0f", total) %></span></div>
-        <div class="summary-line">Shipping: <span><%= String.format("%,.0f", shipFee) %></span></div>
+        <div class="summary-line">Subtotal: <span id="subtotal"><%= String.format("%,.0f", total) %></span></div>
+        <div class="summary-line">Shipping: <span id="ship"><%= String.format("%,.0f", shipFee) %></span></div>
         <% if (discountPercent > 0) { %>
-            <div class="summary-line">Discount (<%= discountPercent %>%): <span>-<%= String.format("%,.0f", discountAmount) %></span></div>
+            <div class="summary-line" id="discount-line">Discount (<%= discountPercent %>%): <span id="discount">-<%= String.format("%,.0f", discountAmount) %></span></div>
         <% } %>
         <div class="summary-line total-line">TOTAL <span id="grandTotal"><%= String.format("%,.0f", grandTotal) %> VND</span></div>
 
-        <!-- ✅ Updated form action -->
         <form action="GoToShippingServlet" method="post">
             <% for (CartItemDTO item : cart.getCartItems()) {
                 ProductDTO p = item.getProduct();
@@ -143,6 +146,20 @@
 </div>
 
 <script>
+    function updateQuantityOnServer(productKey, quantity) {
+        const parts = productKey.split('_');
+        const productID = parts[0];
+        const size = parts[1];
+
+        fetch('UpdateQuantityServlet', {
+            method: 'POST',
+            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
+            body: 'productID=' + encodeURIComponent(productID) +
+                  '&size=' + encodeURIComponent(size) +
+                  '&quantity=' + encodeURIComponent(quantity)
+        }).catch(err => console.error("Error updating quantity:", err));
+    }
+
     function increase(id, stock) {
         const input = document.getElementById("qty_" + id);
         let value = parseInt(input.value);
@@ -161,7 +178,13 @@
         let value = parseInt(input.value);
         if (value <= 1) {
             if (confirm("Quantity is 0. Remove this item from cart?")) {
-                window.location.href = "RemoveFromCartServlet?key=" + id;
+                const parts = id.split('_');
+                const productID = parts[0];
+                const size = parts[1];
+                window.location.href = "RemoveFromCartServlet?productID=" + productID + "&size=" + size;
+                return;
+            } else {
+                input.value = 1;
             }
         } else {
             input.value = value - 1;
@@ -177,7 +200,15 @@
             alert("Product quantity exceeds stock");
             input.value = stock;
         } else if (value < 1 || isNaN(value)) {
-            input.value = 1;
+            if (confirm("Quantity is 0. Remove this item from cart?")) {
+                const parts = id.split('_');
+                const productID = parts[0];
+                const size = parts[1];
+                window.location.href = "RemoveFromCartServlet?productID=" + productID + "&size=" + size;
+                return;
+            } else {
+                input.value = 1;
+            }
         }
         updateQuantityOnServer(id, input.value);
         updateTotal();
@@ -192,19 +223,18 @@
             const qty = parseInt(document.getElementById("qty_" + pid).value);
             subTotal += price * qty;
         });
+
         const discountPercent = <%= discountPercent %>;
         const discountAmount = subTotal * discountPercent / 100;
         const ship = 30000;
         const grandTotal = subTotal + ship - discountAmount;
-        document.getElementById("grandTotal").innerText = grandTotal.toLocaleString() + " VND";
-    }
 
-    function updateQuantityOnServer(productKey, quantity) {
-        fetch('UpdateQuantityServlet', {
-            method: 'POST',
-            headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-            body: 'key=' + productKey + '&quantity=' + quantity
-        }).catch(err => console.error("Error updating quantity:", err));
+        document.getElementById("subtotal").innerText = subTotal.toLocaleString();
+        document.getElementById("ship").innerText = ship.toLocaleString();
+        if (discountPercent > 0) {
+            document.getElementById("discount").innerText = "-" + discountAmount.toLocaleString();
+        }
+        document.getElementById("grandTotal").innerText = grandTotal.toLocaleString() + " VND";
     }
 
     document.querySelector('.btn-continue').addEventListener('click', function () {
