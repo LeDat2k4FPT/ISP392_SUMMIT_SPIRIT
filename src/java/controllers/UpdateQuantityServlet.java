@@ -27,12 +27,13 @@ public class UpdateQuantityServlet extends HttpServlet {
                 return;
             }
 
-            // ✅ Lấy tham số productID, size, quantity từ AJAX
+            // ✅ Lấy tham số productID, size, color, quantity từ AJAX
             String productIDStr = request.getParameter("productID");
             String size = request.getParameter("size");
+            String color = request.getParameter("color"); // ✅ thêm color
             String quantityStr = request.getParameter("quantity");
 
-            if (productIDStr == null || size == null || quantityStr == null) {
+            if (productIDStr == null || size == null || color == null || quantityStr == null) {
                 response.sendError(HttpServletResponse.SC_BAD_REQUEST);
                 return;
             }
@@ -42,14 +43,14 @@ public class UpdateQuantityServlet extends HttpServlet {
 
             CartDTO cart = (CartDTO) session.getAttribute("CART");
 
-            if (cart == null || cart.getCartItem(productID, size) == null) {
+            if (cart == null || cart.getCartItem(productID, size, color) == null) {
                 response.sendError(HttpServletResponse.SC_NOT_FOUND);
                 return;
             }
 
             // ✅ Nếu số lượng <= 0 → xóa khỏi giỏ hàng
             if (newQuantity <= 0) {
-                cart.removeFromCart(productID, size);
+                cart.removeFromCart(productID, size, color); // ✅ truyền thêm color
                 session.setAttribute("CART", cart);
                 return;
             }
@@ -62,8 +63,8 @@ public class UpdateQuantityServlet extends HttpServlet {
                 return;
             }
 
-            // ✅ Cập nhật số lượng
-            cart.updateQuantity(productID, size, newQuantity);
+            // ✅ Cập nhật số lượng theo productID + size + color
+            cart.updateQuantity(productID, size, color, newQuantity); // ✅ truyền thêm color
             session.setAttribute("CART", cart);
 
         } catch (NumberFormatException e) {

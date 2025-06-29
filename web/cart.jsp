@@ -57,7 +57,7 @@
 </head>
 <body>
 <div class="header">
-    <a href="homepage.jsp" class="logo">🏕 Summit Spirit</a>
+    <a href="homepage.jsp" class="logo"> Summit Spirit</a>
     <div class="nav-links">
         <a href="homepage.jsp">Home</a>
         <a href="cart.jsp">Cart</a>
@@ -95,7 +95,8 @@
         <% for (CartItemDTO item : cart.getCartItems()) {
             ProductDTO p = item.getProduct();
             String sizeStr = (p.getSize() != null) ? p.getSize().trim() : "";
-            String uniqueKey = p.getProductID() + "_" + sizeStr;
+            String colorStr = (p.getColor() != null) ? p.getColor().trim() : "";
+            String uniqueKey = p.getProductID() + "_" + sizeStr + "_" + colorStr;
             int quantity = item.getQuantity();
             int stock = p.getStock();
             double price = p.getPrice();
@@ -109,11 +110,14 @@
                 <% if (!sizeStr.isEmpty()) { %>
                     <p>Size: <%= sizeStr %></p>
                 <% } %>
+                <% if (!colorStr.isEmpty()) { %>
+                    <p>Color: <%= colorStr %></p>
+                <% } %>
                 <div class="quantity-box">
                     <button type="button" onclick="decrease('<%= uniqueKey %>')">−</button>
                     <input type="number" name="quantity_<%= uniqueKey %>" id="qty_<%= uniqueKey %>" value="<%= quantity %>" min="1" max="<%= stock %>" onchange="handleManualInput('<%= uniqueKey %>', <%= stock %>)">
                     <button type="button" onclick="increase('<%= uniqueKey %>', <%= stock %>)">+</button>
-                    <a href="RemoveFromCartServlet?productID=<%= p.getProductID() %>&size=<%= p.getSize() %>" class="delete-link"><i class="fa fa-trash"></i></a>
+                    <a href="RemoveFromCartServlet?productID=<%= p.getProductID() %>&size=<%= p.getSize() %>&color=<%= p.getColor() %>" class="delete-link"><i class="fa fa-trash"></i></a>
                 </div>
             </div>
             <div class="price"><%= String.format("%,.0f", lineTotal) %> VND</div>
@@ -135,7 +139,7 @@
         <form action="GoToShippingServlet" method="post">
             <% for (CartItemDTO item : cart.getCartItems()) {
                 ProductDTO p = item.getProduct();
-                String uniqueKey = p.getProductID() + "_" + p.getSize();
+                String uniqueKey = p.getProductID() + "_" + p.getSize() + "_" + p.getColor();
                 int quantity = item.getQuantity();
             %>
                 <input type="hidden" name="quantity_<%= uniqueKey %>" value="<%= quantity %>" id="hidden_qty_<%= uniqueKey %>">
@@ -150,12 +154,14 @@
         const parts = productKey.split('_');
         const productID = parts[0];
         const size = parts[1];
+        const color = parts[2];
 
         fetch('UpdateQuantityServlet', {
             method: 'POST',
             headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
             body: 'productID=' + encodeURIComponent(productID) +
                   '&size=' + encodeURIComponent(size) +
+                  '&color=' + encodeURIComponent(color) +
                   '&quantity=' + encodeURIComponent(quantity)
         }).catch(err => console.error("Error updating quantity:", err));
     }
@@ -181,7 +187,8 @@
                 const parts = id.split('_');
                 const productID = parts[0];
                 const size = parts[1];
-                window.location.href = "RemoveFromCartServlet?productID=" + productID + "&size=" + size;
+                const color = parts[2];
+                window.location.href = "RemoveFromCartServlet?productID=" + productID + "&size=" + size + "&color=" + color;
                 return;
             } else {
                 input.value = 1;
@@ -204,7 +211,8 @@
                 const parts = id.split('_');
                 const productID = parts[0];
                 const size = parts[1];
-                window.location.href = "RemoveFromCartServlet?productID=" + productID + "&size=" + size;
+                const color = parts[2];
+                window.location.href = "RemoveFromCartServlet?productID=" + productID + "&size=" + size + "&color=" + color;
                 return;
             } else {
                 input.value = 1;

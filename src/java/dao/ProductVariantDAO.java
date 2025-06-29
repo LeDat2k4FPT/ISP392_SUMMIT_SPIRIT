@@ -73,4 +73,22 @@ public class ProductVariantDAO {
         }
         return sizes;
     }
+    public List<String> getAvailableColorsByProductId(int productId) throws SQLException, ClassNotFoundException {
+    List<String> colors = new ArrayList<>();
+    String sql = "SELECT DISTINCT c.ColorName " +
+                 "FROM ProductVariant pv " +
+                 "JOIN Color c ON pv.ColorID = c.ColorID " +
+                 "WHERE pv.ProductID = ?";
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, productId);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                colors.add(rs.getString("ColorName"));
+            }
+        }
+    }
+    return colors;
+}
+
 }

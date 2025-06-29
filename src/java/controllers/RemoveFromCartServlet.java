@@ -18,18 +18,18 @@ public class RemoveFromCartServlet extends HttpServlet {
             throws ServletException, IOException {
 
         try {
-            // ✅ Đúng tên tham số: productID
             int productID = Integer.parseInt(request.getParameter("productID"));
             String size = request.getParameter("size");
+            String color = request.getParameter("color");
 
             HttpSession session = request.getSession();
             CartDTO cart = (CartDTO) session.getAttribute("CART");
 
             if (cart != null) {
-                if (size != null && !size.isEmpty()) {
-                    cart.removeFromCart(productID, size);
+                if (size != null && color != null && !size.isEmpty() && !color.isEmpty()) {
+                    cart.removeFromCart(productID, size, color);
                 } else {
-                    cart.removeFromCart(productID); // fallback nếu thiếu size
+                    cart.removeFromCart(productID); // fallback nếu thiếu dữ liệu
                 }
 
                 session.setAttribute("CART", cart);

@@ -7,6 +7,7 @@ public class ProductDTO {
     private String productImage;
     private String description;
     private String size;
+    private String color; // ✅ Đã thêm
     private double price;
     private String status;
     private int stock;
@@ -36,7 +37,7 @@ public class ProductDTO {
         this.cateID = cateID;
         this.status = status;
     }
-    
+
     public String getCateName() {
         return cateName;
     }
@@ -44,7 +45,6 @@ public class ProductDTO {
     public void setCateName(String cateName) {
         this.cateName = cateName;
     }
-    
 
     public int getProductID() {
         return productID;
@@ -84,6 +84,14 @@ public class ProductDTO {
 
     public void setSize(String size) {
         this.size = size;
+    }
+
+    public String getColor() {                      // ✅ Getter
+        return color;
+    }
+
+    public void setColor(String color) {            // ✅ Setter
+        this.color = color;
     }
 
     public double getPrice() {

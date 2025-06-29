@@ -7,7 +7,7 @@ import java.util.Collection;
 
 public class CartDTO implements Serializable {
     private int userID; // Liên kết giỏ hàng với người dùng
-    private Map<String, CartItemDTO> cartItems; // ✅ Key: productID_size
+    private Map<String, CartItemDTO> cartItems; // ✅ Key: productID_size_color
 
     public CartDTO() {
         this.cartItems = new HashMap<>();
@@ -26,21 +26,20 @@ public class CartDTO implements Serializable {
         this.userID = userID;
     }
 
-    // ============================
-    // 🔑 Tạo key từ productID + size
-    private String buildKey(int productID, String size) {
-        return productID + "_" + size;
+    // 🔑 Tạo key từ productID + size + color
+    private String buildKey(int productID, String size, String color) {
+        return productID + "_" + size + "_" + color;
     }
 
-    // ============================
-    // ✅ Thêm sản phẩm vào giỏ (theo productID + size)
+    // ✅ Thêm sản phẩm vào giỏ (theo productID + size + color)
     public void addToCart(ProductDTO product, int quantity) {
         if (product == null || quantity <= 0) {
             return;
         }
 
         String size = product.getSize();
-        String key = buildKey(product.getProductID(), size);
+        String color = product.getColor();
+        String key = buildKey(product.getProductID(), size, color);
 
         if (cartItems.containsKey(key)) {
             CartItemDTO existingItem = cartItems.get(key);
@@ -56,10 +55,9 @@ public class CartDTO implements Serializable {
         }
     }
 
-    // ============================
-    // ✅ Cập nhật số lượng theo productID + size
-    public void updateQuantity(int productID, String size, int newQuantity) {
-        String key = buildKey(productID, size);
+    // ✅ Cập nhật số lượng theo productID + size + color
+    public void updateQuantity(int productID, String size, String color, int newQuantity) {
+        String key = buildKey(productID, size, color);
 
         if (newQuantity <= 0) {
             cartItems.remove(key);
@@ -68,27 +66,23 @@ public class CartDTO implements Serializable {
         }
     }
 
-    // ============================
-    // ✅ Xóa sản phẩm theo productID + size (khuyến nghị)
-    public void removeFromCart(int productID, String size) {
-        String key = buildKey(productID, size);
+    // ✅ Xóa sản phẩm theo productID + size + color
+    public void removeFromCart(int productID, String size, String color) {
+        String key = buildKey(productID, size, color);
         cartItems.remove(key);
     }
 
-    // ============================
     // ✅ Xóa tất cả biến thể theo productID (giữ tương thích hệ thống cũ)
     public void removeFromCart(int productID) {
         String prefix = productID + "_";
         cartItems.keySet().removeIf(key -> key.startsWith(prefix));
     }
 
-    // ============================
     // ✅ Lấy toàn bộ sản phẩm trong giỏ
     public Collection<CartItemDTO> getCartItems() {
         return cartItems.values();
     }
 
-    // ============================
     // ✅ Tính tổng số lượng
     public int getTotalQuantity() {
         int total = 0;
@@ -98,7 +92,6 @@ public class CartDTO implements Serializable {
         return total;
     }
 
-    // ============================
     // ✅ Tính tổng tiền
     public double getTotalPrice() {
         double total = 0;
@@ -108,7 +101,6 @@ public class CartDTO implements Serializable {
         return total;
     }
 
-    // ============================
     // ✅ Xóa toàn bộ giỏ
     public void clearCart() {
         cartItems.clear();
@@ -118,13 +110,11 @@ public class CartDTO implements Serializable {
         return cartItems.isEmpty();
     }
 
-    // ============================
-    // ✅ Truy xuất sản phẩm theo productID + size
-    public CartItemDTO getCartItem(int productID, String size) {
-        return cartItems.get(buildKey(productID, size));
+    // ✅ Truy xuất sản phẩm theo productID + size + color
+    public CartItemDTO getCartItem(int productID, String size, String color) {
+        return cartItems.get(buildKey(productID, size, color));
     }
 
-    // ============================
     // ✅ Truy xuất sản phẩm theo productID (giữ lại phiên bản cũ)
     public CartItemDTO getCartItem(int productID) {
         for (String key : cartItems.keySet()) {
@@ -134,7 +124,8 @@ public class CartDTO implements Serializable {
         }
         return null;
     }
-    // ✅ Cập nhật số lượng theo key "productID_size"
+
+    // ✅ Cập nhật số lượng theo key "productID_size_color"
     public void updateQuantity(String key, int quantity) {
         if (cartItems.containsKey(key)) {
             if (quantity <= 0) {

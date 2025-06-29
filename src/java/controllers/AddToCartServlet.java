@@ -24,7 +24,8 @@ public class AddToCartServlet extends HttpServlet {
         try {
             int productID = Integer.parseInt(request.getParameter("productID"));
             int quantity = Integer.parseInt(request.getParameter("quantity"));
-            String size = request.getParameter("size"); // ✅ lấy size từ form
+            String size = request.getParameter("size");
+            String color = request.getParameter("color"); // ✅ Lấy thêm color từ form
 
             if (quantity <= 0) {
                 response.sendRedirect("productDetail.jsp?id=" + productID + "&error=invalid_quantity");
@@ -39,7 +40,8 @@ public class AddToCartServlet extends HttpServlet {
                 return;
             }
 
-            product.setSize(size); // ✅ gán size vào đối tượng Product
+            product.setSize(size);   // ✅ Gán size
+            product.setColor(color); // ✅ Gán color
 
             int stock = dao.getStockByProductID(productID);
 
@@ -59,8 +61,9 @@ public class AddToCartServlet extends HttpServlet {
             }
 
             int existingQuantity = 0;
-            if (cart.getCartItem(productID) != null) {
-                existingQuantity = cart.getCartItem(productID).getQuantity();
+            // ✅ Sửa: kiểm tra số lượng theo productID + size + color
+            if (cart.getCartItem(productID, size, color) != null) {
+                existingQuantity = cart.getCartItem(productID, size, color).getQuantity();
             }
 
             if (quantity + existingQuantity > stock) {
@@ -69,7 +72,7 @@ public class AddToCartServlet extends HttpServlet {
                 return;
             }
 
-            cart.addToCart(product, quantity); // ✅ vẫn dùng product (đã có size gán vào)
+            cart.addToCart(product, quantity); // ✅ Product đã có đầy đủ size + color
             session.setAttribute("CART", cart);
 
             response.sendRedirect("productDetail.jsp?id=" + productID);

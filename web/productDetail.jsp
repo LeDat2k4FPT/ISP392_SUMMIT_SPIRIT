@@ -1,4 +1,3 @@
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="dao.ProductDAO, dto.ProductDTO, dto.CartDTO, dto.UserDTO" %>
 <%@ page import="dao.ProductVariantDAO, dao.ReviewDAO" %>
@@ -20,6 +19,7 @@
     }
 
     List<String> sizeList = new java.util.ArrayList<>();
+    List<String> colorList = new java.util.ArrayList<>();
     List<ReviewDTO> reviews = new java.util.ArrayList<>();
 
     try {
@@ -40,6 +40,7 @@
 
             ProductVariantDAO variantDAO = new ProductVariantDAO();
             sizeList = variantDAO.getAvailableSizesByProductId(productID);
+            colorList = variantDAO.getAvailableColorsByProductId(productID); // lấy color
 
             ReviewDAO reviewDAO = new ReviewDAO();
             reviews = reviewDAO.getReviewsByProductID(productID);
@@ -52,7 +53,7 @@
 <html>
 <head>
     <meta charset="UTF-8">
-    <title><%= product.getProductName() %></title>
+    <title><%= product != null ? product.getProductName() : "Product Detail" %></title>
     <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
     <link rel="stylesheet" href="css/productDetail.css">
 </head>
@@ -63,14 +64,19 @@
         <a href="homepage.jsp">Home</a>
         <a href="cart.jsp">Cart <span class="cart-count"><%= totalQuantity %></span></a>
         <div class="user-dropdown">
-            <div class="user-name" onclick="toggleMenu()"><%= loginUser.getFullName() %></div>
-            <div id="dropdown" class="dropdown-menu">
-                <a href="profile.jsp">User Profile</a>
-                <a href="MainController?action=Logout">Logout</a>
-            </div>
+            <% if (loginUser != null) { %>
+                <div class="user-name" onclick="toggleMenu()"><%= loginUser.getFullName() %></div>
+                <div id="dropdown" class="dropdown-menu">
+                    <a href="profile.jsp">User Profile</a>
+                    <a href="MainController?action=Logout">Logout</a>
+                </div>
+            <% } else { %>
+                <a href="login.jsp" class="login-link">Login</a>
+            <% } %>
         </div>
     </div>
 </div>
+
 <script>
     function toggleMenu() {
         const menu = document.getElementById("dropdown");
@@ -79,7 +85,7 @@
     document.addEventListener("click", function (event) {
         const dropdown = document.getElementById("dropdown");
         const userBtn = document.querySelector(".user-name");
-        if (!dropdown.contains(event.target) && !userBtn.contains(event.target)) {
+        if (dropdown && userBtn && !dropdown.contains(event.target) && !userBtn.contains(event.target)) {
             dropdown.style.display = "none";
         }
     });
@@ -119,6 +125,19 @@
                     </div>
                     <% } else { %>
                         <input type="hidden" name="size" value="">
+                    <% } %>
+
+                    <% if (colorList != null && !colorList.isEmpty()) { %>
+                    <div class="select-group">
+                        <label for="color">Color:</label>
+                        <select name="color" id="color">
+                            <% for (String color : colorList) { %>
+                                <option value="<%= color %>"><%= color %></option>
+                            <% } %>
+                        </select>
+                    </div>
+                    <% } else { %>
+                        <input type="hidden" name="color" value="">
                     <% } %>
 
                     <div class="select-group">

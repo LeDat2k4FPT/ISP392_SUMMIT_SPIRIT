@@ -98,7 +98,7 @@
 </head>
 <body>
 <div class="header">
-    <a href="homepage.jsp" class="logo">🏕 Summit Spirit</a>
+    <a href="homepage.jsp" class="logo"> Summit Spirit</a>
     <div class="nav-links">
         <a href="homepage.jsp">Home</a>
         <a href="cart.jsp">Cart</a>
@@ -134,7 +134,6 @@
 
         <div class="footer-buttons">
             <a href="cart.jsp" class="back-btn">← Return To Cart</a>
-            <!-- ✅ Đây là button gửi form và sẽ bị chặn nếu chưa hợp lệ -->
             <button type="submit" class="pay-btn">Continue To Pay</button>
         </div>
     </div>
@@ -155,6 +154,9 @@
                 <h4><%= p.getProductName() %></h4>
                 <% if (p.getSize() != null && !p.getSize().isEmpty()) { %>
                     <p>Size: <%= p.getSize() %></p>
+                <% } %>
+                <% if (p.getColor() != null && !p.getColor().isEmpty()) { %>
+                    <p>Color: <%= p.getColor() %></p>
                 <% } %>
                 <div class="quantity-box"><span><%= quantity %></span></div>
             </div>
