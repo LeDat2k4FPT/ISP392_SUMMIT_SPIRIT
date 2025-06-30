@@ -266,3 +266,11 @@ body {
     background-color: #ccc;
     margin: 40px auto;
 }
+
+/* === ERROR MESSAGES === */
+#size-error, #color-error {
+    color: red;
+    font-size: 14px;
+    margin-top: 4px;
+    display: none;
+}

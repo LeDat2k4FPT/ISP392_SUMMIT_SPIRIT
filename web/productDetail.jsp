@@ -125,7 +125,8 @@
                                 <button type="button" class="option-btn" onclick="selectSize('<%= size %>', this)"><%= size %></button>
                                 <% } %>
                             </div>
-                            <input type="hidden" name="size" id="size" value="<%= sizeList.get(0) %>">
+                            <input type="hidden" name="size" id="size" value=""> 
+                            <small id="size-error">Please choose size!</small>
                         </div>
                         <% } else { %>
                         <input type="hidden" name="size" id="size" value="">
@@ -139,7 +140,8 @@
                                 <button type="button" class="option-btn" onclick="selectColor('<%= color %>', this)"><%= color %></button>
                                 <% } %>
                             </div>
-                            <input type="hidden" name="color" id="color" value="<%= colorList.get(0) %>">
+                            <input type="hidden" name="color" id="color" value=""> 
+                            <small id="color-error">Please choose color!</small>
                         </div>
                         <% } else { %>
                         <input type="hidden" name="color" id="color" value="">
@@ -164,13 +166,13 @@
             </div>
 
             <div class="thin-divider"></div>       
-            
+
             <div class="section-box">
                 <h3>Description</h3>
                 <p><%= product.getDescription() %></p>
             </div>
             <div class="thin-divider"></div>
-            
+
             <div class="section-box">
                 <h3>Customer Reviews</h3>
                 <% if (reviews != null && !reviews.isEmpty()) {
@@ -191,16 +193,21 @@
 
 
         <script>
+            
             function selectSize(value, btn) {
                 document.getElementById("size").value = value;
                 document.querySelectorAll("#size-options .option-btn").forEach(b => b.classList.remove("active"));
                 btn.classList.add("active");
+                document.getElementById("size-error").style.display = "none";
             }
+            
             function selectColor(value, btn) {
                 document.getElementById("color").value = value;
                 document.querySelectorAll("#color-options .option-btn").forEach(b => b.classList.remove("active"));
                 btn.classList.add("active");
+                document.getElementById("color-error").style.display = "none";
             }
+
             function decreaseQuantity() {
                 const input = document.getElementById("quantity");
                 const display = document.getElementById("quantity-display");
@@ -222,9 +229,34 @@
                 }
             }
             function validateBeforeSubmit(maxAvailable) {
-                const input = document.getElementById("quantity");
-                return parseInt(input.value) <= maxAvailable;
+                const sizeInput = document.getElementById("size");
+                const colorInput = document.getElementById("color");
+                const quantity = parseInt(document.getElementById("quantity").value);
+
+                let valid = true;
+
+                // Ẩn thông báo cũ
+                document.getElementById("size-error")?.style.setProperty("display", "none");
+                        document.getElementById("color-error")?.style.setProperty("display", "none");
+
+                if (sizeInput && sizeInput.value.trim() === "") {
+                    document.getElementById("size-error").style.display = "block";
+                    valid = false;
+                }
+
+                if (colorInput && colorInput.value.trim() === "") {
+                    document.getElementById("color-error").style.display = "block";
+                    valid = false;
+                }
+
+                if (quantity > maxAvailable) {
+                    alert("Số lượng vượt quá tồn kho.");
+                    valid = false;
+                }
+
+                return valid;
             }
+
         </script>
     </body>
 </html>
