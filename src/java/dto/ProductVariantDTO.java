@@ -9,8 +9,8 @@ public class ProductVariantDTO {
     private double price;
     private int quantity;
 
-    private String colorName;  
-    private String sizeName;   
+    private String colorName;
+    private String sizeName;
 
     // ========== Constructors ==========
 
