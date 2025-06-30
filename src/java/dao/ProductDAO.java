@@ -130,35 +130,61 @@ public class ProductDAO {
         return -1;
     }
 
-    public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
+//    public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
+//        List<ProductDTO> list = new ArrayList<>();
+//        String sql =
+//            "SELECT p.ProductID, p.ProductName, p.Description, p.Status, c.CateName, " +
+//            "(SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, " +
+//            "(SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL " +
+//            "FROM Product p " +
+//            "JOIN Category c ON p.CateID = c.CateID";
+//
+//        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+//            while (rs.next()) {
+//                ProductDTO p = new ProductDTO();
+//                p.setProductID(rs.getInt("ProductID"));
+//                p.setProductName(rs.getString("ProductName"));
+//                p.setDescription(rs.getString("Description"));
+//                p.setStatus(rs.getString("Status"));
+//                p.setCateName(rs.getString("CateName"));
+//
+//                double price = rs.getDouble("Price");
+//                p.setPrice(price);
+//
+//                String img = rs.getString("ImageURL");
+//                p.setProductImage(img != null ? img : "default.jpg");
+//
+//                list.add(p);
+//            }
+//        }
+//        return list;
+//    }
+public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String sql =
-            "SELECT p.ProductID, p.ProductName, p.Description, p.Status, c.CateName, " +
-            "(SELECT TOP 1 Price FROM ProductVariant WHERE ProductID = p.ProductID) AS Price, " +
-            "(SELECT TOP 1 ImageURL FROM ProductImage WHERE ProductID = p.ProductID) AS ImageURL " +
-            "FROM Product p " +
-            "JOIN Category c ON p.CateID = c.CateID";
+        String sql = "SELECT p.ProductID, p.ProductName, c.CateName, " +
+                     "MIN(pv.Price) AS Price, SUM(pv.Quantity) AS Stock " +
+                     "FROM Product p " +
+                     "JOIN Category c ON p.CateID = c.CateID " +
+                     "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID " +
+                     "GROUP BY p.ProductID, p.ProductName, c.CateName";
 
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
             while (rs.next()) {
                 ProductDTO p = new ProductDTO();
                 p.setProductID(rs.getInt("ProductID"));
                 p.setProductName(rs.getString("ProductName"));
-                p.setDescription(rs.getString("Description"));
-                p.setStatus(rs.getString("Status"));
                 p.setCateName(rs.getString("CateName"));
-
-                double price = rs.getDouble("Price");
-                p.setPrice(price);
-
-                String img = rs.getString("ImageURL");
-                p.setProductImage(img != null ? img : "default.jpg");
-
+                p.setPrice(rs.getDouble("Price"));
+                p.setStock(rs.getInt("Stock"));
                 list.add(p);
             }
         }
         return list;
     }
+
 
     public List<ProductDTO> getTopSalesFromCategory(int cateID, int limit)
             throws SQLException, ClassNotFoundException {

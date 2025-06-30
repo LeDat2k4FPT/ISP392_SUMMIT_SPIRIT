@@ -4,6 +4,7 @@
  */
 package dao;
 
+import dto.ProductDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import utils.DBUtils;
@@ -11,7 +12,9 @@ import dto.ProductVariantDTO;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.util.ArrayList;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 
 /**
  *
@@ -91,4 +94,65 @@ public class ProductVariantDAO {
     return colors;
 }
 
+
+
+ public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
+        List<ProductDTO> list = new ArrayList<>();
+        String sql = "SELECT p.ProductID, p.ProductName, c.CateName, " +
+                     "MIN(pv.Price) AS Price, SUM(pv.Quantity) AS Stock " +
+                     "FROM Product p " +
+                     "JOIN Category c ON p.CateID = c.CateID " +
+                     "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID " +
+                     "GROUP BY p.ProductID, p.ProductName, c.CateName";
+
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+
+            while (rs.next()) {
+                ProductDTO p = new ProductDTO();
+                p.setProductID(rs.getInt("ProductID"));
+                p.setProductName(rs.getString("ProductName"));
+                p.setCateName(rs.getString("CateName"));
+                p.setPrice(rs.getDouble("Price"));
+                p.setStock(rs.getInt("Stock"));
+                list.add(p);
+            }
+        }
+        return list;
+    }
+
+public Map<Integer, List<ProductVariantDTO>> getAllVariantsGroupedByProduct()
+        throws ClassNotFoundException, SQLException {
+    Map<Integer, List<ProductVariantDTO>> variantMap = new HashMap<>();
+
+    String sql = "SELECT pv.ProductID, c.ColorName, s.SizeName, pv.Price, pv.Quantity " +
+                 "FROM ProductVariant pv " +
+                 "JOIN Color c ON pv.ColorID = c.ColorID " +
+                 "JOIN Size s ON pv.SizeID = s.SizeID " +
+                 "ORDER BY pv.ProductID, s.SizeName, c.ColorName";
+
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+        while (rs.next()) {
+            int productID = rs.getInt("ProductID");
+            ProductVariantDTO variant = new ProductVariantDTO();
+            variant.setProductID(productID);
+            variant.setColorName(rs.getString("ColorName"));
+            variant.setSizeName(rs.getString("SizeName"));
+            variant.setPrice(rs.getDouble("Price"));
+            variant.setQuantity(rs.getInt("Quantity"));
+
+            variantMap.computeIfAbsent(productID, k -> new ArrayList<>()).add(variant);
+        }
+    }
+    return variantMap;
 }
+
+}
+
+
+
+
+

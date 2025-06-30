@@ -9,12 +9,14 @@ public class ProductVariantDTO {
     private double price;
     private int quantity;
 
+    private String colorName;  
+    private String sizeName;   
+
     // ========== Constructors ==========
 
     public ProductVariantDTO() {
     }
 
-    // Dùng khi tạo mới, chưa có attributeID
     public ProductVariantDTO(int productID, int colorID, int sizeID, double price, int quantity) {
         this.productID = productID;
         this.colorID = colorID;
@@ -23,7 +25,6 @@ public class ProductVariantDTO {
         this.quantity = quantity;
     }
 
-    // Dùng khi cần đầy đủ thông tin (ví dụ khi truy xuất từ DB)
     public ProductVariantDTO(int attributeID, int productID, int colorID, int sizeID, double price, int quantity) {
         this.attributeID = attributeID;
         this.productID = productID;
@@ -81,5 +82,21 @@ public class ProductVariantDTO {
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public String getColorName() {
+        return colorName;
+    }
+
+    public void setColorName(String colorName) {
+        this.colorName = colorName;
+    }
+
+    public String getSizeName() {
+        return sizeName;
+    }
+
+    public void setSizeName(String sizeName) {
+        this.sizeName = sizeName;
     }
 }

@@ -61,7 +61,7 @@
             <aside class="sidebar">
                 <nav class="menu">
                     <button onclick="loadContent('staff/home.jsp')">Home</button>
-                    <button onclick="loadContent('viewRevenue.jsp')">View Revenue</button>
+<!--                    <button onclick="loadContent('viewRevenue.jsp')">View Revenue</button>-->
                     <button onclick="loadContent('staff/productlist.jsp')">Product</button>
                     <button onclick="loadContent('orderlist.jsp')">Order</button>
                 </nav>

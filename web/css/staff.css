@@ -244,3 +244,23 @@ body {
     color: #aa1e1e;
     border-color: #f46a6a;
 }
+
+.product-table td table {
+    border: 1px solid #ddd;
+    width: 100%;
+    border-collapse: collapse;
+    margin-top: 4px;
+}
+
+.product-table td table th,
+.product-table td table td {
+    border: 1px solid #ddd;
+    padding: 2px 4px;
+    text-align: center;
+    font-size: 12px;
+}
+
+.product-table td table th {
+    background: #f9f9f9;
+    font-weight: bold;
+}
