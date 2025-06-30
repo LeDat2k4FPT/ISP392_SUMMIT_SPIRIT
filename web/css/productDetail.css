@@ -162,15 +162,30 @@ body {
     margin-bottom: 20px;
 }
 .select-group label {
+    font-weight: 500;
     display: block;
     margin-bottom: 6px;
-    font-weight: 500;
 }
-.select-group select, .select-group input {
-    padding: 8px;
-    font-size: 16px;
-    width: 100%;
-    max-width: 150px;
+
+.option-buttons {
+    display: flex;
+    gap: 10px;
+    flex-wrap: wrap;
+}
+.option-btn {
+    padding: 8px 16px;
+    border: 1px solid #ccc;
+    background: #E7F0FB;
+    cursor: pointer;
+    border-radius: 6px;
+    font-weight: bold;
+    transition: all 0.2s ease;
+}
+.option-btn:hover,
+.option-btn.active {
+    background: #195181;
+    color: white;
+    border-color: #195181;
 }
 .quantity-controls {
     display: flex;
@@ -183,27 +198,29 @@ body {
     background: #ccc;
     border: none;
     cursor: pointer;
+    font-weight: bold;
+    border-radius: 6px;
+}
+.quantity-number {
+    width: 40px;
+    text-align: center;
+    font-size: 16px;
+    font-weight: bold;
 }
 .add-to-cart {
     display: flex;
     gap: 10px;
-    margin-top: 10px;
+    margin-top: 20px;
 }
-.add-to-cart button, .checkout-btn {
+.add-to-cart button,
+.checkout-btn {
     padding: 12px 24px;
     color: white;
+    background: #28a745;
+    border: none;
     border-radius: 5px;
     cursor: pointer;
-    border: none;
-}
-.add-to-cart button {
-    background: #28a745;
-}
-.checkout-btn {
-    background: #28a745;
-    text-decoration: none;
-    display: inline-block;
-    line-height: normal;
+    font-size: 16px;
 }
 .section-box {
     background: white;

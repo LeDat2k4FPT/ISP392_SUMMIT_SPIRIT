@@ -237,3 +237,29 @@ h2 {
     color: #000;
 }
 
+.promotion-program {
+    display: flex;
+    gap: 20px;
+    justify-content: center;
+    flex-wrap: nowrap;
+    overflow-x: auto;
+    padding: 20px 0;
+}
+
+.promotion-program::-webkit-scrollbar {
+    display: none; /* Chrome, Safari */
+}
+
+.promotion-program img {
+    flex: 0 0 auto;
+    width: 200px;
+    height: 320px;
+    border-radius: 12px;
+    object-fit: cover;
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.1);
+    transition: transform 0.3s ease;
+}
+
+.promotion-program img:hover {
+    transform: scale(1.03);
+}

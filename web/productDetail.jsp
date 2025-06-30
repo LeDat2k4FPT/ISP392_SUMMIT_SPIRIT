@@ -51,15 +51,15 @@
 %>
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title><%= product != null ? product.getProductName() : "Product Detail" %></title>
-    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
-    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <link rel="stylesheet" href="css/productDetail.css">
-</head>
-<body>
- <div class="header">
+    <head>
+        <meta charset="UTF-8">
+        <title><%= product != null ? product.getProductName() : "Product Detail" %></title>
+        <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
+        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+        <link rel="stylesheet" href="css/productDetail.css">
+    </head>
+    <body>
+        <div class="header">
             <a href="homepage.jsp">
                 <img src="image/summit_logo.png" alt="Logo">
             </a>
@@ -81,122 +81,150 @@
                 </div>
             </div>
         </div>
-<script>
-    function toggleMenu() {
-        const menu = document.getElementById("dropdown");
-        menu.style.display = menu.style.display === "block" ? "none" : "block";
-    }
-    document.addEventListener("click", function (event) {
-        const dropdown = document.getElementById("dropdown");
-        const userBtn = document.querySelector(".user-name");
-        if (dropdown && userBtn && !dropdown.contains(event.target) && !userBtn.contains(event.target)) {
-            dropdown.style.display = "none";
-        }
-    });
-</script>
+        <script>
+            function toggleMenu() {
+                const menu = document.getElementById("dropdown");
+                menu.style.display = menu.style.display === "block" ? "none" : "block";
+            }
+            document.addEventListener("click", function (event) {
+                const dropdown = document.getElementById("dropdown");
+                const userBtn = document.querySelector(".user-name");
+                if (dropdown && userBtn && !dropdown.contains(event.target) && !userBtn.contains(event.target)) {
+                    dropdown.style.display = "none";
+                }
+            });
+        </script>
 
-<% if (product != null) {
-    int availableStock = product.getStock() - alreadyInCart;
-    if (availableStock < 0) availableStock = 0;
-%>
-<div class="layout">
-    <div class="breadcrumb">
-        <a class="back-button styled-button" href="javascript:history.back()">← Back</a>
-    </div>
-
-    <div class="product-section">
-        <div class="product-image">
-            <img src="<%= product.getProductImage() %>" alt="Product Image">
-        </div>
-        <div class="product-info">
-            <h1><%= product.getProductName() %></h1>
-            <div class="price"><%= String.format("%,.0f", product.getPrice()) %> VND</div>
-            <form action="AddToCartServlet" method="post" onsubmit="return validateBeforeSubmit(<%= availableStock %>)">
-                <input type="hidden" name="productID" value="<%= product.getProductID() %>">
-                <input type="hidden" name="productName" value="<%= product.getProductName() %>">
-                <input type="hidden" name="productImage" value="<%= product.getProductImage() %>">
-                <input type="hidden" name="price" value="<%= product.getPrice() %>">
-
-                <div class="select-group">
-                    <label for="size">Size:</label>
-                    <select name="size" id="size">
-                        <% if (sizeList != null && !sizeList.isEmpty()) {
-                            for (String size : sizeList) { %>
-                        <option value="<%= size %>"><%= size %></option>
-                        <% } } else { %>
-                        <option disabled selected>No sizes available</option>
-                        <% } %>
-                    </select>
-                </div>
-
-                <% if (colorList != null && !colorList.isEmpty()) { %>
-                <div class="select-group">
-                    <label for="color">Color:</label>
-                    <select name="color" id="color">
-                        <% for (String color : colorList) { %>
-                            <option value="<%= color %>"><%= color %></option>
-                        <% } %>
-                    </select>
-                </div>
-                <% } else { %>
-                    <input type="hidden" name="color" value="">
-                <% } %>
-
-                <div class="select-group">
-                    <label for="quantity">Quantity:</label>
-                    <div class="quantity-controls">
-                        <button type="button" onclick="decreaseQuantity()">−</button>
-                        <input type="number" name="quantity" id="quantity" value="1" min="1" max="<%= availableStock %>">
-                        <button type="button" onclick="increaseQuantity(<%= availableStock %>)">+</button>
-                    </div>
-                </div>
-                <div class="add-to-cart">
-                    <button type="submit">Add to Cart</button>
-                    <a href="shipping.jsp" class="checkout-btn">Check Out</a>
-                </div>
-            </form>
-        </div>
-    </div>
-
-    <div class="section-box">
-        <h3>Description</h3>
-        <p><%= product.getDescription() %></p>
-    </div>
-    <div class="section-box">
-        <h3>Customer Reviews</h3>
-        <% if (reviews != null && !reviews.isEmpty()) {
-            for (ReviewDTO review : reviews) { %>
-            <div style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #ccc;">
-                <strong>Rating:</strong> <%= review.getRating() %> / 5<br>
-                <strong>Comment:</strong> <%= review.getComment() %><br>
-                <small><%= review.getReviewDate() %></small>
+        <% if (product != null) {
+            int availableStock = product.getStock() - alreadyInCart;
+            if (availableStock < 0) availableStock = 0;
+        %>
+        <div class="layout">
+            <div class="breadcrumb">
+                <a class="back-button styled-button" href="javascript:history.back()">← Back</a>
             </div>
-        <% } } else { %>
-            <p>No reviews yet.</p>
-        <% } %>
-    </div>
-</div>
-<% } else { %>
-    <p>Product not found.</p>
-<% } %>
 
-<script>
-    function decreaseQuantity() {
-        const input = document.getElementById("quantity");
-        if (parseInt(input.value) > 1)
-            input.value = parseInt(input.value) - 1;
-    }
-    function increaseQuantity(maxAvailable) {
-        const input = document.getElementById("quantity");
-        if (parseInt(input.value) < maxAvailable)
-            input.value = parseInt(input.value) + 1;
-        else
-            alert("Số lượng đã vượt quá tồn kho còn lại.");
-    }
-    function validateBeforeSubmit(maxAvailable) {
-        const input = document.getElementById("quantity");
-        return parseInt(input.value) <= maxAvailable;
-    }
-</script>
-</body>
+            <div class="product-section">
+                <div class="product-image">
+                    <img src="<%= product.getProductImage() %>" alt="Product Image">
+                </div>
+                <div class="product-info">
+                    <h1><%= product.getProductName() %></h1>
+                    <div class="price"><%= String.format("%,.0f", product.getPrice()) %> VND</div>
+                    <form action="AddToCartServlet" method="post" onsubmit="return validateBeforeSubmit(<%= availableStock %>)">
+                        <input type="hidden" name="productID" value="<%= product.getProductID() %>">
+                        <input type="hidden" name="productName" value="<%= product.getProductName() %>">
+                        <input type="hidden" name="productImage" value="<%= product.getProductImage() %>">
+                        <input type="hidden" name="price" value="<%= product.getPrice() %>">
+
+                        <% if (!sizeList.isEmpty()) { %>
+                        <div class="select-group">
+                            <label>Size:</label>
+                            <div class="option-buttons" id="size-options">
+                                <% for (String size : sizeList) { %>
+                                <button type="button" class="option-btn" onclick="selectSize('<%= size %>', this)"><%= size %></button>
+                                <% } %>
+                            </div>
+                            <input type="hidden" name="size" id="size" value="<%= sizeList.get(0) %>">
+                        </div>
+                        <% } else { %>
+                        <input type="hidden" name="size" id="size" value="">
+                        <% } %>
+
+                        <% if (!colorList.isEmpty()) { %>
+                        <div class="select-group">
+                            <label>Color:</label>
+                            <div class="option-buttons" id="color-options">
+                                <% for (String color : colorList) { %>
+                                <button type="button" class="option-btn" onclick="selectColor('<%= color %>', this)"><%= color %></button>
+                                <% } %>
+                            </div>
+                            <input type="hidden" name="color" id="color" value="<%= colorList.get(0) %>">
+                        </div>
+                        <% } else { %>
+                        <input type="hidden" name="color" id="color" value="">
+                        <% } %>
+
+                        <div class="select-group">
+                            <label>Quantity:</label>
+                            <div class="quantity-controls">
+                                <button type="button" onclick="decreaseQuantity()">−</button>
+                                <span class="quantity-number" id="quantity-display">1</span>
+                                <button type="button" onclick="increaseQuantity(<%= availableStock %>)">+</button>
+                                <input type="hidden" name="quantity" id="quantity" value="1">
+                            </div>
+                        </div>
+
+                        <div class="add-to-cart">
+                            <button type="submit">Add to Cart</button>
+                            <a href="shipping.jsp" class="checkout-btn">Check Out</a>
+                        </div>
+                    </form>
+                </div>
+            </div>
+
+            <div class="thin-divider"></div>       
+            
+            <div class="section-box">
+                <h3>Description</h3>
+                <p><%= product.getDescription() %></p>
+            </div>
+            <div class="thin-divider"></div>
+            
+            <div class="section-box">
+                <h3>Customer Reviews</h3>
+                <% if (reviews != null && !reviews.isEmpty()) {
+            for (ReviewDTO review : reviews) { %>
+                <div style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #ccc;">
+                    <strong>Rating:</strong> <%= review.getRating() %> / 5<br>
+                    <strong>Comment:</strong> <%= review.getComment() %><br>
+                    <small><%= review.getReviewDate() %></small>
+                </div>
+                <% } } else { %>
+                <p>No reviews yet.</p>
+                <% } %>
+            </div>
+        </div>
+        <% } else { %>
+        <p>Product not found.</p>
+        <% } %>
+
+
+        <script>
+            function selectSize(value, btn) {
+                document.getElementById("size").value = value;
+                document.querySelectorAll("#size-options .option-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+            }
+            function selectColor(value, btn) {
+                document.getElementById("color").value = value;
+                document.querySelectorAll("#color-options .option-btn").forEach(b => b.classList.remove("active"));
+                btn.classList.add("active");
+            }
+            function decreaseQuantity() {
+                const input = document.getElementById("quantity");
+                const display = document.getElementById("quantity-display");
+                let val = parseInt(input.value);
+                if (val > 1) {
+                    input.value = val - 1;
+                    display.textContent = val - 1;
+                }
+            }
+            function increaseQuantity(maxAvailable) {
+                const input = document.getElementById("quantity");
+                const display = document.getElementById("quantity-display");
+                let val = parseInt(input.value);
+                if (val < maxAvailable) {
+                    input.value = val + 1;
+                    display.textContent = val + 1;
+                } else {
+                    alert("Số lượng vượt quá tồn kho.");
+                }
+            }
+            function validateBeforeSubmit(maxAvailable) {
+                const input = document.getElementById("quantity");
+                return parseInt(input.value) <= maxAvailable;
+            }
+        </script>
+    </body>
 </html>
