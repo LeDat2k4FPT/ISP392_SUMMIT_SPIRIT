@@ -1,19 +1,31 @@
 package dto;
 
 public class OrderDetailDTO {
+
     private int orderID;
     private int productID;
+    private String productName;
+    private String sizeName;
+    private String colorName;
     private int quantity;
+    private double unitPrice;
 
     public OrderDetailDTO() {
     }
 
-    public OrderDetailDTO(int orderID, int productID, int quantity) {
+    public OrderDetailDTO(int orderID, int productID, String productName,
+            String sizeName, String colorName,
+            int quantity, double unitPrice) {
         this.orderID = orderID;
         this.productID = productID;
+        this.productName = productName;
+        this.sizeName = sizeName;
+        this.colorName = colorName;
         this.quantity = quantity;
+        this.unitPrice = unitPrice;
     }
 
+    // Getter Setter đầy đủ
     public int getOrderID() {
         return orderID;
     }
@@ -30,6 +42,30 @@ public class OrderDetailDTO {
         this.productID = productID;
     }
 
+    public String getProductName() {
+        return productName;
+    }
+
+    public void setProductName(String productName) {
+        this.productName = productName;
+    }
+
+    public String getSizeName() {
+        return sizeName;
+    }
+
+    public void setSizeName(String sizeName) {
+        this.sizeName = sizeName;
+    }
+
+    public String getColorName() {
+        return colorName;
+    }
+
+    public void setColorName(String colorName) {
+        this.colorName = colorName;
+    }
+
     public int getQuantity() {
         return quantity;
     }
@@ -37,4 +73,12 @@ public class OrderDetailDTO {
     public void setQuantity(int quantity) {
         this.quantity = quantity;
     }
-} 
+
+    public double getUnitPrice() {
+        return unitPrice;
+    }
+
+    public void setUnitPrice(double unitPrice) {
+        this.unitPrice = unitPrice;
+    }
+}
