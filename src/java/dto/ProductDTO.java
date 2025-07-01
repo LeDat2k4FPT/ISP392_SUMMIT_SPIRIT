@@ -38,6 +38,15 @@ public class ProductDTO {
         this.status = status;
     }
 
+    public ProductDTO(int productID, String productName, String cateName, double price, int stock, String color) {
+        this.productID = productID;
+        this.productName = productName;
+        this.cateName = cateName;
+        this.price = price;
+        this.stock = stock;
+        this.color = color;
+    }
+
     public String getCateName() {
         return cateName;
     }

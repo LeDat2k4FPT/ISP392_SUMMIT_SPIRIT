@@ -15,34 +15,39 @@ public class OrderDetailDAO {
     private static final String DELETE_ORDER_DETAIL = "DELETE FROM OrderDetail WHERE OrderID = ? AND ProductID = ?";
     private static final String UPDATE_ORDER_DETAIL = "UPDATE OrderDetail SET Quantity = ? WHERE OrderID = ? AND ProductID = ?";
 
-    public List<OrderDetailDTO> getOrderDetails(int orderID) throws SQLException {
-        List<OrderDetailDTO> list = new ArrayList<>();
-        Connection conn = null;
-        PreparedStatement ptm = null;
-        ResultSet rs = null;
-        try {
-            conn = DBUtils.getConnection();
-            if (conn != null) {
-                ptm = conn.prepareStatement(GET_ORDER_DETAILS);
-                ptm.setInt(1, orderID);
-                rs = ptm.executeQuery();
-                while (rs.next()) {
-                    list.add(new OrderDetailDTO(
-                            rs.getInt("OrderID"),
-                            rs.getInt("ProductID"),
-                            rs.getInt("Quantity")
-                    ));
-                }
+public List<OrderDetailDTO> getOrderDetails(int orderID) throws SQLException {
+    List<OrderDetailDTO> list = new ArrayList<>();
+    Connection conn = null;
+    PreparedStatement ptm = null;
+    ResultSet rs = null;
+    try {
+        conn = DBUtils.getConnection();
+        if (conn != null) {
+            ptm = conn.prepareStatement(GET_ORDER_DETAILS);
+            ptm.setInt(1, orderID);
+            rs = ptm.executeQuery();
+            while (rs.next()) {
+                OrderDetailDTO od = new OrderDetailDTO();
+                od.setOrderID(orderID); // từ tham số method
+                od.setProductID(rs.getInt("ProductID"));
+                od.setProductName(rs.getString("ProductName"));
+                od.setSizeName(rs.getString("SizeName"));
+                od.setColorName(rs.getString("ColorName"));
+                od.setQuantity(rs.getInt("Quantity"));
+                od.setUnitPrice(rs.getDouble("UnitPrice"));
+                list.add(od);
             }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (rs != null) rs.close();
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
         }
-        return list;
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (rs != null) rs.close();
+        if (ptm != null) ptm.close();
+        if (conn != null) conn.close();
     }
+    return list;
+}
+
 
     public boolean createOrderDetail(OrderDetailDTO orderDetail) throws SQLException {
         boolean check = false;
