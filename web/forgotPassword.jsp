@@ -15,7 +15,11 @@
     <link rel="stylesheet" type="text/css" href="css/forgotpassword.css">
 </head>
 <body>
-    <img src="image/summit_logo.png" alt="Summit Spirit Logo" class="logo">
+    <div class="logo" >  
+            <a href="homepage.jsp">
+                <img src="image/summit_logo.png" alt="Logo">
+            </a>
+        </div>  
 
     <div class="forgot-box">
         <h2 class="forgot-title">Forgot Password</h2>
