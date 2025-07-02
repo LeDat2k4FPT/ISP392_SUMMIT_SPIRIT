@@ -16,24 +16,20 @@ public class CartDAO {
      * Kiểm tra mã giảm giá có hợp lệ hay không dựa trên điều kiện:
      * - Mã tồn tại và đang hoạt động
      * - Chưa hết hạn
-     * - Tổng tiền giỏ hàng >= MinimumTotal
      *
      * @param code Mã giảm giá
-     * @param cartTotal Tổng tiền giỏ hàng
      * @return Optional chứa DiscountValue nếu hợp lệ, hoặc Optional.empty()
      */
     public Optional<Double> validateDiscountCode(String code, double cartTotal) {
         String sql = "SELECT DiscountValue FROM Voucher "
                    + "WHERE VoucherCode = ? AND Status = 'Active' "
-                   + "AND ExpirationDate >= GETDATE() "
-                   + "AND MinimumTotal <= ?";
+                   + "AND ExpiryDate >= GETDATE()";
 
         try (
             Connection conn = DBUtils.getConnection();
             PreparedStatement stmt = conn.prepareStatement(sql)
         ) {
             stmt.setString(1, code);
-            stmt.setDouble(2, cartTotal);
             try (ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(rs.getDouble("DiscountValue"));

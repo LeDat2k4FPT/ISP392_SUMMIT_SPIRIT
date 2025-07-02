@@ -1,6 +1,5 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.sql.*, java.text.DecimalFormat, dto.CartDTO, dto.CartItemDTO, dto.ProductDTO, dto.UserDTO" %>
-<%@ page import="utils.DBUtils" %>
+<%@ page import="java.text.DecimalFormat, dto.CartDTO, dto.CartItemDTO, dto.ProductDTO, dto.UserDTO" %>
 
 <%
     CartDTO cart = (CartDTO) session.getAttribute("CART");
@@ -10,47 +9,14 @@
     String discountCode = "";
     String discountError = null;
 
-    String country = request.getParameter("country") != null ? request.getParameter("country") : "";
-    String fullname = request.getParameter("fullname") != null ? request.getParameter("fullname") : "";
-    String phone = request.getParameter("phone") != null ? request.getParameter("phone") : "";
-    String email = request.getParameter("email") != null ? request.getParameter("email") : "";
-    String address = request.getParameter("address") != null ? request.getParameter("address") : "";
-    String district = request.getParameter("district") != null ? request.getParameter("district") : "";
-    String city = request.getParameter("city") != null ? request.getParameter("city") : "";
-
-    if ("POST".equalsIgnoreCase(request.getMethod()) && "apply".equals(request.getParameter("action"))) {
-        discountCode = request.getParameter("discountCode");
-        if (discountCode != null && !discountCode.trim().isEmpty()) {
-            try {
-                Connection conn = DBUtils.getConnection();
-                String sql = "SELECT DiscountValue FROM Voucher WHERE VoucherCode = ? AND Status = 'Active' AND ExpiryDate >= GETDATE()";
-                PreparedStatement ps = conn.prepareStatement(sql);
-                ps.setString(1, discountCode.trim());
-                ResultSet rs = ps.executeQuery();
-
-                if (rs.next()) {
-                    discountPercent = rs.getDouble("DiscountValue");
-                    session.setAttribute("DISCOUNT_PERCENT", discountPercent);
-                    session.setAttribute("DISCOUNT_CODE", discountCode);
-                    session.removeAttribute("DISCOUNT_ERROR");
-                } else {
-                    discountError = "Code not available.";
-                    session.removeAttribute("DISCOUNT_PERCENT");
-                    session.removeAttribute("DISCOUNT_CODE");
-                    session.setAttribute("DISCOUNT_ERROR", discountError);
-                }
-
-                rs.close();
-                ps.close();
-                conn.close();
-            } catch (Exception e) {
-                discountError = "Error checking code: " + e.getMessage();
-                session.removeAttribute("DISCOUNT_PERCENT");
-                session.removeAttribute("DISCOUNT_CODE");
-                session.setAttribute("DISCOUNT_ERROR", discountError);
-            }
-        }
-    }
+    // ✅ Giữ lại thông tin đã nhập bằng cách ưu tiên lấy từ session (nếu có)
+    String country = session.getAttribute("SHIPPING_COUNTRY") != null ? (String) session.getAttribute("SHIPPING_COUNTRY") : request.getParameter("country") != null ? request.getParameter("country") : "";
+    String fullname = session.getAttribute("SHIPPING_FULLNAME") != null ? (String) session.getAttribute("SHIPPING_FULLNAME") : request.getParameter("fullname") != null ? request.getParameter("fullname") : "";
+    String phone = session.getAttribute("SHIPPING_PHONE") != null ? (String) session.getAttribute("SHIPPING_PHONE") : request.getParameter("phone") != null ? request.getParameter("phone") : "";
+    String email = session.getAttribute("SHIPPING_EMAIL") != null ? (String) session.getAttribute("SHIPPING_EMAIL") : request.getParameter("email") != null ? request.getParameter("email") : "";
+    String address = session.getAttribute("SHIPPING_ADDRESS") != null ? (String) session.getAttribute("SHIPPING_ADDRESS") : request.getParameter("address") != null ? request.getParameter("address") : "";
+    String district = session.getAttribute("SHIPPING_DISTRICT") != null ? (String) session.getAttribute("SHIPPING_DISTRICT") : request.getParameter("district") != null ? request.getParameter("district") : "";
+    String city = session.getAttribute("SHIPPING_CITY") != null ? (String) session.getAttribute("SHIPPING_CITY") : request.getParameter("city") != null ? request.getParameter("city") : "";
 
     if (session.getAttribute("DISCOUNT_PERCENT") != null) {
         discountPercent = (double) session.getAttribute("DISCOUNT_PERCENT");
@@ -106,7 +72,7 @@
     </div>
 </div>
 
-<form method="post" action="checkout.jsp" onsubmit="return validateForm()">
+<form method="post" action="ApplyDiscountServlet">
 <div class="container">
     <div class="form-section">
         <h3>Shipping Address</h3>
@@ -134,7 +100,7 @@
 
         <div class="footer-buttons">
             <a href="cart.jsp" class="back-btn">← Return To Cart</a>
-            <button type="submit" class="pay-btn">Continue To Pay</button>
+            <button type="submit" formaction="checkout.jsp" class="pay-btn">Continue To Pay</button>
         </div>
     </div>
 

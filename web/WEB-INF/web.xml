@@ -13,10 +13,10 @@
         <url-pattern>/mnproduct</url-pattern>
     </servlet-mapping>
 
-    <!-- ✅ THÊM MỚI: Cấu hình servlet để xử lý mã giảm giá -->
+    <!-- ✅ Cấu hình servlet để xử lý mã giảm giá -->
     <servlet>
         <servlet-name>ApplyDiscountServlet</servlet-name>
-        <servlet-class>controller.ApplyDiscountServlet</servlet-class>
+        <servlet-class>controllers.ApplyDiscountServlet</servlet-class>
     </servlet>
     <servlet-mapping>
         <servlet-name>ApplyDiscountServlet</servlet-name>

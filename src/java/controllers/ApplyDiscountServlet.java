@@ -20,7 +20,7 @@ public class ApplyDiscountServlet extends HttpServlet {
         String discountCode = request.getParameter("discountCode");
         HttpSession session = request.getSession();
 
-        // ✅ Bước 1: Kiểm tra người dùng đã đăng nhập chưa (yêu cầu 10)
+        // ✅ Bước 1: Kiểm tra người dùng đã đăng nhập chưa
         Object loginUser = session.getAttribute("LOGIN_USER");
         if (loginUser == null) {
             session.setAttribute("DISCOUNT_ERROR", "Bạn cần đăng nhập để sử dụng mã giảm giá.");
@@ -28,7 +28,7 @@ public class ApplyDiscountServlet extends HttpServlet {
             return;
         }
 
-        // ✅ Bước 2: Kiểm tra giỏ hàng có tồn tại và không rỗng (yêu cầu 8)
+        // ✅ Bước 2: Kiểm tra giỏ hàng
         CartDTO cart = (CartDTO) session.getAttribute("CART");
         if (cart == null || cart.isEmpty()) {
             session.setAttribute("DISCOUNT_ERROR", "Không thể áp dụng mã khi giỏ hàng trống.");
@@ -36,17 +36,15 @@ public class ApplyDiscountServlet extends HttpServlet {
             return;
         }
 
-        double totalCartAmount = cart.getTotalPrice();  // tính tổng tiền giỏ hàng
+        double totalCartAmount = cart.getTotalPrice();
 
-        // ✅ Bước 3: Kiểm tra mã giảm giá với tổng tiền giỏ hàng
+        // ✅ Bước 3: Kiểm tra mã giảm giá
         CartDAO dao = new CartDAO();
         Optional<Double> discountOpt = dao.validateDiscountCode(discountCode, totalCartAmount);
 
         if (discountOpt.isPresent()) {
             double discountValue = discountOpt.get();
-
-            // ✅ Bước 4: Bảo đảm giảm giá không làm total < 0 (yêu cầu 9)
-            double maxAllowedDiscount = Math.min(discountValue, 100); // không quá 100%
+            double maxAllowedDiscount = Math.min(discountValue, 100);
             double discountAmount = totalCartAmount * maxAllowedDiscount / 100;
 
             if (discountAmount >= totalCartAmount) {
@@ -65,6 +63,16 @@ public class ApplyDiscountServlet extends HttpServlet {
             session.setAttribute("DISCOUNT_ERROR", "Mã giảm giá không hợp lệ, hết hạn hoặc không đủ điều kiện.");
         }
 
-        response.sendRedirect("cart.jsp");
+        // ✅ Ghi nhớ lại thông tin form đã nhập
+        session.setAttribute("SHIPPING_COUNTRY", request.getParameter("country"));
+        session.setAttribute("SHIPPING_FULLNAME", request.getParameter("fullname"));
+        session.setAttribute("SHIPPING_PHONE", request.getParameter("phone"));
+        session.setAttribute("SHIPPING_EMAIL", request.getParameter("email"));
+        session.setAttribute("SHIPPING_ADDRESS", request.getParameter("address"));
+        session.setAttribute("SHIPPING_DISTRICT", request.getParameter("district"));
+        session.setAttribute("SHIPPING_CITY", request.getParameter("city"));
+
+        // ✅ Quay lại trang shipping.jsp
+        response.sendRedirect("shipping.jsp");
     }
 }
