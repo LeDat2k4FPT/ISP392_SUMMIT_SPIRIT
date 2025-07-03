@@ -31,5 +31,14 @@
     <welcome-file-list>
         <welcome-file>MainController</welcome-file>
     </welcome-file-list>
+    
+    <servlet>
+        <servlet-name>UpdateOrderStatus</servlet-name>
+        <servlet-class>staff.management.order.UpdateOrderStatus</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>UpdateOrderStatus</servlet-name>
+        <url-pattern>/UpdateOrderStatus</url-pattern>
+    </servlet-mapping>
 
 </web-app>

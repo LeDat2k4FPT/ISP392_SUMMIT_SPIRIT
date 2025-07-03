@@ -132,30 +132,58 @@ public class OrderDAO {
 //        }
 //        return check;
 //    }
+//    public boolean updateOrderStatus(int orderID, String status) throws SQLException {
+//        boolean check = false;
+//        Connection conn = null;
+//        PreparedStatement ptm = null;
+//        try {
+//            conn = DBUtils.getConnection();
+//            if (conn != null) {
+//                ptm = conn.prepareStatement(UPDATE_ORDER_STATUS);
+//                ptm.setString(1, status);
+//                ptm.setInt(2, orderID);
+//                check = ptm.executeUpdate() > 0;
+//                System.out.println("Executing update: orderID=" + orderID + ", status=" + status);
+//                int rows = ptm.executeUpdate();
+//                System.out.println("Updated rows: " + rows);
+//                check = rows > 0;
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (ptm != null) {
+//                ptm.close();
+//            }
+//            if (conn != null) {
+//                conn.close();
+//            }
+//        }
+//        return check;
+//    }
     public boolean updateOrderStatus(int orderID, String status) throws SQLException {
-        boolean check = false;
-        Connection conn = null;
-        PreparedStatement ptm = null;
-        try {
-            conn = DBUtils.getConnection();
-            if (conn != null) {
-                ptm = conn.prepareStatement(UPDATE_ORDER_STATUS);
-                ptm.setString(1, status);
-                ptm.setInt(2, orderID);
-                check = ptm.executeUpdate() > 0;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (ptm != null) {
-                ptm.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
+    boolean check = false;
+    Connection conn = null;
+    PreparedStatement ptm = null;
+    try {
+        conn = DBUtils.getConnection();
+        if (conn != null) {
+            System.out.println("[DAO] Preparing to update orderID=" + orderID + " to status=" + status);
+            ptm = conn.prepareStatement("UPDATE Orders SET status = ? WHERE orderID = ?");
+            ptm.setString(1, status);
+            ptm.setInt(2, orderID);
+            int count = ptm.executeUpdate();
+            System.out.println("[DAO] Updated rows = " + count);
+            check = count > 0;
         }
-        return check;
+    } catch (Exception e) {
+        e.printStackTrace();
+    } finally {
+        if (ptm != null) ptm.close();
+        if (conn != null) conn.close();
     }
+    return check;
+}
+
 
     public boolean deleteOrder(int orderID) throws SQLException {
         boolean check = false;
