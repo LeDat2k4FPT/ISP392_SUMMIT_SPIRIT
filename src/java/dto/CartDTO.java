@@ -51,7 +51,8 @@ public class CartDTO implements Serializable {
                 existingItem.setQuantity(newQuantity);
             }
         } else {
-            cartItems.put(key, new CartItemDTO(product, quantity));
+            // ✅ Sửa duy nhất dòng này để lưu trạng thái fromSaleOff
+            cartItems.put(key, new CartItemDTO(product, quantity, color, product.isFromSaleOff()));
         }
     }
 

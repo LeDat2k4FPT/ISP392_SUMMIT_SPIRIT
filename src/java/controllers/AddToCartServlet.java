@@ -24,8 +24,10 @@ public class AddToCartServlet extends HttpServlet {
         try {
             int productID = Integer.parseInt(request.getParameter("productID"));
             int quantity = Integer.parseInt(request.getParameter("quantity"));
+            double price = Double.parseDouble(request.getParameter("price")); // ✅ Dùng giá từ form
             String size = request.getParameter("size");
-            String color = request.getParameter("color"); // ✅ Lấy thêm color từ form
+            String color = request.getParameter("color");
+            boolean fromSaleOff = "true".equals(request.getParameter("fromSaleOff")); // ✅ Optional
 
             if (quantity <= 0) {
                 response.sendRedirect("productDetail.jsp?id=" + productID + "&error=invalid_quantity");
@@ -40,8 +42,10 @@ public class AddToCartServlet extends HttpServlet {
                 return;
             }
 
-            product.setSize(size);   // ✅ Gán size
-            product.setColor(color); // ✅ Gán color
+            product.setSize(size);
+            product.setColor(color);
+            product.setPrice(price); // ✅ Gán giá đã được xử lý từ form
+            product.setFromSaleOff(fromSaleOff); // ✅ Gán cờ SaleOff vào sản phẩm
 
             int stock = dao.getStockByProductID(productID);
 
@@ -61,7 +65,6 @@ public class AddToCartServlet extends HttpServlet {
             }
 
             int existingQuantity = 0;
-            // ✅ Sửa: kiểm tra số lượng theo productID + size + color
             if (cart.getCartItem(productID, size, color) != null) {
                 existingQuantity = cart.getCartItem(productID, size, color).getQuantity();
             }
@@ -72,10 +75,10 @@ public class AddToCartServlet extends HttpServlet {
                 return;
             }
 
-            cart.addToCart(product, quantity); // ✅ Product đã có đầy đủ size + color
+            cart.addToCart(product, quantity);
             session.setAttribute("CART", cart);
 
-            response.sendRedirect("productDetail.jsp?id=" + productID);
+            response.sendRedirect("productDetail.jsp?id=" + productID + (fromSaleOff ? "&fromSaleOff=true" : ""));
 
         } catch (Exception e) {
             e.printStackTrace();

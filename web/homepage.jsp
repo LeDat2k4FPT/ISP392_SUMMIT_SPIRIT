@@ -162,15 +162,18 @@
                 <% } %>
             </div>
 
-            <div class="thin-divider"></div>
-            <h2>Sales Off</h2>
-            <div class="promotion-program">
-                <img src="image/km_banner_1.png">
-                <img src="image/km_banner_2.png">
-                <img src="image/km_banner_3.png">
-                <img src="image/km_banner_4.png">
-                <img src="image/km_banner_5.png">
-            </div>
+           <!-- Sales Off -->
+<h2>Sales Off</h2>
+<a href="MainController?action=viewSaleOff">
+    <div class="promotion-program">
+        <img src="image/km_banner_1.png">
+        <img src="image/km_banner_2.png">
+        <img src="image/km_banner_3.png">
+        <img src="image/km_banner_4.png">
+        <img src="image/km_banner_5.png">
+    </div>
+</a>
+
         </div>
     </div>
 

@@ -2,6 +2,7 @@ package controllers;
 
 import dao.CartDAO;
 import dto.CartDTO;
+import dto.CartItemDTO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -20,25 +21,30 @@ public class ApplyDiscountServlet extends HttpServlet {
         String discountCode = request.getParameter("discountCode");
         HttpSession session = request.getSession();
 
-        // ✅ Bước 1: Kiểm tra người dùng đã đăng nhập chưa
         Object loginUser = session.getAttribute("LOGIN_USER");
         if (loginUser == null) {
-            session.setAttribute("DISCOUNT_ERROR", "Bạn cần đăng nhập để sử dụng mã giảm giá.");
-            response.sendRedirect("login.jsp");
+            request.setAttribute("DISCOUNT_ERROR", "Bạn cần đăng nhập để sử dụng mã giảm giá.");
+            request.getRequestDispatcher("shipping.jsp").forward(request, response);
             return;
         }
 
-        // ✅ Bước 2: Kiểm tra giỏ hàng
         CartDTO cart = (CartDTO) session.getAttribute("CART");
         if (cart == null || cart.isEmpty()) {
-            session.setAttribute("DISCOUNT_ERROR", "Không thể áp dụng mã khi giỏ hàng trống.");
-            response.sendRedirect("cart.jsp");
+            request.setAttribute("DISCOUNT_ERROR", "Không thể áp dụng mã khi giỏ hàng trống.");
+            request.getRequestDispatcher("shipping.jsp").forward(request, response);
             return;
+        }
+
+        for (CartItemDTO item : cart.getCartItems()) {
+            if (item.getProduct().isFromSaleOff()) {
+                request.setAttribute("DISCOUNT_ERROR", "Không thể sử dụng mã giảm giá với sản phẩm đang được giảm giá sẵn.");
+                request.getRequestDispatcher("shipping.jsp").forward(request, response);
+                return;
+            }
         }
 
         double totalCartAmount = cart.getTotalPrice();
 
-        // ✅ Bước 3: Kiểm tra mã giảm giá
         CartDAO dao = new CartDAO();
         Optional<Double> discountOpt = dao.validateDiscountCode(discountCode, totalCartAmount);
 
@@ -48,22 +54,18 @@ public class ApplyDiscountServlet extends HttpServlet {
             double discountAmount = totalCartAmount * maxAllowedDiscount / 100;
 
             if (discountAmount >= totalCartAmount) {
-                session.setAttribute("DISCOUNT_ERROR", "Chiết khấu vượt quá tổng tiền giỏ hàng.");
-                session.removeAttribute("DISCOUNT_PERCENT");
-                session.removeAttribute("DISCOUNT_CODE");
+                request.setAttribute("DISCOUNT_ERROR", "Chiết khấu vượt quá tổng tiền giỏ hàng.");
             } else {
-                session.setAttribute("DISCOUNT_PERCENT", maxAllowedDiscount);
-                session.setAttribute("DISCOUNT_CODE", discountCode);
-                session.removeAttribute("DISCOUNT_ERROR");
+                // ✅ Chỉ set vào request, KHÔNG lưu vào session
+                request.setAttribute("DISCOUNT_PERCENT", maxAllowedDiscount);
+                request.setAttribute("DISCOUNT_CODE", discountCode);
             }
 
         } else {
-            session.removeAttribute("DISCOUNT_PERCENT");
-            session.removeAttribute("DISCOUNT_CODE");
-            session.setAttribute("DISCOUNT_ERROR", "Mã giảm giá không hợp lệ, hết hạn hoặc không đủ điều kiện.");
+            request.setAttribute("DISCOUNT_ERROR", "Mã giảm giá không hợp lệ, hết hạn hoặc không đủ điều kiện.");
         }
 
-        // ✅ Ghi nhớ lại thông tin form đã nhập
+        // ✅ Vẫn lưu thông tin giao hàng vào session
         session.setAttribute("SHIPPING_COUNTRY", request.getParameter("country"));
         session.setAttribute("SHIPPING_FULLNAME", request.getParameter("fullname"));
         session.setAttribute("SHIPPING_PHONE", request.getParameter("phone"));
@@ -72,7 +74,7 @@ public class ApplyDiscountServlet extends HttpServlet {
         session.setAttribute("SHIPPING_DISTRICT", request.getParameter("district"));
         session.setAttribute("SHIPPING_CITY", request.getParameter("city"));
 
-        // ✅ Quay lại trang shipping.jsp
-        response.sendRedirect("shipping.jsp");
+        // ✅ Forward lại shipping.jsp để giữ các request attributes như voucher
+        request.getRequestDispatcher("shipping.jsp").forward(request, response);
     }
 }

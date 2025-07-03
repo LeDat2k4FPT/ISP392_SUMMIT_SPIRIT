@@ -9,24 +9,32 @@
     String discountCode = "";
     String discountError = null;
 
-    // ✅ Giữ lại thông tin đã nhập bằng cách ưu tiên lấy từ session (nếu có)
-    String country = session.getAttribute("SHIPPING_COUNTRY") != null ? (String) session.getAttribute("SHIPPING_COUNTRY") : request.getParameter("country") != null ? request.getParameter("country") : "";
-    String fullname = session.getAttribute("SHIPPING_FULLNAME") != null ? (String) session.getAttribute("SHIPPING_FULLNAME") : request.getParameter("fullname") != null ? request.getParameter("fullname") : "";
-    String phone = session.getAttribute("SHIPPING_PHONE") != null ? (String) session.getAttribute("SHIPPING_PHONE") : request.getParameter("phone") != null ? request.getParameter("phone") : "";
-    String email = session.getAttribute("SHIPPING_EMAIL") != null ? (String) session.getAttribute("SHIPPING_EMAIL") : request.getParameter("email") != null ? request.getParameter("email") : "";
-    String address = session.getAttribute("SHIPPING_ADDRESS") != null ? (String) session.getAttribute("SHIPPING_ADDRESS") : request.getParameter("address") != null ? request.getParameter("address") : "";
-    String district = session.getAttribute("SHIPPING_DISTRICT") != null ? (String) session.getAttribute("SHIPPING_DISTRICT") : request.getParameter("district") != null ? request.getParameter("district") : "";
-    String city = session.getAttribute("SHIPPING_CITY") != null ? (String) session.getAttribute("SHIPPING_CITY") : request.getParameter("city") != null ? request.getParameter("city") : "";
+    // ✅ Nhận từ request thay vì session
+    Double appliedDiscountPercent = (Double) request.getAttribute("DISCOUNT_PERCENT");
+    String appliedDiscountCode = (String) request.getAttribute("DISCOUNT_CODE");
+    String discountErrorMsg = (String) request.getAttribute("DISCOUNT_ERROR");
 
-    if (session.getAttribute("DISCOUNT_PERCENT") != null) {
-        discountPercent = (double) session.getAttribute("DISCOUNT_PERCENT");
+    if (appliedDiscountPercent != null) discountPercent = appliedDiscountPercent;
+    if (appliedDiscountCode != null) discountCode = appliedDiscountCode;
+    if (discountErrorMsg != null) discountError = discountErrorMsg;
+
+    boolean hasSaleOffProduct = false;
+    if (cart != null) {
+        for (CartItemDTO item : cart.getCartItems()) {
+            if (item.getProduct().isFromSaleOff()) {
+                hasSaleOffProduct = true;
+                break;
+            }
+        }
     }
-    if (session.getAttribute("DISCOUNT_CODE") != null) {
-        discountCode = (String) session.getAttribute("DISCOUNT_CODE");
-    }
-    if (session.getAttribute("DISCOUNT_ERROR") != null) {
-        discountError = (String) session.getAttribute("DISCOUNT_ERROR");
-    }
+
+    String country = request.getParameter("country") != null ? request.getParameter("country") : "";
+    String fullname = request.getParameter("fullname") != null ? request.getParameter("fullname") : "";
+    String phone = request.getParameter("phone") != null ? request.getParameter("phone") : "";
+    String email = request.getParameter("email") != null ? request.getParameter("email") : "";
+    String address = request.getParameter("address") != null ? request.getParameter("address") : "";
+    String district = request.getParameter("district") != null ? request.getParameter("district") : "";
+    String city = request.getParameter("city") != null ? request.getParameter("city") : "";
 %>
 
 <!DOCTYPE html>
@@ -63,6 +71,7 @@
     </style>
 </head>
 <body>
+
 <div class="header">
     <a href="homepage.jsp" class="logo"> Summit Spirit</a>
     <div class="nav-links">
@@ -87,15 +96,19 @@
             <input type="text" name="district" placeholder="District" value="<%= district %>" required>
             <input type="text" name="city" placeholder="City" value="<%= city %>" required>
         </div>
-        <div class="row">
-            <input type="text" name="discountCode" placeholder="Discount code" value="<%= discountCode %>">
-            <button type="submit" name="action" value="apply">Apply</button>
-        </div>
 
-        <% if (discountError != null) { %>
-            <div class="error-message"><%= discountError %></div>
-        <% } else if (discountCode != null && !discountCode.trim().isEmpty() && discountPercent > 0) { %>
-            <div class="success-message">Discount code has been applied!</div>
+        <% if (!hasSaleOffProduct) { %>
+            <div class="row">
+                <input type="text" name="discountCode" placeholder="Discount code" value="<%= discountCode %>">
+                <button type="submit" name="action" value="apply">Apply</button>
+            </div>
+            <% if (discountError != null) { %>
+                <div class="error-message"><%= discountError %></div>
+            <% } else if (!discountCode.trim().isEmpty() && discountPercent > 0) { %>
+                <div class="success-message">Discount code has been applied!</div>
+            <% } %>
+        <% } else { %>
+            <div class="error-message">You cannot apply the discount code because the product is already discounted.</div>
         <% } %>
 
         <div class="footer-buttons">
@@ -105,39 +118,39 @@
     </div>
 
     <% if (cart != null && !cart.isEmpty()) { %>
-    <div class="cart-preview">
-        <h3>Your Cart</h3>
-        <% double total = 0;
-           for (CartItemDTO item : cart.getCartItems()) {
-               ProductDTO p = item.getProduct();
-               int quantity = item.getQuantity();
-               double lineTotal = p.getPrice() * quantity;
-               total += lineTotal;
-        %>
-        <div class="cart-item">
-            <img src="<%= p.getProductImage() %>" alt="">
-            <div class="cart-info">
-                <h4><%= p.getProductName() %></h4>
-                <% if (p.getSize() != null && !p.getSize().isEmpty()) { %>
-                    <p>Size: <%= p.getSize() %></p>
-                <% } %>
-                <% if (p.getColor() != null && !p.getColor().isEmpty()) { %>
-                    <p>Color: <%= p.getColor() %></p>
-                <% } %>
-                <div class="quantity-box"><span><%= quantity %></span></div>
+        <div class="cart-preview">
+            <h3>Your Cart</h3>
+            <% double total = 0;
+               for (CartItemDTO item : cart.getCartItems()) {
+                   ProductDTO p = item.getProduct();
+                   int quantity = item.getQuantity();
+                   double lineTotal = p.getPrice() * quantity;
+                   total += lineTotal;
+            %>
+            <div class="cart-item">
+                <img src="<%= p.getProductImage() %>" alt="">
+                <div class="cart-info">
+                    <h4><%= p.getProductName() %></h4>
+                    <% if (p.getSize() != null && !p.getSize().isEmpty()) { %>
+                        <p>Size: <%= p.getSize() %></p>
+                    <% } %>
+                    <% if (p.getColor() != null && !p.getColor().isEmpty()) { %>
+                        <p>Color: <%= p.getColor() %></p>
+                    <% } %>
+                    <div class="quantity-box"><span><%= quantity %></span></div>
+                </div>
+                <div><%= String.format("%,.0f", lineTotal) %></div>
             </div>
-            <div><%= String.format("%,.0f", lineTotal) %></div>
+            <% }
+               double shipFee = 30000;
+               double discountAmount = total * discountPercent / 100;
+               double grandTotal = total + shipFee - discountAmount;
+            %>
+            <div class="summary-line">Subtotal: <span><%= String.format("%,.0f", total) %></span></div>
+            <div class="summary-line">Ship: <span><%= String.format("%,.0f", shipFee) %></span></div>
+            <div class="summary-line">Voucher: <span><%= discountPercent > 0 ? "-" + String.format("%,.0f", discountAmount) : "0" %></span></div>
+            <div class="summary-line total-line">Total: <span><%= String.format("%,.0f", grandTotal) %></span></div>
         </div>
-        <% }
-           double shipFee = 30000;
-           double discountAmount = total * discountPercent / 100;
-           double grandTotal = total + shipFee - discountAmount;
-        %>
-        <div class="summary-line">Subtotal: <span><%= String.format("%,.0f", total) %></span></div>
-        <div class="summary-line">Ship: <span><%= String.format("%,.0f", shipFee) %></span></div>
-        <div class="summary-line">Voucher: <span><%= discountPercent > 0 ? "-" + String.format("%,.0f", discountAmount) : "0" %></span></div>
-        <div class="summary-line total-line">Total: <span><%= String.format("%,.0f", grandTotal) %></span></div>
-    </div>
     <% } else { %>
         <p>No items in cart.</p>
     <% } %>
@@ -148,15 +161,12 @@
 function validateForm() {
     const phone = document.querySelector('input[name="phone"]').value.trim();
     const phonePattern = /^\d{10,12}$/;
-
     if (!phonePattern.test(phone)) {
         alert("Phone number must be 10 to 12 digits.");
         return false;
     }
-
     return true;
 }
 </script>
-
 </body>
 </html>
