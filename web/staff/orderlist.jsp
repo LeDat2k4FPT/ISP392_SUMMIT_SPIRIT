@@ -9,6 +9,12 @@
     </head>
     <body>
         <h2>Order List</h2>
+
+        <form action="<%=request.getContextPath()%>/staff/orderlist.jsp" method="get">
+            <input type="text" name="keyword" value="<%= request.getParameter("keyword") != null ? request.getParameter("keyword") : "" %>" placeholder="Search by customer name, email, status, or ID"/>
+            <button type="submit">Search</button>
+        </form>
+
         <table border="1" cellpadding="5" cellspacing="0">
             <tr>
                 <th>ID</th>
@@ -19,8 +25,15 @@
                 <th>View</th>
             </tr>
             <%
+                String keyword = request.getParameter("keyword");
                 OrderDAO orderDAO = new OrderDAO();
-                List<OrderDTO> orders = orderDAO.getAllOrders();
+                List<OrderDTO> orders;
+
+                if (keyword != null && !keyword.trim().isEmpty()) {
+                    orders = orderDAO.searchOrders(keyword.trim());
+                } else {
+                    orders = orderDAO.getAllOrders();
+                }
 
                 if (orders != null && !orders.isEmpty()) {
                     for (OrderDTO o : orders) {
@@ -42,9 +55,8 @@
                         <button type="submit">Update</button>
                     </form>
                 </td>
-
                 <td>
-                    <form action="staff/orderDetail.jsp" method="get" style="display:inline;">
+                    <form action="<%=request.getContextPath()%>/staff/orderDetail.jsp" method="get" style="display:inline;">
                         <input type="hidden" name="orderID" value="<%= o.getOrderID() %>"/>
                         <button type="submit">Details</button>
                     </form>

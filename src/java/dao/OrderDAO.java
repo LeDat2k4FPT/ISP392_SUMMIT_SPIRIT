@@ -161,29 +161,32 @@ public class OrderDAO {
 //        return check;
 //    }
     public boolean updateOrderStatus(int orderID, String status) throws SQLException {
-    boolean check = false;
-    Connection conn = null;
-    PreparedStatement ptm = null;
-    try {
-        conn = DBUtils.getConnection();
-        if (conn != null) {
-            System.out.println("[DAO] Preparing to update orderID=" + orderID + " to status=" + status);
-            ptm = conn.prepareStatement("UPDATE Orders SET status = ? WHERE orderID = ?");
-            ptm.setString(1, status);
-            ptm.setInt(2, orderID);
-            int count = ptm.executeUpdate();
-            System.out.println("[DAO] Updated rows = " + count);
-            check = count > 0;
+        boolean check = false;
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        try {
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                System.out.println("[DAO] Preparing to update orderID=" + orderID + " to status=" + status);
+                ptm = conn.prepareStatement("UPDATE Orders SET status = ? WHERE orderID = ?");
+                ptm.setString(1, status);
+                ptm.setInt(2, orderID);
+                int count = ptm.executeUpdate();
+                System.out.println("[DAO] Updated rows = " + count);
+                check = count > 0;
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-    } finally {
-        if (ptm != null) ptm.close();
-        if (conn != null) conn.close();
+        return check;
     }
-    return check;
-}
-
 
     public boolean deleteOrder(int orderID) throws SQLException {
         boolean check = false;
@@ -231,6 +234,34 @@ public class OrderDAO {
                     od.setQuantity(rs.getInt("Quantity"));
                     od.setUnitPrice(rs.getDouble("UnitPrice"));
                     list.add(od);
+                }
+            }
+        }
+        return list;
+    }
+
+    public List<OrderDTO> searchOrders(String keyword) throws SQLException, ClassNotFoundException {
+        List<OrderDTO> list = new ArrayList<>();
+        String sql = "SELECT o.OrderID, o.OrderDate, o.TotalAmount, o.Status, a.FullName "
+                + "FROM Orders o "
+                + "JOIN Account a ON o.UserID = a.UserID "
+                + "WHERE o.OrderID LIKE ? OR o.Status LIKE ? OR a.FullName LIKE ? OR a.Email LIKE ? "
+                + "ORDER BY o.OrderDate DESC";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            String kw = "%" + keyword + "%";
+            ps.setString(1, kw);
+            ps.setString(2, kw);
+            ps.setString(3, kw);
+            ps.setString(4, kw);
+            try ( ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    OrderDTO order = new OrderDTO();
+                    order.setOrderID(rs.getInt("OrderID"));
+                    order.setOrderDate(rs.getDate("OrderDate"));
+                    order.setTotalAmount(rs.getDouble("TotalAmount"));
+                    order.setStatus(rs.getString("Status"));
+                    order.setFullName(rs.getString("FullName"));
+                    list.add(order);
                 }
             }
         }
