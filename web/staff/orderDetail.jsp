@@ -43,4 +43,5 @@
     </tr>
     <% } %>
 </table>
+<button class="btn btn-secondary" onclick="history.back()">Back</button>
 <% } %>

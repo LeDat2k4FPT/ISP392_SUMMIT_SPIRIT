@@ -41,9 +41,10 @@
             <aside class="sidebar">
                 <nav class="menu">
                     <a href="profile.jsp" class="menu-link active">My Profile</a>
-                    <a href="orderHistory.jsp" class="menu-link">Orders History</a>
+                    <a href="UserOrderHistoryController" class="menu-link">Orders History</a>
                 </nav>
             </aside>
+
             <!-- Profile form -->
             <main class="main-content">
                 <div class="profile-form">

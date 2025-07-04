@@ -14,7 +14,7 @@ public class OrderDAO {
 
     private static final String GET_ALL_ORDERS = "SELECT OrderID, UserID, OrderDate, TotalAmount, Status FROM Orders";
     private static final String GET_ORDER_BY_ID = "SELECT * FROM Orders WHERE OrderID = ?";
-    private static final String GET_ORDERS_BY_USER = "SELECT * FROM Orders WHERE userID = ? ORDER BY orderDate DESC";
+    private static final String GET_ORDERS_BY_USER =  "SELECT OrderID, OrderDate, Status, TotalAmount FROM Orders WHERE UserID = ? ORDER BY OrderDate DESC";
     private static final String CREATE_ORDER = "INSERT INTO Orders (userID, orderDate, total, status) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_ORDER_STATUS = "UPDATE Orders SET status = ? WHERE orderID = ?";
     private static final String DELETE_ORDER = "DELETE FROM Orders WHERE OrderID = ?";
@@ -77,17 +77,19 @@ public class OrderDAO {
         try {
             conn = DBUtils.getConnection();
             if (conn != null) {
+
                 ptm = conn.prepareStatement(GET_ORDERS_BY_USER);
                 ptm.setInt(1, userID);
                 rs = ptm.executeQuery();
                 while (rs.next()) {
                     orders.add(new OrderDTO(
                             rs.getInt("OrderID"),
-                            rs.getInt("UserID"),
+                            userID, // vì bạn không select UserID, gán thẳng
                             rs.getDate("OrderDate"),
-                            rs.getDouble("Total"),
+                            rs.getDouble("TotalAmount"),
                             rs.getString("Status")
                     ));
+                    System.out.println("DEBUG: Found orderID = " + rs.getInt("OrderID"));
                 }
             }
         } catch (Exception e) {
@@ -106,6 +108,26 @@ public class OrderDAO {
         return orders;
     }
 
+//    public List<OrderDTO> getOrdersByUserID(int userID) {
+//    List<OrderDTO> list = new ArrayList<>();
+//    try {
+//        String sql = "SELECT OrderID, OrderDate, Status, TotalAmount FROM Orders WHERE UserID=? ORDER BY OrderDate DESC";
+//        PreparedStatement ps = connection.prepareStatement(sql);
+//        ps.setInt(1, userID);
+//        ResultSet rs = ps.executeQuery();
+//        while (rs.next()) {
+//            OrderDTO o = new OrderDTO();
+//            o.setOrderID(rs.getInt("OrderID"));
+//            o.setOrderDate(rs.getDate("OrderDate"));
+//            o.setStatus(rs.getString("Status"));
+//            o.setTotalAmount(rs.getDouble("TotalAmount"));
+//            list.add(o);
+//        }
+//    } catch (Exception e) {
+//        e.printStackTrace();
+//    }
+//    return list;
+//}
 //    public boolean createOrder(OrderDTO order) throws SQLException {
 //        boolean check = false;
 //        Connection conn = null;
@@ -266,6 +288,10 @@ public class OrderDAO {
             }
         }
         return list;
+    }
+
+    public List<OrderDetailDTO> getOrderDetailsByOrderID(int orderID) {
+        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
     }
 
 }
