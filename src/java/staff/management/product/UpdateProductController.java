@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.nio.file.Paths;
+import utils.DBUtils;
 
 @WebServlet(name = "UpdateProductController", urlPatterns = {"/UpdateProductController"})
 @MultipartConfig(maxFileSize = 1024 * 1024 * 5) // 5MB
@@ -33,10 +34,6 @@ public class UpdateProductController extends HttpServlet {
             String description = request.getParameter("description");
             String status = request.getParameter("status");
             int cateID = Integer.parseInt(request.getParameter("cateID"));
-            double price = Double.parseDouble(request.getParameter("price"));
-            int colorID = Integer.parseInt(request.getParameter("colorID"));
-            int sizeID = Integer.parseInt(request.getParameter("sizeID"));
-            int quantity = Integer.parseInt(request.getParameter("quantity"));
             Part filePart = request.getPart("image");
 
             ProductDTO product = new ProductDTO();
@@ -49,20 +46,49 @@ public class UpdateProductController extends HttpServlet {
             ProductDAO dao = new ProductDAO();
             boolean updated = dao.updateProductByID(product);
 
-            // Update variant
+            // Đồng bộ variant: xóa các variant không còn trên form
             ProductVariantDAO variantDAO = new ProductVariantDAO();
-            variantDAO.deleteByProductID(productID);
-            ProductVariantDTO variant = new ProductVariantDTO(0, productID, colorID, sizeID, price, quantity);
-            variantDAO.insertVariant(variant);
+            int variantCount = Integer.parseInt(request.getParameter("variantCount"));
+            java.util.Set<Integer> variantIdsOnForm = new java.util.HashSet<>();
+            for (int i = 0; i < variantCount; i++) {
+                int attributeID = Integer.parseInt(request.getParameter("variantId_" + i));
+                String sizeName = request.getParameter("size_" + i);
+                String colorName = request.getParameter("color_" + i);
+                int qty = Integer.parseInt(request.getParameter("quantity_" + i));
+                double prc = Double.parseDouble(request.getParameter("price_" + i));
+                int sizeID = new dao.SizeDAO().getOrInsertSize(sizeName);
+                int colorID = new dao.ColorDAO().getOrInsertColor(colorName);
+                ProductVariantDTO variant = new ProductVariantDTO(attributeID, productID, colorID, sizeID, prc, qty);
+                variantDAO.updateVariant(variant);
+                if (attributeID > 0) variantIdsOnForm.add(attributeID);
+            }
+            // Xóa các variant không còn trên form
+            java.util.List<ProductVariantDTO> dbVariants = variantDAO.getVariantsByProductId(productID);
+            for (ProductVariantDTO v : dbVariants) {
+                if (!variantIdsOnForm.contains(v.getAttributeID())) {
+                    String sql = "DELETE FROM ProductVariant WHERE AttributeID = ? AND ProductID = ?";
+                    try (java.sql.Connection conn = utils.DBUtils.getConnection();
+                         java.sql.PreparedStatement ps = conn.prepareStatement(sql)) {
+                        ps.setInt(1, v.getAttributeID());
+                        ps.setInt(2, productID);
+                        ps.executeUpdate();
+                    }
+                }
+            }
 
             // Update image
-            if (filePart != null && filePart.getSize() > 0) {
-                String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
-                String path = getServletContext().getRealPath("/images/" + fileName);
-                filePart.write(path);
-                ProductImageDAO imageDAO = new ProductImageDAO();
+            String imageUrl = request.getParameter("imageUrl");
+            ProductImageDAO imageDAO = new ProductImageDAO();
+            if ((filePart != null && filePart.getSize() > 0) || (imageUrl != null && !imageUrl.trim().isEmpty())) {
                 imageDAO.deleteByProductID(productID);
-                imageDAO.insertImage(new ProductImageDTO(fileName, productID));
+                if (filePart != null && filePart.getSize() > 0) {
+                    String fileName = Paths.get(filePart.getSubmittedFileName()).getFileName().toString();
+                    String path = getServletContext().getRealPath("/images/" + fileName);
+                    filePart.write(path);
+                    imageDAO.insertImage(new ProductImageDTO(fileName, productID));
+                } else if (imageUrl != null && !imageUrl.trim().isEmpty()) {
+                    imageDAO.insertImage(new ProductImageDTO(imageUrl.trim(), productID));
+                }
             }
 
             if (updated) {

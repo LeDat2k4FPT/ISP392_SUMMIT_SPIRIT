@@ -1,16 +1,21 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ page import="dto.UserDTO" %>
+<%@ page import="dao.CategoryDAO" %>
+<%@ page import="dto.CategoryDTO" %>
 <%
     UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
     if (user == null || !"Staff".equals(user.getRole())) {
         response.sendRedirect("../login.jsp");
         return;
     }
+
+    CategoryDAO categoryDAO = new CategoryDAO();
+    java.util.List<CategoryDTO> categories = categoryDAO.getAllCategories();
 %>
 <div class="product-form-wrapper">
     <div class="product-header">
         <h2>Add new product</h2>
-        <a href="#" onclick="loadContent('staff/productlist.jsp')" class="btn-add">🔙 Back to Product List</a>
+        <a href="#" onclick="loadContent('ProductListController')" class="btn-add">🔙 Back to Product List</a>
     </div>
 
     <% String error = (String) request.getAttribute("error");
@@ -28,21 +33,11 @@
         <div class="form-row">
             <div>
                 <label>Color:</label>
-                <select name="color" required>
-                    <option value="Black">Black</option>
-                    <option value="Red">Red</option>
-                    <option value="Blue">Blue</option>
-                </select>
+                <input type="text" name="color" required>
             </div>
             <div>
                 <label>Size:</label>
-                <select name="size" required>
-                    <option value="S">S</option>
-                    <option value="M">M</option>
-                    <option value="L">L</option>
-                    <option value="small">small</option>
-                    <option value="big">big</option>
-                </select>
+                <input type="text" name="size" required>
             </div>
         </div>
         <div class="form-row">
@@ -57,14 +52,10 @@
         </div>
 
         <label>Category:</label>
-        <select name="cateID" required>
-            <option value="1">Paints</option>
-            <option value="2">Shirts</option>
-            <option value="3">Backpacks</option>
-            <option value="4">Gears</option>
-            <option value="5">Tents</option>
-            <option value="6">Hats</option>
-            <option value="7">Camping Tools</option>
+        <select name="cateID" id="cateID" required>
+            <% for (CategoryDTO c : categories) { %>
+                <option value="<%= c.getCateID() %>"><%= c.getCateName() %></option>
+            <% } %>
         </select>
 
         <label>Status:</label>
@@ -73,9 +64,9 @@
             <option value="Inactive">Inactive</option>
         </select>
 
-        <label>Product Image URL:</label>
-        <input type="text" name="imageURL" placeholder="e.g., https://example.com/image.jpg">
+        <label>Product Image:</label>
+        <input type="file" name="imageFile" accept="image/*">
+        <input type="text" name="imageURL" placeholder="Or enter image URL...">
 
         <button type="submit" class="submit-btn">Add new product</button>
     </form>
-</div>

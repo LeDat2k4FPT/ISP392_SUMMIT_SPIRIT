@@ -9,6 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import utils.DBUtils;
 
 /**
@@ -43,6 +45,33 @@ public class ColorDAO {
         }
 
         return -1;
+    }
+
+    public String getColorNameById(int colorID) throws SQLException, ClassNotFoundException {
+        String sql = "SELECT ColorName FROM Color WHERE ColorID = ?";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, colorID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("ColorName");
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<String> getAllColors() throws SQLException, ClassNotFoundException {
+        List<String> colors = new ArrayList<>();
+        String sql = "SELECT ColorName FROM Color";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                colors.add(rs.getString("ColorName"));
+            }
+        }
+        return colors;
     }
 }
 

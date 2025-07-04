@@ -60,7 +60,7 @@
         <aside class="sidebar">
             <nav class="menu">
                 <button onclick="loadContent('staff/home.jsp')">Home</button>
-                <button onclick="loadContent('staff/productlist.jsp')">Product</button>
+                <button onclick="loadContent('ProductListController')">Product</button>
                 <button onclick="loadContent('staff/orderlist.jsp')">Order</button>
             </nav>
             <form action="LogoutController" method="post">

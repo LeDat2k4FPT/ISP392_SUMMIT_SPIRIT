@@ -34,6 +34,8 @@ public class MainController extends HttpServlet {
     private static final String MANAGE_USER_ACCOUNT_CONTROLLER = "ManageUserAccountController";
     private static final String VIEW_SALE_OFF = "viewSaleOff";
     private static final String VIEW_SALE_OFF_CONTROLLER = "ViewSaleOffController";
+    private static final String PRODUCT_LIST = "ProductList";
+    private static final String PRODUCT_LIST_CONTROLLER = "ProductListController";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -67,6 +69,9 @@ public class MainController extends HttpServlet {
                 url = "GoToShippingServlet";
             } else if (VIEW_SALE_OFF.equals(action)) {
                 url = VIEW_SALE_OFF_CONTROLLER;
+            }
+            else if (PRODUCT_LIST.equals(action)) {
+                url = PRODUCT_LIST_CONTROLLER;
             }
         } catch (Exception e) {
             log("error at MainController: " + e.toString());
