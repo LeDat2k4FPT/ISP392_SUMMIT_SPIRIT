@@ -1,15 +1,22 @@
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
-<%@ page import="java.text.DecimalFormat, dto.CartDTO, dto.CartItemDTO, dto.ProductDTO, dto.UserDTO" %>
+<%--
+    Document   : checkout
+    Created on : Jul 3, 2025, 9:11:24 PM
+    Author     : gmt
+--%>
+
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="dto.UserDTO, dao.ProductDAO, dto.ProductDTO"%>
+<%@page import="java.util.List, java.util.ArrayList" %>
+<%@page import="dao.ProductVariantDAO" %>
+<%--<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>--%>
 
 <%
-    CartDTO cart = (CartDTO) session.getAttribute("CART");
     UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
 
     double discountPercent = 0.0;
     String discountCode = "";
     String discountError = null;
 
-    // ✅ Nhận từ request thay vì session
     Double appliedDiscountPercent = (Double) request.getAttribute("DISCOUNT_PERCENT");
     String appliedDiscountCode = (String) request.getAttribute("DISCOUNT_CODE");
     String discountErrorMsg = (String) request.getAttribute("DISCOUNT_ERROR");
@@ -18,13 +25,40 @@
     if (appliedDiscountCode != null) discountCode = appliedDiscountCode;
     if (discountErrorMsg != null) discountError = discountErrorMsg;
 
+    List<String> sizeList = new ArrayList<>();
+    List<String> colorList = new ArrayList<>();
+
+    // Lấy thông tin sản phẩm từ request
+    String paramProductId = request.getParameter("productId");
+    String paramSize = request.getParameter("size");
+    String paramColor = request.getParameter("color");
+    if (paramProductId != null) {
+        int productId = Integer.parseInt(paramProductId);
+        ProductVariantDAO variantDAO = new ProductVariantDAO();
+        try {
+            sizeList = variantDAO.getAvailableSizesByProductId(productId);
+            colorList = variantDAO.getAvailableColorsByProductId(productId);
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+    }
+    String paramQuantity = request.getParameter("quantity");
+
+    ProductDTO product = null;
+    int quantity = 1;
     boolean hasSaleOffProduct = false;
-    if (cart != null) {
-        for (CartItemDTO item : cart.getCartItems()) {
-            if (item.getProduct().isFromSaleOff()) {
-                hasSaleOffProduct = true;
-                break;
-            }
+
+    if (paramProductId != null && paramQuantity != null) {
+        int productId = Integer.parseInt(paramProductId);
+        quantity = Integer.parseInt(paramQuantity);
+
+        ProductDAO productDAO = new ProductDAO();
+        product = productDAO.getProductByID(productId);
+
+        if (product != null) {
+            if (paramSize != null) product.setSize(paramSize);
+            if (paramColor != null) product.setColor(paramColor);
+            hasSaleOffProduct = product.isFromSaleOff();
         }
     }
 
@@ -40,8 +74,8 @@
 <!DOCTYPE html>
 <html>
     <head>
-        <meta charset="UTF-8">
-        <title>Shipping Address - Summit Spirit</title>
+        <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+        <title>Checkout Page</title>
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
         <style>
@@ -176,7 +210,6 @@
         </style>
     </head>
     <body>
-
         <div class="header">
             <a href="homepage.jsp" class="logo"> Summit Spirit</a>
             <div class="nav-links">
@@ -185,7 +218,6 @@
                 <a href="profile.jsp"><i class="fa fa-user"></i></a>
             </div>
         </div>
-
         <form action="MainController" method="POST" onsubmit="return validateForm()">
             <div class="container">
                 <div class="form-section">
@@ -206,7 +238,9 @@
 
                     <% if (!hasSaleOffProduct) { %>
                     <div class="row">
-                        <input type="hidden" name="sourcePage" value="shipping.jsp">
+                        <input type="hidden" name="sourcePage" value="checkout.jsp">
+                        <input type="hidden" name="productId" value="<%= paramProductId %>">
+                        <input type="hidden" name="quantity" value="<%= paramQuantity %>">
                         <input type="text" name="discountCode" placeholder="Discount code" value="<%= discountCode %>">
                         <button type="submit" name="action" value="ApplyDiscount">Apply</button>
                     </div>
@@ -220,75 +254,49 @@
                     <% } %>
 
                     <div class="footer-buttons">
-                        <a href="cart.jsp" class="back-btn">← Return To Cart</a>
-                        <%-- Hidden inputs for VNPay checkout --%>
-                        <% if (cart != null && !cart.isEmpty()) {
-                            double total = 0;
-                            StringBuilder productNames = new StringBuilder();
-                            StringBuilder sizes = new StringBuilder();
-                            StringBuilder colors = new StringBuilder();
-                            for (CartItemDTO item : cart.getCartItems()) {
-                                ProductDTO p = item.getProduct();
-                                int quantity = item.getQuantity();
-                                double lineTotal = p.getPrice() * quantity;
-                                total += lineTotal;
-                                if (productNames.length() > 0) productNames.append(", ");
-                                productNames.append(p.getProductName());
-                                if (sizes.length() > 0) sizes.append(", ");
-                                sizes.append(p.getSize() != null ? p.getSize() : "N/A");
-                                if (colors.length() > 0) colors.append(", ");
-                                colors.append(p.getColor() != null ? p.getColor() : "N/A");
-                            }
+                        <% if (product != null) {
+                            double total = product.getPrice() * quantity;
                             double shipFee = 30000;
                             double discountAmount = total * discountPercent / 100;
                             double grandTotal = total + shipFee - discountAmount;
                         %>
                         <input type="hidden" name="amount" value="<%= (int) grandTotal %>">
-                        <input type="hidden" name="productName" value="<%= productNames.toString() %>">
-                        <input type="hidden" name="size" value="<%= sizes.toString() %>">
-                        <input type="hidden" name="color" value="<%= colors.toString() %>">
+                        <input type="hidden" name="productName" value="<%= product.getProductName() %>">
+                        <input type="hidden" name="size" value="<%= product.getSize() != null ? product.getSize() : "N/A" %>">
+                        <input type="hidden" name="color" value="<%= product.getColor() != null ? product.getColor() : "N/A" %>">
                         <% } %>
                         <button type="submit" name="action" value="CheckoutVNPay" class="pay-btn">Continue To Pay</button>
                     </div>
                 </div>
 
-                <% if (cart != null && !cart.isEmpty()) { %>
-                <div class="cart-preview">
-                    <h3>Your Cart</h3>
-                    <% double total = 0;
-                       for (CartItemDTO item : cart.getCartItems()) {
-                           ProductDTO p = item.getProduct();
-                           int quantity = item.getQuantity();
-                           double lineTotal = p.getPrice() * quantity;
-                           total += lineTotal;
+                <div>
+                    <h3>Your Order</h3>
+                    <% if (product != null) {
+                            double total = product.getPrice() * quantity;
+                            double shipFee = 30000;
+                            double discountAmount = total * discountPercent / 100;
+                            double grandTotal = total + shipFee - discountAmount;
                     %>
                     <div class="cart-item">
-                        <img src="<%= p.getProductImage() %>" alt="">
+                        <img src="<%= product.getProductImage() %>" alt="">
                         <div class="cart-info">
-                            <h4><%= p.getProductName() %></h4>
-                            <% if (p.getSize() != null && !p.getSize().isEmpty()) { %>
-                            <p>Size: <%= p.getSize() %></p>
+                            <h4><%= product.getProductName() %></h4>
+                            <% if (product.getSize() != null && !product.getSize().isEmpty()) { %>
+                            <p>Size: <%= product.getSize() %></p>
                             <% } %>
-                            <% if (p.getColor() != null && !p.getColor().isEmpty()) { %>
-                            <p>Color: <%= p.getColor() %></p>
+                            <% if (product.getColor() != null && !product.getColor().isEmpty()) { %>
+                            <p>Color: <%= product.getColor() %></p>
                             <% } %>
                             <div class="quantity-box"><span><%= quantity %></span></div>
                         </div>
-                        <div><%= String.format("%,.0f", p.getPrice()) %></div>
+                        <div><%= String.format("%,.0f", product.getPrice()) %></div>
                     </div>
-                    <% }
-                       double shipFee = 30000;
-                       double discountAmount = total * discountPercent / 100;
-                       double grandTotal = total + shipFee - discountAmount;
-                    %>
                     <div class="summary-line">Subtotal: <span><%= String.format("%,.0f", total) %></span></div>
                     <div class="summary-line">Ship: <span><%= String.format("%,.0f", shipFee) %></span></div>
                     <div class="summary-line">Voucher: <span><%= discountPercent > 0 ? "-" + String.format("%,.0f", discountAmount) : "0" %></span></div>
                     <div class="summary-line total-line">Total: <span><%= String.format("%,.0f", grandTotal) %></span></div>
+                    <% } %>
                 </div>
-                <% } else { %>
-                <p>No items in cart.</p>
-                <% } %>
             </div>
         </form>
 
@@ -315,3 +323,4 @@
         </script>
     </body>
 </html>
+

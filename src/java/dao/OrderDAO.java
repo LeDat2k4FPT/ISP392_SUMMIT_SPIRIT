@@ -14,10 +14,12 @@ public class OrderDAO {
 
     private static final String GET_ALL_ORDERS = "SELECT OrderID, UserID, OrderDate, TotalAmount, Status FROM Orders";
     private static final String GET_ORDER_BY_ID = "SELECT * FROM Orders WHERE OrderID = ?";
-    private static final String GET_ORDERS_BY_USER =  "SELECT OrderID, OrderDate, Status, TotalAmount FROM Orders WHERE UserID = ? ORDER BY OrderDate DESC";
+    private static final String GET_ORDERS_BY_USER = "SELECT OrderID, OrderDate, Status, TotalAmount FROM Orders WHERE UserID = ? ORDER BY OrderDate DESC";
     private static final String CREATE_ORDER = "INSERT INTO Orders (userID, orderDate, total, status) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_ORDER_STATUS = "UPDATE Orders SET status = ? WHERE orderID = ?";
     private static final String DELETE_ORDER = "DELETE FROM Orders WHERE OrderID = ?";
+    private static final String INSERT_ORDER = "INSERT INTO Orders (UserID, OrderDate, TotalAmount, Status) VALUES (?, ?, ?, ?)";
+    private static final String UPDATE_STATUS = "UPDATE Orders SET Status = ? WHERE OrderID = ?";
 
     public List<OrderDTO> getAllOrders() throws SQLException, ClassNotFoundException {
         List<OrderDTO> list = new ArrayList<>();
@@ -56,9 +58,19 @@ public class OrderDAO {
                             rs.getDouble("TotalAmount"),
                             rs.getString("Status")
                     );
-                    order.setFullName(rs.getString("FullName"));
-                    order.setEmail(rs.getString("Email"));
-                    order.setPhoneNumber(rs.getString("Phone"));
+                    // Kiểm tra null trước khi set
+                    String fullName = rs.getString("FullName");
+                    if (fullName != null) {
+                        order.setFullName(fullName);
+                    }
+                    String email = rs.getString("Email");
+                    if (email != null) {
+                        order.setEmail(email);
+                    }
+                    String phone = rs.getString("Phone");
+                    if (phone != null) {
+                        order.setPhoneNumber(phone);
+                    }
 
                     System.out.println("DEBUG: Found orderID = " + order.getOrderID());
                 } else {
@@ -183,6 +195,11 @@ public class OrderDAO {
 //        return check;
 //    }
     public boolean updateOrderStatus(int orderID, String status) throws SQLException {
+
+        if (orderID <= 0 || status == null || status.isEmpty()) {
+            System.err.println("[updateOrderStatus] Lỗi: orderID hoặc status không hợp lệ. orderID=" + orderID + ", status=" + status);
+            return false;
+        }
         boolean check = false;
         Connection conn = null;
         PreparedStatement ptm = null;
@@ -207,6 +224,31 @@ public class OrderDAO {
                 conn.close();
             }
         }
+
+//        boolean check = false;
+//        Connection conn = null;
+//        PreparedStatement ptm = null;
+//        try {
+//            conn = DBUtils.getConnection();
+//            if (conn != null) {
+//                System.out.println("[DAO] Preparing to update orderID=" + orderID + " to status=" + status);
+//                ptm = conn.prepareStatement("UPDATE Orders SET status = ? WHERE orderID = ?");
+//                ptm.setString(1, status);
+//                ptm.setInt(2, orderID);
+//                int count = ptm.executeUpdate();
+//                System.out.println("[DAO] Updated rows = " + count);
+//                check = count > 0;
+//            }
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        } finally {
+//            if (ptm != null) {
+//                ptm.close();
+//            }
+//            if (conn != null) {
+//                conn.close();
+//            }
+//        }
         return check;
     }
 
@@ -260,6 +302,81 @@ public class OrderDAO {
             }
         }
         return list;
+    }
+
+    public int insertOrder(OrderDTO order) throws SQLException, ClassNotFoundException {
+        int orderId = -1;
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        ResultSet rs = null;
+        try {
+            // Kiểm tra dữ liệu đầu vào
+            if (order == null || order.getUserID() <= 0 || order.getTotalAmount() <= 0 || order.getStatus() == null || order.getStatus().isEmpty()) {
+                System.err.println("[insertOrder] Lỗi: Dữ liệu đầu vào không hợp lệ. userID=" + (order != null ? order.getUserID() : "null") + ", totalAmount=" + (order != null ? order.getTotalAmount() : "null") + ", status=" + (order != null ? order.getStatus() : "null"));
+                return -1;
+            }
+            conn = DBUtils.getConnection();
+            if (conn != null) {
+                ptm = conn.prepareStatement(INSERT_ORDER, PreparedStatement.RETURN_GENERATED_KEYS);
+                ptm.setInt(1, order.getUserID());
+                ptm.setTimestamp(2, order.getOrderDate() != null
+                        ? new java.sql.Timestamp(order.getOrderDate().getTime())
+                        : new java.sql.Timestamp(System.currentTimeMillis()));
+                ptm.setDouble(3, order.getTotalAmount());
+                ptm.setString(4, order.getStatus() != null ? order.getStatus() : "Pending");
+                int affectedRows = ptm.executeUpdate();
+                if (affectedRows > 0) {
+                    rs = ptm.getGeneratedKeys();
+                    if (rs.next()) {
+                        orderId = rs.getInt(1);
+                    }
+                } else {
+                    System.err.println("[insertOrder] Không insert được order vào DB. affectedRows=0");
+                }
+            } else {
+                System.err.println("[insertOrder] Không kết nối được DB.");
+            }
+        } catch (Exception ex) {
+            System.err.println("[insertOrder] Exception: " + ex.getMessage());
+            ex.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return orderId;
+    }
+
+    public boolean updateOrderStatus(OrderDTO order) throws SQLException, ClassNotFoundException {
+        if (order == null || order.getOrderID() <= 0 || order.getStatus() == null || order.getStatus().isEmpty()) {
+            System.err.println("[updateOrderStatus] Lỗi: order hoặc trường dữ liệu không hợp lệ. orderID=" + (order != null ? order.getOrderID() : "null") + ", status=" + (order != null ? order.getStatus() : "null"));
+            return false;
+        }
+        boolean check = false;
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        try {
+            conn = DBUtils.getConnection();
+            ptm = conn.prepareStatement(UPDATE_STATUS);
+            ptm.setString(1, order.getStatus());
+            ptm.setInt(2, order.getOrderID());
+            int rowsAffected = ptm.executeUpdate();
+            check = rowsAffected > 0;
+        } finally {
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return check;
     }
 
     public List<OrderDTO> searchOrders(String keyword) throws SQLException, ClassNotFoundException {

@@ -281,17 +281,16 @@ public class ProductDAO {
     public List<ProductDTO> getProductsByName(String keyword) throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
         String sql = "SELECT p.ProductID, p.ProductName, c.CateName, "
-                   + "MIN(pv.Price) AS Price, SUM(pv.Quantity) AS Stock "
-                   + "FROM Product p "
-                   + "JOIN Category c ON p.CateID = c.CateID "
-                   + "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID "
-                   + "WHERE p.ProductName LIKE ? "
-                   + "GROUP BY p.ProductID, p.ProductName, c.CateName";
+                + "MIN(pv.Price) AS Price, SUM(pv.Quantity) AS Stock "
+                + "FROM Product p "
+                + "JOIN Category c ON p.CateID = c.CateID "
+                + "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID "
+                + "WHERE p.ProductName LIKE ? "
+                + "GROUP BY p.ProductID, p.ProductName, c.CateName";
 
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setString(1, "%" + keyword + "%");
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     ProductDTO p = new ProductDTO();
                     p.setProductID(rs.getInt("ProductID"));
@@ -310,52 +309,44 @@ public class ProductDAO {
     public List<ProductDTO> getSaleOffProducts() throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
         String sql = BASE_SELECT + BASE_FROM
-                   + "JOIN ProductVariant pv2 ON p.ProductID = pv2.ProductID "
-                   + "WHERE pv2.Discount > 0 AND p.Status = 'Active' "
-                   + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
+                + "JOIN ProductVariant pv2 ON p.ProductID = pv2.ProductID "
+                + "WHERE pv2.Discount > 0 AND p.Status = 'Active' "
+                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
 
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql);  ResultSet rs = ps.executeQuery()) {
             while (rs.next()) {
                 list.add(extractProduct(rs));
             }
         }
         return list;
     }
+
     public List<ProductDTO> get3FixedShirtsForSaleOff() throws SQLException, ClassNotFoundException {
-    List<ProductDTO> list = new ArrayList<>();
-    String sql = "SELECT p.ProductID, p.ProductName, p.Description, " +
-                 "MIN(pv.Price) AS Price, MIN(pv.Quantity) AS Stock, " +
-                 "MIN(s.SizeName) AS Size, MIN(i.ImageURL) AS ImageURL, p.CateID " +
-                 "FROM Product p " +
-                 "JOIN ProductVariant pv ON p.ProductID = pv.ProductID " +
-                 "LEFT JOIN Size s ON pv.SizeID = s.SizeID " +
-                 "LEFT JOIN ProductImage i ON p.ProductID = i.ProductID " +
-                 "WHERE p.ProductID IN (?, ?, ?) AND p.Status = 'Active' " +
-                 "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
+        List<ProductDTO> list = new ArrayList<>();
+        String sql = "SELECT p.ProductID, p.ProductName, p.Description, "
+                + "MIN(pv.Price) AS Price, MIN(pv.Quantity) AS Stock, "
+                + "MIN(s.SizeName) AS Size, MIN(i.ImageURL) AS ImageURL, p.CateID "
+                + "FROM Product p "
+                + "JOIN ProductVariant pv ON p.ProductID = pv.ProductID "
+                + "LEFT JOIN Size s ON pv.SizeID = s.SizeID "
+                + "LEFT JOIN ProductImage i ON p.ProductID = i.ProductID "
+                + "WHERE p.ProductID IN (?, ?, ?) AND p.Status = 'Active' "
+                + "GROUP BY p.ProductID, p.ProductName, p.Description, p.CateID";
 
-    try (Connection conn = DBUtils.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
 
-        ps.setInt(1, 13);  // ✅ Đổi sang 3 ProductID hợp lệ có trong DB
-        ps.setInt(2, 14);
-        ps.setInt(3, 15);
+            ps.setInt(1, 13);  // ✅ Đổi sang 3 ProductID hợp lệ có trong DB
+            ps.setInt(2, 14);
+            ps.setInt(3, 15);
 
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                ProductDTO dto = extractProduct(rs);
-                dto.setDiscount(20.0); // 👈 chỉ để hiển thị
-                list.add(dto);
+            try ( ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    ProductDTO dto = extractProduct(rs);
+                    dto.setDiscount(20.0); // 👈 chỉ để hiển thị
+                    list.add(dto);
+                }
             }
         }
+        return list;
     }
-    return list;
-}
-
-
-
-
-
-
 }

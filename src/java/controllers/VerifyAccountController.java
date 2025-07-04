@@ -9,48 +9,41 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
-import java.util.Random;
-import utils.EmailUtils;
 
 /**
  *
  * @author gmt
  */
-@WebServlet(name = "ForgotPasswordController", urlPatterns = {"/ForgotPasswordController"})
-public class ForgotPasswordController extends HttpServlet {
+@WebServlet(name = "VerifyAccountController", urlPatterns = {"/VerifyAccountController"})
+public class VerifyAccountController extends HttpServlet {
 
-    private static final String ERROR = "forgotPassword.jsp";
-    private static final String SUCCESS = "verifyOtp.jsp";
+    private static final String ERROR = "verifyAccount.jsp";
+    private static final String SUCCESS = "homepage.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
         String url = ERROR;
-        boolean checkValidation = true;
         try {
-            String email = request.getParameter("email");
-            String otp = String.valueOf(new Random().nextInt(900000) + 100000);
-            if (checkValidation) {
+            String userOtp = request.getParameter("otp");
+            HttpSession session = request.getSession();
+            String sessionOtp = (String) session.getAttribute("OTP");
+            UserDTO pendingUser = (UserDTO) session.getAttribute("PENDING_USER");
+            if (userOtp != null && userOtp.equals(sessionOtp) && pendingUser != null) {
                 UserDAO dao = new UserDAO();
-                HttpSession session = request.getSession();
-                UserDTO user = dao.findByEmail(email);
-                if (user != null) {
-                    session.setAttribute("OTP", otp);
-                    session.setAttribute("email", email);
-                    //Gửi OTP qua email
-                    String htmlBody = "<p>Hello <strong>" + user.getFullName() + "</strong>,</p>"
-                            + "<p>We have received a request to reset the password for your account on <strong>SUMMIT SPIRIT</strong>.</p>"
-                            + "<p><strong>Your OTP code: <span style='font-size: 20px; color: #007bff;'>" + otp + "</span></strong></p>"
-                            + "<p>If you did not request a password reset, please ignore this email.</p>"
-                            + "<p>Best regards,<br><em>SUMMIT SPIRIT</em></p>";
-                    EmailUtils.sendEmail(email, "Password Reset Request", htmlBody);
+                boolean checkCreate = dao.create(pendingUser);
+                if (checkCreate) {
+                    session.removeAttribute("OTP");
+                    session.removeAttribute("PENDING_USER");
+                    UserDTO loginUser = dao.checkLogin(pendingUser.getEmail(), pendingUser.getPassword());
+                    session.setAttribute("LOGIN_USER", loginUser);
                     url = SUCCESS;
-                } else {
-                    request.setAttribute("MESSAGE", "Email doesn't exist!");
-                    url = ERROR;
                 }
+            } else {
+                request.setAttribute("MESSAGE", "Invalid OTP!");
+                url = ERROR;
             }
         } catch (Exception e) {
-            log("Error at ForgotPasswordController: " + e.toString());
+            log("Error at VerifyAccountController: " + e.toString());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
         }

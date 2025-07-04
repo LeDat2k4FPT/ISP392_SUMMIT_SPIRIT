@@ -39,8 +39,8 @@ public class ProductVariantDAO {
     }
 
     public int getNextAttributeID() throws SQLException, ClassNotFoundException {
-        // Lấy AttributeID mới bằng cách lấy MAX hiện tại + 1
-        // Nếu bảng chưa có bản ghi nào, dùng 1 làm ID đầu tiên
+        // Láº¥y AttributeID má»›i báº±ng cÃ¡ch láº¥y MAX hiá»‡n táº¡i + 1
+        // Náº¿u báº£ng chÆ°a cÃ³ báº£n ghi nÃ o, dÃ¹ng 1 lÃ m ID Ä‘áº§u tiÃªn
         String sql = "SELECT ISNULL(MAX(AttributeID), 0) + 1 FROM ProductVariant";
         try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
@@ -93,7 +93,7 @@ public class ProductVariantDAO {
     return colors;
 }
 
-    // Thêm phương thức lấy tất cả variant, nhóm theo ProductID
+    // ThÃªm phÆ°Æ¡ng thá»©c láº¥y táº¥t cáº£ variant, nhÃ³m theo ProductID
     public Map<Integer, List<ProductVariantDTO>> getAllVariantsGroupedByProduct() throws SQLException, ClassNotFoundException {
         Map<Integer, List<ProductVariantDTO>> map = new HashMap<>();
         String sql = "SELECT pv.AttributeID, pv.ProductID, pv.ColorID, pv.SizeID, pv.Price, pv.Quantity, c.ColorName, s.SizeName " +
@@ -148,6 +148,7 @@ public class ProductVariantDAO {
         return list;
     }
 
+
     public void deleteVariantByID(int attributeID) throws SQLException, ClassNotFoundException {
         String sql = "DELETE FROM ProductVariant WHERE AttributeID=?";
         try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
@@ -167,7 +168,7 @@ public class ProductVariantDAO {
             ps.setInt(6, variant.getProductID());
             int affected = ps.executeUpdate();
             if (affected == 0) {
-                // Nếu không có dòng nào bị update, thì insert mới
+                // Náº¿u khÃ´ng cÃ³ dÃ²ng nÃ o bá»‹ update, thÃ¬ insert má»›i
                 insertVariant(variant);
             }
         }

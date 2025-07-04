@@ -19,26 +19,30 @@ public class ApplyDiscountServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String discountCode = request.getParameter("discountCode");
+        String sourcePage = request.getParameter("sourcePage"); // Lấy trang nguồn
+        if (sourcePage == null || sourcePage.isEmpty()) {
+            sourcePage = "shipping.jsp"; // Mặc định
+        }
         HttpSession session = request.getSession();
 
         Object loginUser = session.getAttribute("LOGIN_USER");
         if (loginUser == null) {
             request.setAttribute("DISCOUNT_ERROR", "Bạn cần đăng nhập để sử dụng mã giảm giá.");
-            request.getRequestDispatcher("shipping.jsp").forward(request, response);
+            request.getRequestDispatcher(sourcePage).forward(request, response);
             return;
         }
 
         CartDTO cart = (CartDTO) session.getAttribute("CART");
         if (cart == null || cart.isEmpty()) {
             request.setAttribute("DISCOUNT_ERROR", "Không thể áp dụng mã khi giỏ hàng trống.");
-            request.getRequestDispatcher("shipping.jsp").forward(request, response);
+            request.getRequestDispatcher(sourcePage).forward(request, response);
             return;
         }
 
         for (CartItemDTO item : cart.getCartItems()) {
             if (item.getProduct().isFromSaleOff()) {
                 request.setAttribute("DISCOUNT_ERROR", "Không thể sử dụng mã giảm giá với sản phẩm đang được giảm giá sẵn.");
-                request.getRequestDispatcher("shipping.jsp").forward(request, response);
+                request.getRequestDispatcher(sourcePage).forward(request, response);
                 return;
             }
         }
@@ -65,7 +69,7 @@ public class ApplyDiscountServlet extends HttpServlet {
             request.setAttribute("DISCOUNT_ERROR", "Mã giảm giá không hợp lệ, hết hạn hoặc không đủ điều kiện.");
         }
 
-        // ✅ Vẫn lưu thông tin giao hàng vào session
+        // Lưu thông tin giao hàng vào session
         session.setAttribute("SHIPPING_COUNTRY", request.getParameter("country"));
         session.setAttribute("SHIPPING_FULLNAME", request.getParameter("fullname"));
         session.setAttribute("SHIPPING_PHONE", request.getParameter("phone"));
@@ -74,7 +78,7 @@ public class ApplyDiscountServlet extends HttpServlet {
         session.setAttribute("SHIPPING_DISTRICT", request.getParameter("district"));
         session.setAttribute("SHIPPING_CITY", request.getParameter("city"));
 
-        // ✅ Forward lại shipping.jsp để giữ các request attributes như voucher
-        request.getRequestDispatcher("shipping.jsp").forward(request, response);
+        // Forward lại đúng trang nguồn
+        request.getRequestDispatcher(sourcePage).forward(request, response);
     }
 }
