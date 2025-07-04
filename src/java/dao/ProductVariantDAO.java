@@ -24,7 +24,7 @@ public class ProductVariantDAO {
 
     public void insertVariant(ProductVariantDTO variant) throws SQLException, ClassNotFoundException {
         String sql = "INSERT INTO ProductVariant (AttributeID, ProductID, ColorID, SizeID, Price, Quantity) VALUES (?, ?, ?, ?, ?, ?)";
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
 
             int nextID = getNextAttributeID();
 
@@ -43,7 +43,7 @@ public class ProductVariantDAO {
         // Lấy AttributeID mới bằng cách lấy MAX hiện tại + 1
         // Nếu bảng chưa có bản ghi nào, dùng 1 làm ID đầu tiên
         String sql = "SELECT ISNULL(MAX(AttributeID), 0) + 1 FROM ProductVariant";
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql);  ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
                 return rs.getInt(1);
             }
@@ -53,7 +53,7 @@ public class ProductVariantDAO {
 
     public void deleteByProductID(int productID) throws Exception {
         String sql = "DELETE FROM ProductVariant WHERE ProductID = ?";
-        try (Connection con = DBUtils.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try ( Connection con = DBUtils.getConnection();  PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, productID);
             ps.executeUpdate();
         }
@@ -61,14 +61,13 @@ public class ProductVariantDAO {
 
     public List<String> getAvailableSizesByProductId(int productId) throws SQLException, ClassNotFoundException {
         List<String> sizes = new ArrayList<>();
-        String sql = "SELECT DISTINCT s.SizeName " +
-                     "FROM ProductVariant pv " +
-                     "JOIN Size s ON pv.SizeID = s.SizeID " +
-                     "WHERE pv.ProductID = ?";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = "SELECT DISTINCT s.SizeName "
+                + "FROM ProductVariant pv "
+                + "JOIN Size s ON pv.SizeID = s.SizeID "
+                + "WHERE pv.ProductID = ?";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productId);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 while (rs.next()) {
                     sizes.add(rs.getString("SizeName"));
                 }
@@ -76,38 +75,34 @@ public class ProductVariantDAO {
         }
         return sizes;
     }
+
     public List<String> getAvailableColorsByProductId(int productId) throws SQLException, ClassNotFoundException {
-    List<String> colors = new ArrayList<>();
-    String sql = "SELECT DISTINCT c.ColorName " +
-                 "FROM ProductVariant pv " +
-                 "JOIN Color c ON pv.ColorID = c.ColorID " +
-                 "WHERE pv.ProductID = ?";
-    try (Connection conn = DBUtils.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, productId);
-        try (ResultSet rs = ps.executeQuery()) {
-            while (rs.next()) {
-                colors.add(rs.getString("ColorName"));
+        List<String> colors = new ArrayList<>();
+        String sql = "SELECT DISTINCT c.ColorName "
+                + "FROM ProductVariant pv "
+                + "JOIN Color c ON pv.ColorID = c.ColorID "
+                + "WHERE pv.ProductID = ?";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            try ( ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    colors.add(rs.getString("ColorName"));
+                }
             }
         }
+        return colors;
     }
-    return colors;
-}
 
-
-
- public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
+    public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
         List<ProductDTO> list = new ArrayList<>();
-        String sql = "SELECT p.ProductID, p.ProductName, c.CateName, " +
-                     "MIN(pv.Price) AS Price, SUM(pv.Quantity) AS Stock " +
-                     "FROM Product p " +
-                     "JOIN Category c ON p.CateID = c.CateID " +
-                     "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID " +
-                     "GROUP BY p.ProductID, p.ProductName, c.CateName";
+        String sql = "SELECT p.ProductID, p.ProductName, c.CateName, "
+                + "MIN(pv.Price) AS Price, SUM(pv.Quantity) AS Stock "
+                + "FROM Product p "
+                + "JOIN Category c ON p.CateID = c.CateID "
+                + "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID "
+                + "GROUP BY p.ProductID, p.ProductName, c.CateName";
 
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql);
-             ResultSet rs = ps.executeQuery()) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql);  ResultSet rs = ps.executeQuery()) {
 
             while (rs.next()) {
                 ProductDTO p = new ProductDTO();
@@ -122,37 +117,50 @@ public class ProductVariantDAO {
         return list;
     }
 
-public Map<Integer, List<ProductVariantDTO>> getAllVariantsGroupedByProduct()
-        throws ClassNotFoundException, SQLException {
-    Map<Integer, List<ProductVariantDTO>> variantMap = new HashMap<>();
+    public Map<Integer, List<ProductVariantDTO>> getAllVariantsGroupedByProduct()
+            throws ClassNotFoundException, SQLException {
+        Map<Integer, List<ProductVariantDTO>> variantMap = new HashMap<>();
 
-    String sql = "SELECT pv.ProductID, c.ColorName, s.SizeName, pv.Price, pv.Quantity " +
-                 "FROM ProductVariant pv " +
-                 "JOIN Color c ON pv.ColorID = c.ColorID " +
-                 "JOIN Size s ON pv.SizeID = s.SizeID " +
-                 "ORDER BY pv.ProductID, s.SizeName, c.ColorName";
+        String sql = "SELECT pv.ProductID, c.ColorName, s.SizeName, pv.Price, pv.Quantity "
+                + "FROM ProductVariant pv "
+                + "JOIN Color c ON pv.ColorID = c.ColorID "
+                + "JOIN Size s ON pv.SizeID = s.SizeID "
+                + "ORDER BY pv.ProductID, s.SizeName, c.ColorName";
 
-    try (Connection conn = DBUtils.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
-        while (rs.next()) {
-            int productID = rs.getInt("ProductID");
-            ProductVariantDTO variant = new ProductVariantDTO();
-            variant.setProductID(productID);
-            variant.setColorName(rs.getString("ColorName"));
-            variant.setSizeName(rs.getString("SizeName"));
-            variant.setPrice(rs.getDouble("Price"));
-            variant.setQuantity(rs.getInt("Quantity"));
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql);  ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                int productID = rs.getInt("ProductID");
+                ProductVariantDTO variant = new ProductVariantDTO();
+                variant.setProductID(productID);
+                variant.setColorName(rs.getString("ColorName"));
+                variant.setSizeName(rs.getString("SizeName"));
+                variant.setPrice(rs.getDouble("Price"));
+                variant.setQuantity(rs.getInt("Quantity"));
 
-            variantMap.computeIfAbsent(productID, k -> new ArrayList<>()).add(variant);
+                variantMap.computeIfAbsent(productID, k -> new ArrayList<>()).add(variant);
+            }
         }
+        return variantMap;
     }
-    return variantMap;
+
+    public int getStockForVariant(int productID, String sizeIDStr, String colorIDStr) throws Exception {
+        int stock = 0;
+        String sql = "SELECT Quantity FROM ProductVariant WHERE ProductID = ? AND SizeID = ? AND ColorID = ?";
+
+        try (
+                 Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productID);
+            ps.setInt(2, Integer.parseInt(sizeIDStr));
+            ps.setInt(3, Integer.parseInt(colorIDStr));
+
+            try ( ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    stock = rs.getInt("Quantity");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return stock;
+    }
 }
-
-}
-
-
-
-
-

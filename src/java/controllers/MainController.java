@@ -24,6 +24,8 @@ public class MainController extends HttpServlet {
     private static final String FORGOT_PASSWORD_CONTROLLER = "ForgotPasswordController";
     private static final String CREATE_USER = "CreateUser";
     private static final String CREATE_USER_CONTROLLER = "CreateUserController";
+    private static final String VERIFY_ACCOUNT = "VerifyAccount";
+    private static final String VERIFY_ACCOUNT_CONTROLLER = "VerifyAccountController";
     private static final String CHANGE_PASSWORD = "ChangePassword";
     private static final String CHANGE_PASSWORD_CONTROLLER = "ChangePasswordController";
     private static final String VERIFY_OTP = "VerifyOtp";
@@ -34,6 +36,12 @@ public class MainController extends HttpServlet {
     private static final String MANAGE_USER_ACCOUNT_CONTROLLER = "ManageUserAccountController";
     private static final String VIEW_SALE_OFF = "viewSaleOff";
     private static final String VIEW_SALE_OFF_CONTROLLER = "ViewSaleOffController";
+    private static final String ADD_TO_CART = "AddToCart";
+    private static final String ADD_TO_CART_CONTROLLER = "AddToCartServlet";
+    private static final String APPLY_DISCOUNT = "ApplyDiscount";
+    private static final String APPLY_DISCOUNT_CONTROLLER = "ApplyDiscountServlet";
+    private static final String CHECKOUT = "CheckoutVNPay";
+    private static final String CHECKOUT_CONTROLLER = "CheckoutVNPayController";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -55,6 +63,8 @@ public class MainController extends HttpServlet {
                 url = FORGOT_PASSWORD_CONTROLLER;
             } else if (CREATE_USER.equals(action)) {
                 url = CREATE_USER_CONTROLLER;
+            } else if (VERIFY_ACCOUNT.equals(action)) {
+                url = VERIFY_ACCOUNT_CONTROLLER;
             } else if (CHANGE_PASSWORD.equals(action)) {
                 url = CHANGE_PASSWORD_CONTROLLER;
             } else if (VERIFY_OTP.equals(action)) {
@@ -67,6 +77,12 @@ public class MainController extends HttpServlet {
                 url = "GoToShippingServlet";
             } else if (VIEW_SALE_OFF.equals(action)) {
                 url = VIEW_SALE_OFF_CONTROLLER;
+            } else if (ADD_TO_CART.equals(action)) {
+                url = ADD_TO_CART_CONTROLLER;
+            } else if (APPLY_DISCOUNT.equals(action)) {
+                url = APPLY_DISCOUNT_CONTROLLER;
+            } else if (CHECKOUT.equals(action)) {
+                url = CHECKOUT_CONTROLLER;
             }
         } catch (Exception e) {
             log("error at MainController: " + e.toString());
