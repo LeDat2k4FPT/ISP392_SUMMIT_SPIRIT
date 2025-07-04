@@ -46,7 +46,7 @@
         </div>
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-success px-4" style="background:#234C45;">Create</button>
-            <button type="button" class="btn btn-outline-secondary px-4" onclick="loadContent('MainController?action=ManageUserAccount')">Cancel</button>
+            <button type="button" class="btn btn-outline-secondary px-4" onclick="loadContent('ManageUserAccountController')">Cancel</button>
         </div>
     </form>
 </div>

@@ -92,7 +92,7 @@ public class ManageUserActionController extends HttpServlet {
             request.setAttribute("ERROR", "Failed to perform action: " + e.getMessage());
         }
 
-        response.sendRedirect("ManageUserAccountController"); // Reload the list
+        response.sendRedirect(request.getContextPath() + "/admin/admin.jsp?page=ManageUserAccountController"); // Reload the list with layer
 
 //        UserDAO dao = new UserDAO();
 //

@@ -65,7 +65,7 @@ public class AdminCreateUserController extends HttpServlet {
                 UserDTO user = new UserDTO(0, fullName, address, password, phone, email, role);
                 boolean success = dao.create(user);
                 if (success) {
-                    response.sendRedirect(SUCCESS);
+                    response.sendRedirect(request.getContextPath() + "/admin/admin.jsp?page=ManageUserAccountController");
                     return;
                 } else {
                     message = "❌ Failed to create user. Please try again.";

@@ -4,11 +4,15 @@ public class VoucherDTO {
     private int voucherID;
     private String voucherCode;
     private double discountValue;
+    private java.sql.Date expiryDate;
+    private String status;
 
-    public VoucherDTO(int voucherID, String voucherCode, double discountValue) {
+    public VoucherDTO(int voucherID, String voucherCode, double discountValue, java.sql.Date expiryDate, String status) {
         this.voucherID = voucherID;
         this.voucherCode = voucherCode;
         this.discountValue = discountValue;
+        this.expiryDate = expiryDate;
+        this.status = status;
     }
 
     public int getVoucherID() {
@@ -33,5 +37,21 @@ public class VoucherDTO {
 
     public void setDiscountValue(double discountValue) {
         this.discountValue = discountValue;
+    }
+
+    public java.sql.Date getExpiryDate() {
+        return expiryDate;
+    }
+
+    public void setExpiryDate(java.sql.Date expiryDate) {
+        this.expiryDate = expiryDate;
+    }
+
+    public String getStatus() {
+        return status;
+    }
+
+    public void setStatus(String status) {
+        this.status = status;
     }
 }

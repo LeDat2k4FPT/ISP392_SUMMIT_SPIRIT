@@ -87,22 +87,27 @@
         </style>
         <script>
             function loadContent(page, msg, type = 'success') {
-                fetch(page)
-                        .then(res => res.text())
-                        .then(html => {
-                            const mainContent = document.getElementById("main-content");
-                            let alertBox = "";
-                            if (msg) {
-                                alertBox = '<div class="alert alert-' + type + ' mt-2">' + msg + '</div>';
-                            }
-                            mainContent.innerHTML = alertBox + html;
+                // Lấy context path từ URL
+                var pathArr = window.location.pathname.split('/');
+                var contextPath = pathArr.length > 1 ? '/' + pathArr[1] : '';
+                // Nếu page đã bắt đầu bằng '/' thì không thêm, nếu không thì thêm '/'
+                var url = page.startsWith('/') ? contextPath + page : contextPath + '/' + page;
+                fetch(url)
+                    .then(res => res.text())
+                    .then(html => {
+                        const mainContent = document.getElementById("main-content");
+                        let alertBox = "";
+                        if (msg) {
+                            alertBox = '<div class="alert alert-' + type + ' mt-2">' + msg + '</div>';
+                        }
+                        mainContent.innerHTML = alertBox + html;
 
-                            setTimeout(() => {
-                                const alert = document.querySelector(".alert");
-                                if (alert)
-                                    alert.remove();
-                            }, 3000);
-                        });
+                        setTimeout(() => {
+                            const alert = document.querySelector(".alert");
+                            if (alert)
+                                alert.remove();
+                        }, 3000);
+                    });
             }
             window.addEventListener("DOMContentLoaded", () => {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -118,7 +123,6 @@
     <body style="background-color: #f0f0f0;">
         <div class="top-bar-custom d-flex justify-content-between align-items-center">
             <span>Hello, <%= loginUser.getFullName() %></span>
-            <button class="btn btn-light btn-sm" onclick="if(confirm('Are you sure you want to logout?')){window.location.href='MainController?action=Logout';}"><i class="bi bi-box-arrow-right"></i> Logout</button>
         </div>
         <div class="container-fluid">
             <div class="row flex-nowrap">
@@ -132,6 +136,15 @@
                         </li>
                         <li>
                             <button class="nav-link text-start w-100" onclick="loadContent('MainController?action=ManageUserAccount')"><i class="bi bi-people"></i> Manage User Account</button>
+                        </li>
+                        <li>
+                            <button class="nav-link text-start w-100" onclick="loadContent('ManageVoucherController')"><i class="bi bi-ticket"></i> Manage Vouchers</button>
+                        </li>
+                        <li>
+                            <button class="nav-link text-start w-100" onclick="loadContent('ManagePotentialCustomerController')"><i class="bi bi-star"></i> Potential Customers</button>
+                        </li>
+                        <li>
+                            <button class="nav-link text-start w-100" onclick="loadContent('ManageUpdateHistoryController')"><i class="bi bi-clock-history"></i> Update History</button>
                         </li>
                     </ul>
                     <form action="LogoutController" method="post" class="mt-auto">

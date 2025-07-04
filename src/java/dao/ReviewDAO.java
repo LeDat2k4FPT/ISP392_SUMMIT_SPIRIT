@@ -33,4 +33,17 @@ public class ReviewDAO {
         }
         return list;
     }
+
+    public int getReviewCountByUser(int userID) throws SQLException, ClassNotFoundException {
+        String sql = "SELECT COUNT(*) FROM Review WHERE UserID = ?";
+        try (Connection con = utils.DBUtils.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+            ps.setInt(1, userID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        return 0;
+    }
 }
