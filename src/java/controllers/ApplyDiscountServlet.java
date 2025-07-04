@@ -3,6 +3,7 @@ package controllers;
 import dao.CartDAO;
 import dto.CartDTO;
 import dto.CartItemDTO;
+import dto.ProductDTO;
 
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -19,12 +20,12 @@ public class ApplyDiscountServlet extends HttpServlet {
             throws ServletException, IOException {
 
         String discountCode = request.getParameter("discountCode");
-        String sourcePage = request.getParameter("sourcePage"); // Lấy trang nguồn
+        String sourcePage = request.getParameter("sourcePage");
         if (sourcePage == null || sourcePage.isEmpty()) {
-            sourcePage = "shipping.jsp"; // Mặc định
+            sourcePage = "shipping.jsp";
         }
-        HttpSession session = request.getSession();
 
+        HttpSession session = request.getSession();
         Object loginUser = session.getAttribute("LOGIN_USER");
         if (loginUser == null) {
             request.setAttribute("DISCOUNT_ERROR", "Bạn cần đăng nhập để sử dụng mã giảm giá.");
@@ -33,21 +34,40 @@ public class ApplyDiscountServlet extends HttpServlet {
         }
 
         CartDTO cart = (CartDTO) session.getAttribute("CART");
-        if (cart == null || cart.isEmpty()) {
-            request.setAttribute("DISCOUNT_ERROR", "Không thể áp dụng mã khi giỏ hàng trống.");
+        ProductDTO buyNowProduct = (ProductDTO) session.getAttribute("BUY_NOW_PRODUCT");
+
+        boolean hasValidProduct = (cart != null && !cart.isEmpty()) || buyNowProduct != null;
+
+        if (!hasValidProduct) {
+            request.setAttribute("DISCOUNT_ERROR", "Không thể áp dụng mã khi không có sản phẩm nào.");
             request.getRequestDispatcher(sourcePage).forward(request, response);
             return;
         }
 
-        for (CartItemDTO item : cart.getCartItems()) {
-            if (item.getProduct().isFromSaleOff()) {
-                request.setAttribute("DISCOUNT_ERROR", "Không thể sử dụng mã giảm giá với sản phẩm đang được giảm giá sẵn.");
-                request.getRequestDispatcher(sourcePage).forward(request, response);
-                return;
+        // Kiểm tra sản phẩm giảm giá sẵn
+        if (cart != null && !cart.isEmpty()) {
+            for (CartItemDTO item : cart.getCartItems()) {
+                if (item.getProduct().isFromSaleOff()) {
+                    request.setAttribute("DISCOUNT_ERROR", "Không thể sử dụng mã giảm giá với sản phẩm đang được giảm giá sẵn.");
+                    request.getRequestDispatcher(sourcePage).forward(request, response);
+                    return;
+                }
             }
         }
 
-        double totalCartAmount = cart.getTotalPrice();
+        if (buyNowProduct != null && buyNowProduct.isFromSaleOff()) {
+            request.setAttribute("DISCOUNT_ERROR", "Không thể sử dụng mã giảm giá với sản phẩm đang được giảm giá sẵn.");
+            request.getRequestDispatcher(sourcePage).forward(request, response);
+            return;
+        }
+
+        // Tính tổng tiền
+        double totalCartAmount = 0.0;
+        if (cart != null && !cart.isEmpty()) {
+            totalCartAmount = cart.getTotalPrice();
+        } else if (buyNowProduct != null) {
+            totalCartAmount = buyNowProduct.getPrice() * buyNowProduct.getQuantity();
+        }
 
         CartDAO dao = new CartDAO();
         Optional<Double> discountOpt = dao.validateDiscountCode(discountCode, totalCartAmount);
@@ -58,13 +78,11 @@ public class ApplyDiscountServlet extends HttpServlet {
             double discountAmount = totalCartAmount * maxAllowedDiscount / 100;
 
             if (discountAmount >= totalCartAmount) {
-                request.setAttribute("DISCOUNT_ERROR", "Chiết khấu vượt quá tổng tiền giỏ hàng.");
+                request.setAttribute("DISCOUNT_ERROR", "Chiết khấu vượt quá tổng tiền.");
             } else {
-                // ✅ Chỉ set vào request, KHÔNG lưu vào session
                 request.setAttribute("DISCOUNT_PERCENT", maxAllowedDiscount);
                 request.setAttribute("DISCOUNT_CODE", discountCode);
             }
-
         } else {
             request.setAttribute("DISCOUNT_ERROR", "Mã giảm giá không hợp lệ, hết hạn hoặc không đủ điều kiện.");
         }
@@ -78,7 +96,6 @@ public class ApplyDiscountServlet extends HttpServlet {
         session.setAttribute("SHIPPING_DISTRICT", request.getParameter("district"));
         session.setAttribute("SHIPPING_CITY", request.getParameter("city"));
 
-        // Forward lại đúng trang nguồn
         request.getRequestDispatcher(sourcePage).forward(request, response);
     }
 }
