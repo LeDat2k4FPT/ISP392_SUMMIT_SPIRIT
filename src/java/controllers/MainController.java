@@ -32,7 +32,7 @@ public class MainController extends HttpServlet {
     private static final String VERIFY_OTP_CONTROLLER = "VerifyOtpController";
     private static final String RESET_PASSWORD = "ResetPassword";
     private static final String RESET_PASSWORD_CONTROLLER = "ResetPasswordController";
-    private static final String MANAGE_USER_ACCOUNT = "ManageUser";
+    private static final String MANAGE_USER_ACCOUNT = "ManageUserAccount";
     private static final String MANAGE_USER_ACCOUNT_CONTROLLER = "ManageUserAccountController";
     private static final String VIEW_SALE_OFF = "viewSaleOff";
     private static final String VIEW_SALE_OFF_CONTROLLER = "ViewSaleOffController";

@@ -43,7 +43,13 @@ public class ProductListController extends HttpServlet {
             ProductDAO productDAO = new ProductDAO();
             ProductVariantDAO variantDAO = new ProductVariantDAO();
 
-            List<ProductDTO> productList = productDAO.getAllProducts();
+            String keyword = request.getParameter("keyword");
+            List<ProductDTO> productList;
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                productList = productDAO.getProductsByName(keyword.trim());
+            } else {
+                productList = productDAO.getAllProducts();
+            }
             Map<Integer, List<ProductVariantDTO>> variantMap = variantDAO.getAllVariantsGroupedByProduct();
 
             request.setAttribute("productList", productList);

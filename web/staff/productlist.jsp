@@ -25,7 +25,7 @@
     }
 %>
 <div class="search-bar" style="margin-bottom:15px;">
-    <form method="get" action="<%= request.getContextPath() %>/staff/productlist.jsp">
+    <form method="get" action="<%= request.getContextPath() %>/ProductListController">
         <input type="text" name="keyword" value="<%= keyword %>" placeholder="🔍 Search product name..." style="padding:5px; width:200px;">
         <button type="submit">Search</button>
     </form>

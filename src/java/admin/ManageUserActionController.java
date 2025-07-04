@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controllers;
+package admin;
 
 import dao.UserDAO;
 import jakarta.servlet.ServletException;
@@ -120,3 +120,4 @@ public class ManageUserActionController extends HttpServlet {
     }// </editor-fold>
 
 }
+ 

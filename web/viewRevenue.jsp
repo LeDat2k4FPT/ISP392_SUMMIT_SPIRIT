@@ -7,76 +7,62 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="java.util.*, com.google.gson.Gson"%>
 <%@page import="dto.RevenueLineDTO, dto.ProductSoldDTO"%>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>View Revenue</title>
-    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; margin: 20px; background: #f7f7f7; }
-        .chart-container { width: 80%; margin: auto; padding-bottom: 50px; }
-        form { text-align: center; margin-bottom: 30px; }
-        select, input, button { margin: 5px; padding: 5px; }
-    </style>
-</head>
-<body>
-    <h1 style="text-align:center;">📈 Revenue Overview</h1>
+<h1 style="text-align:center;">📈 Revenue Overview</h1>
+<!-- Filter Form -->
+<form method="get" action="ViewRevenueController">
+    <label>View by:
+        <select name="filter">
+            <option value="day" <%= "day".equals(request.getAttribute("filterType")) ? "selected" : "" %>>Day</option>
+            <option value="month" <%= "month".equals(request.getAttribute("filterType")) ? "selected" : "" %>>Month</option>
+            <option value="year" <%= "year".equals(request.getAttribute("filterType")) ? "selected" : "" %>>Year</option>
+        </select>
+    </label>
 
-    <!-- Filter Form -->
-    <form method="get" action="ViewRevenueController">
-        <label>View by:
-            <select name="filter">
-                <option value="day" <%= "day".equals(request.getAttribute("filterType")) ? "selected" : "" %>>Day</option>
-                <option value="month" <%= "month".equals(request.getAttribute("filterType")) ? "selected" : "" %>>Month</option>
-                <option value="year" <%= "year".equals(request.getAttribute("filterType")) ? "selected" : "" %>>Year</option>
-            </select>
-        </label>
+    <label>Date:
+        <select name="dateValue">
+            <% 
+                String selectedDay = (String) request.getAttribute("selectedDay");
+                out.print("<option value='all'" + ("all".equals(selectedDay) ? " selected" : "") + ">All</option>");
+                for (int i = 1; i <= 31; i++) {
+                    String val = String.valueOf(i);
+                    String sel = val.equals(selectedDay) ? " selected" : "";
+                    out.print("<option value='" + val + "'" + sel + ">" + val + "</option>");
+                }
+            %>
+        </select>
+    </label>
 
-        <label>Date:
-            <select name="dateValue">
-                <% 
-                    String selectedDay = (String) request.getAttribute("selectedDay");
-                    out.print("<option value='all'" + ("all".equals(selectedDay) ? " selected" : "") + ">All</option>");
-                    for (int i = 1; i <= 31; i++) {
-                        String val = String.valueOf(i);
-                        String sel = val.equals(selectedDay) ? " selected" : "";
-                        out.print("<option value='" + val + "'" + sel + ">" + val + "</option>");
-                    }
-                %>
-            </select>
-        </label>
+    <label>Month:
+        <select name="monthValue">
+            <% 
+                String selectedMonth = (String) request.getAttribute("selectedMonth");
+                out.print("<option value='all'" + ("all".equals(selectedMonth) ? " selected" : "") + ">All</option>");
+                for (int i = 1; i <= 12; i++) {
+                    String val = String.valueOf(i);
+                    String sel = val.equals(selectedMonth) ? " selected" : "";
+                    out.print("<option value='" + val + "'" + sel + ">Month " + val + "</option>");
+                }
+            %>
+        </select>
+    </label>
 
-        <label>Month:
-            <select name="monthValue">
-                <% 
-                    String selectedMonth = (String) request.getAttribute("selectedMonth");
-                    out.print("<option value='all'" + ("all".equals(selectedMonth) ? " selected" : "") + ">All</option>");
-                    for (int i = 1; i <= 12; i++) {
-                        String val = String.valueOf(i);
-                        String sel = val.equals(selectedMonth) ? " selected" : "";
-                        out.print("<option value='" + val + "'" + sel + ">Month " + val + "</option>");
-                    }
-                %>
-            </select>
-        </label>
+    <label>Year:
+        <select name="yearValue">
+            <% 
+                int currentYear = Calendar.getInstance().get(Calendar.YEAR);
+                String selectedYear = (String) request.getAttribute("selectedYear");
+                out.print("<option value='all'" + ("all".equals(selectedYear) ? " selected" : "") + ">All</option>");
+                for (int y = currentYear; y >= currentYear - 5; y--) {
+                    String val = String.valueOf(y);
+                    String sel = val.equals(selectedYear) ? " selected" : "";
+                    out.print("<option value='" + val + "'" + sel + ">" + val + "</option>");
+                }
+            %>
+        </select>
+    </label>
 
-        <label>Year:
-            <select name="yearValue">
-                <% 
-                    int currentYear = Calendar.getInstance().get(Calendar.YEAR);
-                    String selectedYear = (String) request.getAttribute("selectedYear");
-                    out.print("<option value='all'" + ("all".equals(selectedYear) ? " selected" : "") + ">All</option>");
-                    for (int y = currentYear; y >= currentYear - 5; y--) {
-                        String val = String.valueOf(y);
-                        String sel = val.equals(selectedYear) ? " selected" : "";
-                        out.print("<option value='" + val + "'" + sel + ">" + val + "</option>");
-                    }
-                %>
-            </select>
-        </label>
-
-        <label>Category:
-            <select name="category">
+    <label>Category:
+        <select name="category">
 <%
     List categoryList = (List) request.getAttribute("categoryList");
     String selectedCategory = (String) request.getAttribute("selectedCategory");
@@ -91,138 +77,138 @@
         }
     }
 %>
-            </select>
-        </label>
+        </select>
+    </label>
 
-        <label>Status:
-            <select name="orderStatus">
-                <%
-                    String selectedStatus = (String) request.getAttribute("selectedStatus");
-                    String[] statusArr = {"All", "Delivered", "Cancelled", "Processing", "Shipped"};
-                    for (String s : statusArr) {
-                        String sel = s.equals(selectedStatus) ? " selected" : "";
-                        out.print("<option value='" + s + "'" + sel + ">" + s + "</option>");
-                    }
-                %>
-            </select>
-        </label>
+    <label>Status:
+        <select name="orderStatus">
+            <%
+                String selectedStatus = (String) request.getAttribute("selectedStatus");
+                String[] statusArr = {"All", "Delivered", "Cancelled", "Processing", "Shipped"};
+                for (String s : statusArr) {
+                    String sel = s.equals(selectedStatus) ? " selected" : "";
+                    out.print("<option value='" + s + "'" + sel + ">" + s + "</option>");
+                }
+            %>
+        </select>
+    </label>
 
-        <button type="submit">Apply Filters</button>
-    </form>
+    <button type="submit">Apply Filters</button>
+</form>
 
-    <!-- Tổng doanh thu -->
-    <%
-        List lineData = (List) request.getAttribute("lineData");
-        double totalRevenue = 0;
-        if (lineData != null) {
-            for (Object obj : lineData) {
-                dto.RevenueLineDTO dto = (dto.RevenueLineDTO) obj;
-                totalRevenue += dto.getTotalRevenue();
-            }
+<!-- Tổng doanh thu -->
+<%
+    List lineData = (List) request.getAttribute("lineData");
+    double totalRevenue = 0;
+    if (lineData != null) {
+        for (Object obj : lineData) {
+            dto.RevenueLineDTO dto = (dto.RevenueLineDTO) obj;
+            totalRevenue += dto.getTotalRevenue();
         }
-    %>
-    <div style="display:flex; justify-content:center; gap:30px; margin-bottom:30px;">
-        <div style="background:#fff; border-radius:10px; box-shadow:0 2px 8px #eee; padding:20px 30px; min-width:180px; text-align:center;">
-            <div style="font-size:2em; color:#195181; font-weight:bold;"> <%= String.format("%,.0f", totalRevenue) %> </div>
-            <div style="color:#888;">Total Revenue (VND)</div>
-        </div>
-        <div style="background:#fff; border-radius:10px; box-shadow:0 2px 8px #eee; padding:20px 30px; min-width:180px; text-align:center;">
-            <div style="font-size:2em; color:#234C45; font-weight:bold;"> <%= request.getAttribute("totalOrders") %> </div>
-            <div style="color:#888;">Total Orders</div>
-        </div>
-        <div style="background:#fff; border-radius:10px; box-shadow:0 2px 8px #eee; padding:20px 30px; min-width:180px; text-align:center;">
-            <div style="font-size:2em; color:#28a745; font-weight:bold;"> <%= request.getAttribute("totalProducts") %> </div>
-            <div style="color:#888;">Products Sold</div>
-        </div>
-        <div style="background:#fff; border-radius:10px; box-shadow:0 2px 8px #eee; padding:20px 30px; min-width:180px; text-align:center;">
-            <div style="font-size:2em; color:#007bff; font-weight:bold;"> <%= request.getAttribute("deliveredOrders") %> </div>
-            <div style="color:#888;">Delivered Orders</div>
-        </div>
-        <div style="background:#fff; border-radius:10px; box-shadow:0 2px 8px #eee; padding:20px 30px; min-width:180px; text-align:center;">
-            <div style="font-size:2em; color:#dc3545; font-weight:bold;"> <%= request.getAttribute("cancelledOrders") %> </div>
-            <div style="color:#888;">Cancelled Orders</div>
-        </div>
+    }
+%>
+<div style="display:flex; justify-content:center; gap:30px; margin-bottom:30px;">
+    <div style="background:#fff; border-radius:10px; box-shadow:0 2px 8px #eee; padding:20px 30px; min-width:180px; text-align:center;">
+        <div style="font-size:2em; color:#195181; font-weight:bold;"> <%= String.format("%,.0f", totalRevenue) %> </div>
+        <div style="color:#888;">Total Revenue (VND)</div>
     </div>
-
-    <!-- Line Chart Section -->
-    <div class="chart-container">
-        <h3>Line Chart - <span id="lineChartTitle">Sales Quantity</span> by <%= request.getAttribute("filterType") %></h3>
-        <div style="text-align:center; margin-bottom:10px;">
-            <button type="button" id="toggleChartBtn" style="padding:6px 18px; border-radius:6px; background:#195181; color:#fff; border:none; cursor:pointer;">Toggle Quantity/Revenue</button>
-        </div>
-        <canvas id="lineChart"></canvas>
+    <div style="background:#fff; border-radius:10px; box-shadow:0 2px 8px #eee; padding:20px 30px; min-width:180px; text-align:center;">
+        <div style="font-size:2em; color:#234C45; font-weight:bold;"> <%= request.getAttribute("totalOrders") %> </div>
+        <div style="color:#888;">Total Orders</div>
     </div>
-
-    <!-- Pie Chart Section -->
-    <div class="chart-container">
-        <h3>Pie Chart - Product Distribution in "<%= request.getAttribute("selectedCategory") %>"</h3>
-        <canvas id="pieChart"></canvas>
+    <div style="background:#fff; border-radius:10px; box-shadow:0 2px 8px #eee; padding:20px 30px; min-width:180px; text-align:center;">
+        <div style="font-size:2em; color:#28a745; font-weight:bold;"> <%= request.getAttribute("totalProducts") %> </div>
+        <div style="color:#888;">Products Sold</div>
     </div>
-
-    <!-- Bảng chi tiết doanh thu -->
-    <div class="chart-container" style="margin-bottom: 30px;">
-        <h3 style="text-align:center;">Revenue Details</h3>
-        <table style="width:100%; border-collapse:collapse; background:#fff; box-shadow:0 2px 8px #eee;">
-            <thead>
-                <tr style="background:#195181; color:#fff;">
-                    <th style="padding:10px;">Time</th>
-                    <th style="padding:10px;">Category</th>
-                    <th style="padding:10px;">Quantity Sold</th>
-                    <th style="padding:10px;">Revenue (VND)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% if (lineData != null && !lineData.isEmpty()) {
-                    for (Object obj : lineData) {
-                        dto.RevenueLineDTO dto = (dto.RevenueLineDTO) obj;
-                %>
-                <tr>
-                    <td style="padding:8px; text-align:center;"><%= dto.getTimeLabel() %></td>
-                    <td style="padding:8px; text-align:center;"><%= dto.getCategory() %></td>
-                    <td style="padding:8px; text-align:right;"><%= dto.getTotalQuantity() %></td>
-                    <td style="padding:8px; text-align:right;"><%= String.format("%,.0f", dto.getTotalRevenue()) %></td>
-                </tr>
-                <%  } 
-                   } else { %>
-                <tr><td colspan="4" style="text-align:center; color:#888; padding:15px;">No data available.</td></tr>
-                <% } %>
-            </tbody>
-        </table>
+    <div style="background:#fff; border-radius:10px; box-shadow:0 2px 8px #eee; padding:20px 30px; min-width:180px; text-align:center;">
+        <div style="font-size:2em; color:#007bff; font-weight:bold;"> <%= request.getAttribute("deliveredOrders") %> </div>
+        <div style="color:#888;">Delivered Orders</div>
     </div>
-
-    <!-- Bar Chart Top Products -->
-    <div class="chart-container" style="margin-bottom: 30px;">
-        <h3 style="text-align:center;">Top 5 Best-Selling Products</h3>
-        <canvas id="barChart"></canvas>
-        <table style="width:100%; border-collapse:collapse; background:#fff; box-shadow:0 2px 8px #eee; margin-top:20px;">
-            <thead>
-                <tr style="background:#195181; color:#fff;">
-                    <th style="padding:10px;">Product</th>
-                    <th style="padding:10px;">Quantity Sold</th>
-                    <th style="padding:10px;">Revenue (VND)</th>
-                </tr>
-            </thead>
-            <tbody>
-                <% 
-                    List topProducts = (List) request.getAttribute("topProducts");
-                    if (topProducts != null && !topProducts.isEmpty()) {
-                        for (Object obj : topProducts) {
-                            dto.ProductSoldDTO dto = (dto.ProductSoldDTO) obj;
-                %>
-                <tr>
-                    <td style="padding:8px; text-align:center;"><%= dto.getProductName() %></td>
-                    <td style="padding:8px; text-align:right;"><%= dto.getQuantitySold() %></td>
-                    <td style="padding:8px; text-align:right;"><%= String.format("%,.0f", dto.getTotalRevenue()) %></td>
-                </tr>
-                <%  } 
-                   } else { %>
-                <tr><td colspan="3" style="text-align:center; color:#888; padding:15px;">No data available.</td></tr>
-                <% } %>
-            </tbody>
-        </table>
+    <div style="background:#fff; border-radius:10px; box-shadow:0 2px 8px #eee; padding:20px 30px; min-width:180px; text-align:center;">
+        <div style="font-size:2em; color:#dc3545; font-weight:bold;"> <%= request.getAttribute("cancelledOrders") %> </div>
+        <div style="color:#888;">Cancelled Orders</div>
     </div>
+</div>
 
-    <script>
+<!-- Line Chart Section -->
+<div class="chart-container">
+    <h3>Line Chart - <span id="lineChartTitle">Sales Quantity</span> by <%= request.getAttribute("filterType") %></h3>
+    <div style="text-align:center; margin-bottom:10px;">
+        <button type="button" id="toggleChartBtn" style="padding:6px 18px; border-radius:6px; background:#195181; color:#fff; border:none; cursor:pointer;">Toggle Quantity/Revenue</button>
+    </div>
+    <canvas id="lineChart"></canvas>
+</div>
+
+<!-- Pie Chart Section -->
+<div class="chart-container">
+    <h3>Pie Chart - Product Distribution in "<%= request.getAttribute("selectedCategory") %>"</h3>
+    <canvas id="pieChart"></canvas>
+</div>
+
+<!-- Bảng chi tiết doanh thu -->
+<div class="chart-container" style="margin-bottom: 30px;">
+    <h3 style="text-align:center;">Revenue Details</h3>
+    <table style="width:100%; border-collapse:collapse; background:#fff; box-shadow:0 2px 8px #eee;">
+        <thead>
+            <tr style="background:#195181; color:#fff;">
+                <th style="padding:10px;">Time</th>
+                <th style="padding:10px;">Category</th>
+                <th style="padding:10px;">Quantity Sold</th>
+                <th style="padding:10px;">Revenue (VND)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (lineData != null && !lineData.isEmpty()) {
+                for (Object obj : lineData) {
+                    dto.RevenueLineDTO dto = (dto.RevenueLineDTO) obj;
+            %>
+            <tr>
+                <td style="padding:8px; text-align:center;"><%= dto.getTimeLabel() %></td>
+                <td style="padding:8px; text-align:center;"><%= dto.getCategory() %></td>
+                <td style="padding:8px; text-align:right;"><%= dto.getTotalQuantity() %></td>
+                <td style="padding:8px; text-align:right;"><%= String.format("%,.0f", dto.getTotalRevenue()) %></td>
+            </tr>
+            <%  } 
+               } else { %>
+            <tr><td colspan="4" style="text-align:center; color:#888; padding:15px;">No data available.</td></tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<!-- Bar Chart Top Products -->
+<div class="chart-container" style="margin-bottom: 30px;">
+    <h3 style="text-align:center;">Top 5 Best-Selling Products</h3>
+    <canvas id="barChart"></canvas>
+    <table style="width:100%; border-collapse:collapse; background:#fff; box-shadow:0 2px 8px #eee; margin-top:20px;">
+        <thead>
+            <tr style="background:#195181; color:#fff;">
+                <th style="padding:10px;">Product</th>
+                <th style="padding:10px;">Quantity Sold</th>
+                <th style="padding:10px;">Revenue (VND)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% 
+                List topProducts = (List) request.getAttribute("topProducts");
+                if (topProducts != null && !topProducts.isEmpty()) {
+                    for (Object obj : topProducts) {
+                        dto.ProductSoldDTO dto = (dto.ProductSoldDTO) obj;
+            %>
+            <tr>
+                <td style="padding:8px; text-align:center;"><%= dto.getProductName() %></td>
+                <td style="padding:8px; text-align:right;"><%= dto.getQuantitySold() %></td>
+                <td style="padding:8px; text-align:right;"><%= String.format("%,.0f", dto.getTotalRevenue()) %></td>
+            </tr>
+            <%  } 
+               } else { %>
+            <tr><td colspan="3" style="text-align:center; color:#888; padding:15px;">No data available.</td></tr>
+            <% } %>
+        </tbody>
+    </table>
+</div>
+
+<script>
 <%
     // Chuẩn bị dữ liệu cho line chart
     if (lineData == null) lineData = new ArrayList<>();
@@ -369,8 +355,6 @@
             }
         }
     });
-    </script>
-</body>
-</html>
+</script>
 
 

@@ -2,7 +2,7 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
  */
-package controllers;
+package admin;
 
 import dao.UserDAO;
 import dto.UserDTO;
@@ -37,4 +37,4 @@ public class ManageUserAccountController extends HttpServlet {
         request.setAttribute("keyword", keyword);
         request.getRequestDispatcher("admin/adminManageUser.jsp").forward(request, response);
     }
-}
+} 

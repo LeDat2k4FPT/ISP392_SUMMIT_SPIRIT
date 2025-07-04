@@ -1,8 +1,8 @@
-/*
+ /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controllers;
+package admin;
 
 import dao.UserDAO;
 import dto.UserDTO;
@@ -20,7 +20,7 @@ import java.io.PrintWriter;
 public class AdminCreateUserController extends HttpServlet {
 
     private static final String ERROR = "admin/createUserAccount.jsp";
-    private static final String SUCCESS = "manageUser";
+    private static final String SUCCESS = "ManageUserAccountController";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)

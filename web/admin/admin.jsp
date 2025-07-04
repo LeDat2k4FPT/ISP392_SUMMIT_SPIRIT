@@ -23,7 +23,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="../css/staff.css">
+        <link rel="stylesheet" href="../css/admin.css">
         <style>
             .sidebar-custom {
                 background: #fff;
@@ -131,7 +131,7 @@
                             <button class="nav-link text-start w-100" onclick="loadContent('viewRevenue.jsp')"><i class="bi bi-bar-chart"></i> View Revenue</button>
                         </li>
                         <li>
-                            <button class="nav-link text-start w-100" onclick="loadContent('MainController?action=ManageUser')"><i class="bi bi-people"></i> Manage User Account</button>
+                            <button class="nav-link text-start w-100" onclick="loadContent('MainController?action=ManageUserAccount')"><i class="bi bi-people"></i> Manage User Account</button>
                         </li>
                     </ul>
                     <form action="LogoutController" method="post" class="mt-auto">
