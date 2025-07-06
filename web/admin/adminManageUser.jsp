@@ -38,7 +38,7 @@
                 </tr>
             </thead>
             <tbody>
-            <% if (users != null) { 
+                <% if (users != null) { 
                for (UserDTO u : users) { %>
                 <tr>
                     <td><%= u.getUserID() %></td>
@@ -47,11 +47,12 @@
                     <td><%= u.getAddress() %></td>
                     <td><%= u.getRole() %></td>
                     <td>
-                        <form action="ManageUserActionController" method="post" style="display:inline;" onsubmit="return confirm('Are you sure to change role?');">
+                        <form action="${pageContext.request.contextPath}/ManageUserActionController" method="post" style="display:inline;" onsubmit="return confirm('Are you sure to change role?');">
                             <input type="hidden" name="userID" value="<%= u.getUserID() %>">
                             <input type="hidden" name="action" value="editRole">
                             <button type="submit" class="btn btn-sm btn-outline-primary">Change Role</button>
                         </form>
+
                         <form action="ManageUserActionController" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently delete user <%= u.getFullName() %>?');">
                             <input type="hidden" name="userID" value="<%= u.getUserID() %>">
                             <input type="hidden" name="action" value="delete">
@@ -59,10 +60,10 @@
                         </form>
                     </td>
                 </tr>
-            <%     } 
+                <%     } 
                } else { %>
                 <tr><td colspan="6" class="text-center text-muted">No users found or error loading users.</td></tr>
-            <% } %>
+                <% } %>
             </tbody>
         </table>
     </div>
