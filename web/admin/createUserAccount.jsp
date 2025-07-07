@@ -9,9 +9,9 @@
 <div class="container-fluid px-0" style="max-width:600px;">
     <h2 class="mb-4" style="color:#234C45;font-weight:600;">Create New User Account</h2>
     <% if (msg != null && !msg.isEmpty()) { %>
-        <div class="alert alert-danger"><%= msg %></div>
+    <div class="alert alert-danger"><%= msg %></div>
     <% } %>
-    <form action="AdminCreateUserController" method="post" class="bg-white p-4 rounded shadow-sm">
+    <form action="${pageContext.request.contextPath}/AdminCreateUserController" method="post" class="bg-white p-4 rounded shadow-sm">
         <div class="mb-3">
             <label class="form-label">Full Name</label>
             <input type="text" class="form-control" name="fullName" value="<%= request.getAttribute("fullName") != null ? request.getAttribute("fullName") : "" %>" required>

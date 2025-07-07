@@ -436,5 +436,24 @@ public class OrderDAO {
         }
         return 0;
     }
+    public boolean hasUserPurchasedProduct(int userId, int productId) throws SQLException, ClassNotFoundException {
+    String sql = "SELECT COUNT(*) AS Total "
+               + "FROM Orders o "
+               + "JOIN OrderDetail od ON o.OrderID = od.OrderID "
+               + "JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID "
+               + "WHERE o.UserID = ? AND o.Status = 'Delivered' AND pv.ProductID = ?";
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, userId);
+        ps.setInt(2, productId);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                return rs.getInt("Total") > 0;
+            }
+        }
+    }
+    return false;
+}
+
 
 }

@@ -9,7 +9,8 @@
 <%@page import="dto.RevenueLineDTO, dto.ProductSoldDTO"%>
 <h1 style="text-align:center;">📈 Revenue Overview</h1>
 <!-- Filter Form -->
-<form method="get" action="ViewRevenueController">
+<form action="${pageContext.request.contextPath}/ViewRevenueController" method="get">
+
     <label>View by:
         <select name="filter">
             <option value="day" <%= "day".equals(request.getAttribute("filterType")) ? "selected" : "" %>>Day</option>
