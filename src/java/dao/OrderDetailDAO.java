@@ -10,43 +10,43 @@ import java.util.List;
 import utils.DBUtils;
 
 public class OrderDetailDAO {
-    private static final String GET_ORDER_DETAILS = "SELECT * FROM OrderDetail WHERE OrderID = ?";
     private static final String CREATE_ORDER_DETAIL = "INSERT INTO OrderDetail (OrderID, ProductID, Quantity) VALUES (?, ?, ?)";
     private static final String DELETE_ORDER_DETAIL = "DELETE FROM OrderDetail WHERE OrderID = ? AND ProductID = ?";
     private static final String UPDATE_ORDER_DETAIL = "UPDATE OrderDetail SET Quantity = ? WHERE OrderID = ? AND ProductID = ?";
 
-public List<OrderDetailDTO> getOrderDetails(int orderID) throws SQLException {
+private static final String GET_ORDER_DETAILS = 
+    "SELECT od.OrderID, od.AttributeID, od.Quantity, od.UnitPrice, " +
+    "p.ProductName, c.ColorName, s.SizeName " +
+    "FROM OrderDetail od " +
+    "JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID " +
+    "JOIN Product p ON pv.ProductID = p.ProductID " +
+    "JOIN Color c ON pv.ColorID = c.ColorID " +
+    "JOIN Size s ON pv.SizeID = s.SizeID " +
+    "WHERE od.OrderID = ?";
+
+public List<OrderDetailDTO> getOrderDetails(int orderID) throws SQLException, ClassNotFoundException {
     List<OrderDetailDTO> list = new ArrayList<>();
-    Connection conn = null;
-    PreparedStatement ptm = null;
-    ResultSet rs = null;
-    try {
-        conn = DBUtils.getConnection();
-        if (conn != null) {
-            ptm = conn.prepareStatement(GET_ORDER_DETAILS);
-            ptm.setInt(1, orderID);
-            rs = ptm.executeQuery();
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ptm = conn.prepareStatement(GET_ORDER_DETAILS)) {
+         
+        ptm.setInt(1, orderID);
+        try (ResultSet rs = ptm.executeQuery()) {
             while (rs.next()) {
                 OrderDetailDTO od = new OrderDetailDTO();
-                od.setOrderID(orderID); // từ tham số method
-                od.setProductID(rs.getInt("ProductID"));
+                od.setOrderID(rs.getInt("OrderID"));
+                od.setAttributeID(rs.getInt("AttributeID"));
+                od.setQuantity(rs.getInt("Quantity"));
+                od.setUnitPrice(rs.getDouble("UnitPrice"));
                 od.setProductName(rs.getString("ProductName"));
                 od.setSizeName(rs.getString("SizeName"));
                 od.setColorName(rs.getString("ColorName"));
-                od.setQuantity(rs.getInt("Quantity"));
-                od.setUnitPrice(rs.getDouble("UnitPrice"));
                 list.add(od);
             }
         }
-    } catch (Exception e) {
-        e.printStackTrace();
-    } finally {
-        if (rs != null) rs.close();
-        if (ptm != null) ptm.close();
-        if (conn != null) conn.close();
     }
     return list;
 }
+
 
 
     public boolean createOrderDetail(OrderDetailDTO orderDetail) throws SQLException {

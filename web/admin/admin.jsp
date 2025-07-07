@@ -93,21 +93,21 @@
                 // Nếu page đã bắt đầu bằng '/' thì không thêm, nếu không thì thêm '/'
                 var url = page.startsWith('/') ? contextPath + page : contextPath + '/' + page;
                 fetch(url)
-                    .then(res => res.text())
-                    .then(html => {
-                        const mainContent = document.getElementById("main-content");
-                        let alertBox = "";
-                        if (msg) {
-                            alertBox = '<div class="alert alert-' + type + ' mt-2">' + msg + '</div>';
-                        }
-                        mainContent.innerHTML = alertBox + html;
+                        .then(res => res.text())
+                        .then(html => {
+                            const mainContent = document.getElementById("main-content");
+                            let alertBox = "";
+                            if (msg) {
+                                alertBox = '<div class="alert alert-' + type + ' mt-2">' + msg + '</div>';
+                            }
+                            mainContent.innerHTML = alertBox + html;
 
-                        setTimeout(() => {
-                            const alert = document.querySelector(".alert");
-                            if (alert)
-                                alert.remove();
-                        }, 3000);
-                    });
+                            setTimeout(() => {
+                                const alert = document.querySelector(".alert");
+                                if (alert)
+                                    alert.remove();
+                            }, 3000);
+                        });
             }
             window.addEventListener("DOMContentLoaded", () => {
                 const urlParams = new URLSearchParams(window.location.search);
@@ -147,9 +147,12 @@
                             <button class="nav-link text-start w-100" onclick="loadContent('ManageUpdateHistoryController')"><i class="bi bi-clock-history"></i> Update History</button>
                         </li>
                     </ul>
-                    <form action="LogoutController" method="post" class="mt-auto">
-                        <button class="logout-btn mt-3"><i class="bi bi-box-arrow-right"></i> Logout</button>
+                    <form action="${pageContext.request.contextPath}/LogoutController" method="post" class="mt-auto">
+                        <button class="logout-btn mt-3">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
                     </form>
+
                 </nav>
                 <main id="main-content" class="col py-4 main-content">
                     <h2>Welcome to Admin Dashboard</h2>
