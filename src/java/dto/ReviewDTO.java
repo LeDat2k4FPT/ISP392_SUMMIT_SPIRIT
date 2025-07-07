@@ -3,6 +3,7 @@ package dto;
 import java.util.Date;
 
 public class ReviewDTO {
+    private String userFullName;
     private int reviewID;
     private int rating;
     private String comment;
@@ -10,13 +11,14 @@ public class ReviewDTO {
     private int userID;
     private int productID;
 
-    public ReviewDTO(int reviewID, int rating, String comment, Date reviewDate, int userID, int productID) {
+    public ReviewDTO(int reviewID, int rating, String comment, Date reviewDate, int userID, int productID, String userFullName) {
         this.reviewID = reviewID;
         this.rating = rating;
         this.comment = comment;
         this.reviewDate = reviewDate;
         this.userID = userID;
         this.productID = productID;
+        this.userFullName = userFullName;
     }
 
     public int getReviewID() {
@@ -65,5 +67,13 @@ public class ReviewDTO {
 
     public void setProductID(int productID) {
         this.productID = productID;
+    }
+
+    public String getUserFullName() {
+        return userFullName;
+    }
+
+    public void setUserFullName(String userFullName) {
+        this.userFullName = userFullName;
     }
 }
