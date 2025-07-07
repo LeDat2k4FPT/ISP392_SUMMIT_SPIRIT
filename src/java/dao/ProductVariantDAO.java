@@ -22,19 +22,21 @@ import java.util.Map;
 public class ProductVariantDAO {
 
     public void insertVariant(ProductVariantDTO variant) throws SQLException, ClassNotFoundException {
+        System.out.println("[DEBUG] Insert variant: " + variant);
         String sql = "INSERT INTO ProductVariant (AttributeID, ProductID, ColorID, SizeID, Price, Quantity) VALUES (?, ?, ?, ?, ?, ?)";
         try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-
             int nextID = getNextAttributeID();
-
             ps.setInt(1, nextID);
             ps.setInt(2, variant.getProductID());
             ps.setInt(3, variant.getColorID());
             ps.setInt(4, variant.getSizeID());
             ps.setDouble(5, variant.getPrice());
             ps.setInt(6, variant.getQuantity());
-
             ps.executeUpdate();
+        } catch (Exception e) {
+            System.out.println("[ERROR] Insert variant: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
 
@@ -158,6 +160,7 @@ public class ProductVariantDAO {
     }
 
     public void updateVariant(ProductVariantDTO variant) throws SQLException, ClassNotFoundException {
+        System.out.println("[DEBUG] Update variant: " + variant);
         String sql = "UPDATE ProductVariant SET ColorID = ?, SizeID = ?, Price = ?, Quantity = ? WHERE AttributeID = ? AND ProductID = ?";
         try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, variant.getColorID());
@@ -168,9 +171,12 @@ public class ProductVariantDAO {
             ps.setInt(6, variant.getProductID());
             int affected = ps.executeUpdate();
             if (affected == 0) {
-                // Náº¿u khÃ´ng cÃ³ dÃ²ng nÃ o bá»‹ update, thÃ¬ insert má»›i
                 insertVariant(variant);
             }
+        } catch (Exception e) {
+            System.out.println("[ERROR] Update variant: " + e.getMessage());
+            e.printStackTrace();
+            throw e;
         }
     }
 

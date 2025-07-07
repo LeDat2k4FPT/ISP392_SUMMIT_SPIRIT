@@ -87,11 +87,11 @@
         </style>
         <script>
             function loadContent(page, msg, type = 'success') {
-                // Lấy context path từ URL
                 var pathArr = window.location.pathname.split('/');
                 var contextPath = pathArr.length > 1 ? '/' + pathArr[1] : '';
-                // Nếu page đã bắt đầu bằng '/' thì không thêm, nếu không thì thêm '/'
                 var url = page.startsWith('/') ? contextPath + page : contextPath + '/' + page;
+                // Thêm tham số ngẫu nhiên để tránh cache
+                url += (url.indexOf('?') === -1 ? '?' : '&') + 't=' + new Date().getTime();
                 fetch(url)
                     .then(res => res.text())
                     .then(html => {
@@ -101,7 +101,6 @@
                             alertBox = '<div class="alert alert-' + type + ' mt-2">' + msg + '</div>';
                         }
                         mainContent.innerHTML = alertBox + html;
-
                         setTimeout(() => {
                             const alert = document.querySelector(".alert");
                             if (alert)
@@ -110,6 +109,15 @@
                     });
             }
             window.addEventListener("DOMContentLoaded", () => {
+                const urlParams = new URLSearchParams(window.location.search);
+                const page = urlParams.get("page");
+                const msg = urlParams.get("msg");
+                const type = urlParams.get("type") || "success";
+                if (page) {
+                    loadContent(page, msg, type);
+                }
+            });
+            window.addEventListener("pageshow", function(event) {
                 const urlParams = new URLSearchParams(window.location.search);
                 const page = urlParams.get("page");
                 const msg = urlParams.get("msg");

@@ -51,15 +51,27 @@ public class UpdateProductController extends HttpServlet {
             int variantCount = Integer.parseInt(request.getParameter("variantCount"));
             java.util.Set<Integer> variantIdsOnForm = new java.util.HashSet<>();
             for (int i = 0; i < variantCount; i++) {
-                int attributeID = Integer.parseInt(request.getParameter("variantId_" + i));
+                String attrIdStr = request.getParameter("variantId_" + i);
                 String sizeName = request.getParameter("size_" + i);
                 String colorName = request.getParameter("color_" + i);
-                int qty = Integer.parseInt(request.getParameter("quantity_" + i));
-                double prc = Double.parseDouble(request.getParameter("price_" + i));
+                String qtyStr = request.getParameter("quantity_" + i);
+                String prcStr = request.getParameter("price_" + i);
+                if (attrIdStr == null || sizeName == null || colorName == null || qtyStr == null || prcStr == null) {
+                    log("[WARN] Bỏ qua variant dòng " + i + " vì thiếu dữ liệu!");
+                    continue;
+                }
+                int attributeID = Integer.parseInt(attrIdStr);
+                int qty = Integer.parseInt(qtyStr);
+                double prc = Double.parseDouble(prcStr);
                 int sizeID = new dao.SizeDAO().getOrInsertSize(sizeName);
                 int colorID = new dao.ColorDAO().getOrInsertColor(colorName);
                 ProductVariantDTO variant = new ProductVariantDTO(attributeID, productID, colorID, sizeID, prc, qty);
-                variantDAO.updateVariant(variant);
+                try {
+                    log("[DEBUG] Insert/Update variant: " + variant);
+                    variantDAO.updateVariant(variant);
+                } catch (Exception ex) {
+                    log("[ERROR] Error insert/update variant: " + ex.getMessage(), ex);
+                }
                 if (attributeID > 0) variantIdsOnForm.add(attributeID);
             }
             // Xóa các variant không còn trên form
@@ -97,7 +109,7 @@ public class UpdateProductController extends HttpServlet {
                 request.setAttribute("error", "Cập nhật sản phẩm thất bại!");
             }
         } catch (Exception e) {
-            log("Error at UpdateProductController: " + e.getMessage());
+            log("[ERROR] Error at UpdateProductController: " + e.getMessage(), e);
             request.setAttribute("error", "Lỗi: " + e.getMessage());
         } finally {
             request.getRequestDispatcher(url).forward(request, response);
