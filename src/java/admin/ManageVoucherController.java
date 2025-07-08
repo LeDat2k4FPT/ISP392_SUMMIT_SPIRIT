@@ -15,7 +15,7 @@ public class ManageVoucherController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         try {
             VoucherDAO dao = new VoucherDAO();
-            List<VoucherDTO> vouchers = dao.getAllVouchers();
+            List<VoucherDTO> vouchers = dao.getActiveVouchers();
             request.setAttribute("vouchers", vouchers);
             request.getRequestDispatcher("admin/manageVoucher.jsp").forward(request, response);
         } catch (SQLException | ClassNotFoundException e) {
@@ -29,7 +29,7 @@ public class ManageVoucherController extends HttpServlet {
         try {
             if ("add".equals(action)) {
                 VoucherDTO v = new VoucherDTO(
-                    Integer.parseInt(request.getParameter("voucherID")),
+                    0,
                     request.getParameter("voucherCode"),
                     Double.parseDouble(request.getParameter("discountValue")),
                     java.sql.Date.valueOf(request.getParameter("expiryDate")),
@@ -37,17 +37,14 @@ public class ManageVoucherController extends HttpServlet {
                 );
                 dao.addVoucher(v);
             } else if ("update".equals(action)) {
-                VoucherDTO v = new VoucherDTO(
-                    Integer.parseInt(request.getParameter("voucherID")),
-                    request.getParameter("voucherCode"),
-                    Double.parseDouble(request.getParameter("discountValue")),
-                    java.sql.Date.valueOf(request.getParameter("expiryDate")),
-                    request.getParameter("status")
-                );
-                dao.updateVoucher(v);
+                int voucherID = Integer.parseInt(request.getParameter("voucherID"));
+                String status = request.getParameter("status");
+                dao.updateVoucherStatus(voucherID, status);
             } else if ("delete".equals(action)) {
-                int id = Integer.parseInt(request.getParameter("voucherID"));
-                dao.deleteVoucher(id);
+                int voucherID = Integer.parseInt(request.getParameter("voucherID"));
+                dao.updateVoucherStatus(voucherID, "Inactive");
+                response.sendRedirect("ManageVoucherController?msg=Voucher+deleted+successfully&type=success");
+                return;
             }
             response.sendRedirect("ManageVoucherController");
         } catch (SQLException | ClassNotFoundException e) {
