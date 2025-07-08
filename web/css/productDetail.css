@@ -216,11 +216,14 @@ body {
 .checkout-btn {
     padding: 12px 24px;
     color: white;
-    background: #28a745;
+    background: #1e5b3e;
     border: none;
     border-radius: 5px;
     cursor: pointer;
     font-size: 16px;
+}
+.checkout-btn:hover {
+    background-color: #28a745;
 }
 .section-box {
     background: white;

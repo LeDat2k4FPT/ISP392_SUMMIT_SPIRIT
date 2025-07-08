@@ -15,6 +15,7 @@
     }
     String discountCode = (String) session.getAttribute("DISCOUNT_CODE");
     String discountError = (String) session.getAttribute("DISCOUNT_ERROR");
+    int cartItemCount = (cart != null) ? cart.getCartItems().size() : 0;
 %>
 <!DOCTYPE html>
 <html>
@@ -22,49 +23,31 @@
     <title>Cart</title>
     <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
     <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-    <style>
-        body { font-family: 'Kumbh Sans', sans-serif; margin: 0; background-color: #f9f9f9; }
-        .header { background-color: #004080; padding: 15px 30px; display: flex; justify-content: space-between; align-items: center; color: white; }
-        .header .logo { font-size: 24px; font-weight: bold; color: white; text-decoration: none; }
-        .nav-links a { color: white; margin: 0 10px; text-decoration: none; font-size: 16px; }
-        .user-dropdown { position: relative; display: inline-block; }
-        .user-name { cursor: pointer; font-weight: bold; }
-        .dropdown-menu { display: none; position: absolute; background-color: white; box-shadow: 0px 8px 16px rgba(0,0,0,0.2); z-index: 1; right: 0; }
-        .dropdown-menu a { display: block; padding: 10px; text-decoration: none; color: #333; }
-        .dropdown-menu a:hover { background-color: #eee; }
-        .main-wrapper { display: flex; justify-content: space-between; padding: 40px; gap: 20px; }
-        .cart-section { flex: 3; }
-        .summary-section { flex: 1; background: #fff; padding: 30px; border-radius: 10px; box-shadow: 0 0 10px rgba(0,0,0,0.1); height: fit-content; }
-        .cart-item { display: flex; gap: 20px; align-items: center; border-bottom: 1px solid #ddd; padding: 20px 0; background-color: #fff; border-radius: 10px; margin-bottom: 20px; }
-        .cart-item img { width: 100px; }
-        .cart-info { flex: 1; }
-        .cart-info h3 { margin: 0; font-size: 18px; }
-        .price { font-weight: bold; min-width: 120px; text-align: right; }
-        .quantity-box { display: flex; align-items: center; gap: 8px; margin-top: 10px; }
-        .quantity-box button { width: 30px; height: 30px; font-size: 16px; border: none; border-radius: 6px; background-color: #f0f0f0; cursor: pointer; }
-        .quantity-box input { width: 40px; text-align: center; border: 1px solid #ccc; }
-        .delete-link { font-size: 18px; color: #888; text-decoration: none; margin-left: 10px; }
-        .summary-line { display: flex; justify-content: space-between; margin-bottom: 12px; font-size: 16px; }
-        .total-line { font-weight: bold; font-size: 18px; color: #222; border-top: 1px solid #ccc; padding-top: 10px; }
-        .btn-continue { width: 100%; padding: 15px; background-color: #849e98; color: white; border: none; font-size: 16px; border-radius: 5px; cursor: pointer; margin-top: 20px; }
-        .empty-cart { text-align: center; font-size: 20px; padding: 80px 0; }
-    </style>
+    <link rel="stylesheet" type="text/css" href="css/cart.css">
 </head>
 <body>
 <div class="header">
-    <a href="homepage.jsp" class="logo"> Summit Spirit</a>
-    <div class="nav-links">
-        <a href="homepage.jsp">Home</a>
-        <a href="cart.jsp">Cart</a>
-        <div class="user-dropdown">
-            <div class="user-name" onclick="toggleMenu()"><%= loginUser.getFullName() %></div>
-            <div id="dropdown" class="dropdown-menu">
-                <a href="profile.jsp">User Profile</a>
-                <a href="MainController?action=Logout">Logout</a>
+            <a href="homepage.jsp">
+                <img src="image/summit_logo.png" alt="Logo">
+            </a>
+            <div class="nav-links">
+                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="cart.jsp" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <% if (cartItemCount > 0) { %>
+                    <span class="cart-badge"><%= cartItemCount %></span>
+                    <% } %>
+                </a>
+                <div class="user-dropdown">
+                    <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i>
+                        <div id="dropdown" class="dropdown-menu">
+                            <a href="profile.jsp"><%= loginUser.getFullName() %></a>
+                            <a href="MainController?action=Logout">Logout</a>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
-    </div>
-</div>
 
 <script>
     function toggleMenu() {

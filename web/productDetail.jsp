@@ -187,7 +187,7 @@ avgRating = reviewDAO.averageRatingByProduct(productID);
 
                         <div class="add-to-cart">
                             <% if (availableStock > 0) { %>
-                            <button type="submit" name="action" value="AddToCart">Add to Cart</button>
+                            <button type="submit" class="checkout-btn" name="action" value="AddToCart">Add to Cart</button>
                             <button type="button" class="checkout-btn" onclick="submitBuyNow()">Buy Now</button>
                             <% } else { %>
                             <button type="button" style="background-color: #ccc; color: #888; cursor: not-allowed;" disabled>Sold Out</button>
