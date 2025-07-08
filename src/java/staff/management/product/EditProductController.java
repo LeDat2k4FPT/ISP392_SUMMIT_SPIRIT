@@ -21,7 +21,9 @@ public class EditProductController extends HttpServlet {
         try {
             int productID = Integer.parseInt(request.getParameter("productID"));
             ProductDAO dao = new ProductDAO();
-            ProductDTO product = dao.getFullProductByID(productID);
+            
+            // ✅ Sửa tại đây để không lọc Status
+            ProductDTO product = dao.getProductByID(productID);
 
             if (product != null) {
                 request.setAttribute("PRODUCT", product);
