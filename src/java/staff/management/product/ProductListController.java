@@ -24,7 +24,7 @@ import java.util.Map;
  *
  * @author Admin
  */
-@WebServlet(name = "NewServlet", urlPatterns = {"/NewServlet"})
+@WebServlet(name = "ProductListController", urlPatterns = {"/ProductListController"})
 public class ProductListController extends HttpServlet {
 
     /**
@@ -43,13 +43,19 @@ public class ProductListController extends HttpServlet {
             ProductDAO productDAO = new ProductDAO();
             ProductVariantDAO variantDAO = new ProductVariantDAO();
 
-            List<ProductDTO> productList = productDAO.getAllProducts();
+            String keyword = request.getParameter("keyword");
+            List<ProductDTO> productList;
+            if (keyword != null && !keyword.trim().isEmpty()) {
+                productList = productDAO.getProductsByName(keyword.trim());
+            } else {
+                productList = productDAO.getAllProducts();
+            }
             Map<Integer, List<ProductVariantDTO>> variantMap = variantDAO.getAllVariantsGroupedByProduct();
 
             request.setAttribute("productList", productList);
             request.setAttribute("variantMap", variantMap);
 
-            request.getRequestDispatcher("/staff/productList.jsp").forward(request, response);
+            request.getRequestDispatcher("/staff/productlist.jsp").forward(request, response);
         } catch (SQLException | ClassNotFoundException e) {
             throw new ServletException(e);
         }

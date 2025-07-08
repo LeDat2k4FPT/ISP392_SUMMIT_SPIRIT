@@ -23,7 +23,7 @@
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="../css/staff.css">
+        <link rel="stylesheet" href="../css/admin.css">
         <style>
             .sidebar-custom {
                 background: #fff;
@@ -87,7 +87,12 @@
         </style>
         <script>
             function loadContent(page, msg, type = 'success') {
-                fetch(page)
+                var pathArr = window.location.pathname.split('/');
+                var contextPath = pathArr.length > 1 ? '/' + pathArr[1] : '';
+                var url = page.startsWith('/') ? contextPath + page : contextPath + '/' + page;
+                // Thêm tham số ngẫu nhiên để tránh cache
+                url += (url.indexOf('?') === -1 ? '?' : '&') + 't=' + new Date().getTime();
+                fetch(url)
                         .then(res => res.text())
                         .then(html => {
                             const mainContent = document.getElementById("main-content");
@@ -113,12 +118,20 @@
                     loadContent(page, msg, type);
                 }
             });
+            window.addEventListener("pageshow", function(event) {
+                const urlParams = new URLSearchParams(window.location.search);
+                const page = urlParams.get("page");
+                const msg = urlParams.get("msg");
+                const type = urlParams.get("type") || "success";
+                if (page) {
+                    loadContent(page, msg, type);
+                }
+            });
         </script>
     </head>
     <body style="background-color: #f0f0f0;">
         <div class="top-bar-custom d-flex justify-content-between align-items-center">
             <span>Hello, <%= loginUser.getFullName() %></span>
-            <button class="btn btn-light btn-sm" onclick="if(confirm('Are you sure you want to logout?')){window.location.href='MainController?action=Logout';}"><i class="bi bi-box-arrow-right"></i> Logout</button>
         </div>
         <div class="container-fluid">
             <div class="row flex-nowrap">
@@ -131,12 +144,24 @@
                             <button class="nav-link text-start w-100" onclick="loadContent('viewRevenue.jsp')"><i class="bi bi-bar-chart"></i> View Revenue</button>
                         </li>
                         <li>
-                            <button class="nav-link text-start w-100" onclick="loadContent('MainController?action=ManageUser')"><i class="bi bi-people"></i> Manage User Account</button>
+                            <button class="nav-link text-start w-100" onclick="loadContent('MainController?action=ManageUserAccount')"><i class="bi bi-people"></i> Manage User Account</button>
+                        </li>
+                        <li>
+                            <button class="nav-link text-start w-100" onclick="loadContent('ManageVoucherController')"><i class="bi bi-ticket"></i> Manage Vouchers</button>
+                        </li>
+                        <li>
+                            <button class="nav-link text-start w-100" onclick="loadContent('ManagePotentialCustomerController')"><i class="bi bi-star"></i> Potential Customers</button>
+                        </li>
+                        <li>
+                            <button class="nav-link text-start w-100" onclick="loadContent('ManageUpdateHistoryController')"><i class="bi bi-clock-history"></i> Update History</button>
                         </li>
                     </ul>
-                    <form action="LogoutController" method="post" class="mt-auto">
-                        <button class="logout-btn mt-3"><i class="bi bi-box-arrow-right"></i> Logout</button>
+                    <form action="${pageContext.request.contextPath}/LogoutController" method="post" class="mt-auto">
+                        <button class="logout-btn mt-3">
+                            <i class="bi bi-box-arrow-right"></i> Logout
+                        </button>
                     </form>
+
                 </nav>
                 <main id="main-content" class="col py-4 main-content">
                     <h2>Welcome to Admin Dashboard</h2>

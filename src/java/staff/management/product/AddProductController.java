@@ -4,15 +4,18 @@ import dao.*;
 import dto.*;
 
 import jakarta.servlet.ServletException;
+import jakarta.servlet.annotation.MultipartConfig;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.Part;
 
 import java.io.IOException;
 import java.net.URLEncoder;
 
 @WebServlet(name = "AddProductController", urlPatterns = {"/AddProductController"})
+@MultipartConfig(maxFileSize = 1024 * 1024 * 5) // 5MB
 public class AddProductController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
@@ -30,12 +33,31 @@ public class AddProductController extends HttpServlet {
         String quantity_raw = request.getParameter("stock");
 
         String imageURL = request.getParameter("imageURL"); // ảnh sản phẩm
-        if (imageURL == null || imageURL.trim().isEmpty()) {
-            imageURL = "default.jpg";
-        }
+        Part imageFile = null;
+        try { imageFile = request.getPart("imageFile"); } catch(Exception ex) { imageFile = null; }
 
         try {
-            int cateID = Integer.parseInt(pCateID_raw);
+            int cateID = -1;
+            if ("other".equals(pCateID_raw)) {
+                String otherCate = request.getParameter("otherCategory");
+                CategoryDAO categoryDAO = new CategoryDAO();
+                java.util.List<CategoryDTO> allCate = categoryDAO.getAllCategories();
+                boolean exists = false;
+                for (CategoryDTO c : allCate) {
+                    if (c.getCateName().equalsIgnoreCase(otherCate)) {
+                        cateID = c.getCateID();
+                        exists = true;
+                        break;
+                    }
+                }
+                if (!exists) {
+                    cateID = allCate.stream().mapToInt(CategoryDTO::getCateID).max().orElse(0) + 1;
+                    categoryDAO.createCategory(new CategoryDTO(cateID, otherCate));
+                }
+            } else {
+                cateID = Integer.parseInt(pCateID_raw);
+            }
+            if (cateID == -1) throw new Exception("Invalid category");
             double price = Double.parseDouble(price_raw.replace(",", ""));
             int quantity = Integer.parseInt(quantity_raw);
 
@@ -59,7 +81,14 @@ public class AddProductController extends HttpServlet {
                 variantDAO.insertVariant(variant);
 
                 // 5. Insert product image
-                ProductImageDTO imageDTO = new ProductImageDTO(imageURL, productID);
+                String imgToSave = imageURL;
+                if (imageFile != null && imageFile.getSize() > 0) {
+                    String fileName = java.nio.file.Paths.get(imageFile.getSubmittedFileName()).getFileName().toString();
+                    String path = getServletContext().getRealPath("/images/" + fileName);
+                    imageFile.write(path);
+                    imgToSave = fileName;
+                }
+                ProductImageDTO imageDTO = new ProductImageDTO(imgToSave, productID);
                 ProductImageDAO imageDAO = new ProductImageDAO();
                 imageDAO.insertImage(imageDTO);
             }

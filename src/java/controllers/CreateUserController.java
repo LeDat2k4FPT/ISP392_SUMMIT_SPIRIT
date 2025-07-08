@@ -9,7 +9,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
+import java.util.Random;
 import user.UserError;
+import utils.EmailUtils;
 
 /**
  *
@@ -19,11 +21,10 @@ import user.UserError;
 public class CreateUserController extends HttpServlet {
 
     private static final String ERROR = "createUser.jsp";
-    private static final String SUCCESS = "homepage.jsp";
-    private static final String UNKNOW_MESSAGE = "Unknow error!";
+    private static final String SUCCESS = "verifyAccount.jsp";
     private static final String NOT_MATCH = "Please make sure the password and confirm password match!";
     private static final String DUPLICATE_MESSAGE = "Email already exists!";
-    private static final String DUPLCATE_PHONE_NUMBER = "Phone number already exists!";
+    private static final String DUPLICATE_PHONE_NUMBER = "Phone number already exists!";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -34,7 +35,6 @@ public class CreateUserController extends HttpServlet {
         String phone = "";
         String password = "";
         String confirm = "";
-        UserError userError = new UserError();
         boolean checkValidation = true;
         try {
             fullName = request.getParameter("fullName");
@@ -43,6 +43,7 @@ public class CreateUserController extends HttpServlet {
             phone = request.getParameter("phone");
             password = request.getParameter("password");
             confirm = request.getParameter("confirm");
+            UserError userError = new UserError();
             UserDAO dao = new UserDAO();
             boolean emailExists = dao.checkEmailExists(email);
             if (emailExists) {
@@ -67,20 +68,23 @@ public class CreateUserController extends HttpServlet {
             }
             boolean phoneExists = dao.checkPhoneExists(phone);
             if (phoneExists) {
-                userError.setPhone(DUPLCATE_PHONE_NUMBER);
+                userError.setPhone(DUPLICATE_PHONE_NUMBER);
                 checkValidation = false;
             }
+            String otp = String.valueOf(new Random().nextInt(900000) + 100000);
             if (checkValidation) {
-                UserDTO tempUser = new UserDTO(0, fullName, address, password, phone, email, "User");
-                boolean checkCreate = dao.create(tempUser);
-                if (checkCreate) {
-                    UserDTO user = dao.checkLogin(email, password);
-                    HttpSession session = request.getSession();
-                    session.setAttribute("LOGIN_USER", user);
-                    url = SUCCESS;
-                } else {
-                    userError.setErrorMessage(UNKNOW_MESSAGE);
-                }
+                HttpSession session = request.getSession();
+                UserDTO user = new UserDTO(0, fullName, address, password, phone, email, "User");
+                session.setAttribute("PENDING_USER", user);
+                session.setAttribute("OTP", otp);
+                session.setAttribute("email", email);
+                String htmlBody = "<p>Hello <strong>" + fullName + "</strong>,</p>"
+                        + "<p>You just registered the account on <strong>SUMMIT SPIRIT</strong> by this email.To complete the registration, please enter the following verification code:</p>"
+                        + "<p><strong>Verification Code: <span style='font-size: 20px; color: #007bff;'>" + otp + "</span></strong></p>"
+                        + "<p>If you did not initiate this action, please ignore this email.</p>"
+                        + "<p>Best regards,<br><em>SUMMIT SPIRIT</em></p>";
+                EmailUtils.sendEmail(email, "Verify Account", htmlBody);
+                url = SUCCESS;
             } else {
                 request.setAttribute("USER_ERROR", userError);
                 url = ERROR;

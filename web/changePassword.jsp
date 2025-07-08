@@ -40,7 +40,7 @@
                 <label class="form-label">Confirm New Password</label>
                 <input type="password" name="confirmNewPassword" class="form-control" required />
 
-                <button type="submit" class="btn-submit">Update Password</button>
+                <button type="submit" name="action" value="ChangePassword" class="btn-submit">Update Password</button>
             </form>
             <div class="text-center mt-3">
                 <a href="profile.jsp" class="back-link">Back to profile</a>

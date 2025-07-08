@@ -1,8 +1,8 @@
-/*
+ /*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-package controllers;
+package admin;
 
 import dao.UserDAO;
 import dto.UserDTO;
@@ -11,7 +11,6 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.*;
 
 import java.io.IOException;
-import java.io.PrintWriter;
 /**
  *
  * @author Hanne
@@ -20,7 +19,7 @@ import java.io.PrintWriter;
 public class AdminCreateUserController extends HttpServlet {
 
     private static final String ERROR = "admin/createUserAccount.jsp";
-    private static final String SUCCESS = "manageUser";
+    private static final String SUCCESS = "ManageUserAccountController";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -65,7 +64,7 @@ public class AdminCreateUserController extends HttpServlet {
                 UserDTO user = new UserDTO(0, fullName, address, password, phone, email, role);
                 boolean success = dao.create(user);
                 if (success) {
-                    response.sendRedirect(SUCCESS);
+                    response.sendRedirect(request.getContextPath() + "/admin/admin.jsp?page=ManageUserAccountController");
                     return;
                 } else {
                     message = "❌ Failed to create user. Please try again.";

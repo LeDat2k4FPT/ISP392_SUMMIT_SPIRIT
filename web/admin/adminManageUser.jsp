@@ -14,7 +14,7 @@
 
 <div class="container-fluid px-0">
     <h2 class="mb-4" style="color:#234C45;font-weight:600;">Manage User Accounts</h2>
-    <form method="get" action="manageUser" class="row g-2 align-items-center mb-3">
+    <form method="get" action="${pageContext.request.contextPath}/ManageUserAccountController" class="row g-2 align-items-center mb-3">
         <div class="col-md-4">
             <input type="text" class="form-control" name="keyword" value="<%= keyword %>" placeholder="Search by name, email, address, or role...">
         </div>
@@ -25,6 +25,7 @@
             <button type="button" class="btn btn-outline-success" style="color:#234C45;border-color:#234C45;" onclick="loadContent('admin/createUserAccount.jsp')">Create New Account</button>
         </div>
     </form>
+
     <div class="table-responsive">
         <table class="table table-bordered table-hover align-middle bg-white">
             <thead class="table-light">
@@ -38,7 +39,7 @@
                 </tr>
             </thead>
             <tbody>
-            <% if (users != null) { 
+                <% if (users != null) { 
                for (UserDTO u : users) { %>
                 <tr>
                     <td><%= u.getUserID() %></td>
@@ -47,11 +48,12 @@
                     <td><%= u.getAddress() %></td>
                     <td><%= u.getRole() %></td>
                     <td>
-                        <form action="ManageUserActionController" method="post" style="display:inline;" onsubmit="return confirm('Are you sure to change role?');">
+                        <form action="${pageContext.request.contextPath}/ManageUserActionController" method="post" style="display:inline;" onsubmit="return confirm('Are you sure to change role?');">
                             <input type="hidden" name="userID" value="<%= u.getUserID() %>">
                             <input type="hidden" name="action" value="editRole">
                             <button type="submit" class="btn btn-sm btn-outline-primary">Change Role</button>
                         </form>
+
                         <form action="ManageUserActionController" method="post" style="display:inline;" onsubmit="return confirm('Are you sure you want to permanently delete user <%= u.getFullName() %>?');">
                             <input type="hidden" name="userID" value="<%= u.getUserID() %>">
                             <input type="hidden" name="action" value="delete">
@@ -59,10 +61,10 @@
                         </form>
                     </td>
                 </tr>
-            <%     } 
+                <%     } 
                } else { %>
                 <tr><td colspan="6" class="text-center text-muted">No users found or error loading users.</td></tr>
-            <% } %>
+                <% } %>
             </tbody>
         </table>
     </div>

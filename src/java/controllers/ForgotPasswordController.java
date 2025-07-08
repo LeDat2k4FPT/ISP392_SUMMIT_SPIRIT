@@ -37,7 +37,12 @@ public class ForgotPasswordController extends HttpServlet {
                     session.setAttribute("OTP", otp);
                     session.setAttribute("email", email);
                     //Gửi OTP qua email
-                    EmailUtils.sendOtpEmail(email, otp);
+                    String htmlBody = "<p>Hello <strong>" + user.getFullName() + "</strong>,</p>"
+                            + "<p>We have received a request to reset the password for your account on <strong>SUMMIT SPIRIT</strong>.</p>"
+                            + "<p><strong>Your OTP code: <span style='font-size: 20px; color: #007bff;'>" + otp + "</span></strong></p>"
+                            + "<p>If you did not request a password reset, please ignore this email.</p>"
+                            + "<p>Best regards,<br><em>SUMMIT SPIRIT</em></p>";
+                    EmailUtils.sendEmail(email, "Password Reset Request", htmlBody);
                     url = SUCCESS;
                 } else {
                     request.setAttribute("MESSAGE", "Email doesn't exist!");

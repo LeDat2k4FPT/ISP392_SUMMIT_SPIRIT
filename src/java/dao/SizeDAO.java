@@ -9,6 +9,8 @@ import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
 import java.sql.Statement;
+import java.util.ArrayList;
+import java.util.List;
 import utils.DBUtils;
 
 /**
@@ -43,5 +45,32 @@ public class SizeDAO {
         }
 
         return -1;
+    }
+
+    public String getSizeNameById(int sizeID) throws SQLException, ClassNotFoundException {
+        String sql = "SELECT SizeName FROM Size WHERE SizeID = ?";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, sizeID);
+            try (ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getString("SizeName");
+                }
+            }
+        }
+        return null;
+    }
+
+    public List<String> getAllSizes() throws SQLException, ClassNotFoundException {
+        List<String> sizes = new ArrayList<>();
+        String sql = "SELECT SizeName FROM Size";
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                sizes.add(rs.getString("SizeName"));
+            }
+        }
+        return sizes;
     }
 }

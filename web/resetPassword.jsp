@@ -48,6 +48,9 @@
                 <label>Confirm New Password:</label>
                 <input type="password" name="confirmNewPassword" required />
                 <input type="submit" value="Update Password" />
+                <div class="text-center mt-3">
+                    <a href="profile.jsp" class="back-link">Back to User Information Page</a>
+                </div>
             </form>
         </div>
     </body>

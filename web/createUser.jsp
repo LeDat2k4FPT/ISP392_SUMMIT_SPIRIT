@@ -19,7 +19,6 @@
         <div class="container register-box">
             <h2>Welcome to Summit Spirit</h2>
             <h5>Register your account</h5>
-
             <%
                 String message = (String) request.getAttribute("MESSAGE");
                 if (message != null && !message.isEmpty()) {
@@ -32,7 +31,13 @@
                     userError = new UserError();
                 }
             %>
-
+            <%
+                if (userError.getErrorMessage() != null && !userError.getErrorMessage().isEmpty()) {
+            %>
+            <p class="text-danger text-center"><%= userError.getErrorMessage() %></p>
+            <%
+                }
+            %>
             <form id="create-form" action="MainController" method="POST">
                 <div class="row g-3">
                     <div class="col-md-6">
