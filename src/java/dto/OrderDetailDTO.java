@@ -10,6 +10,7 @@ public class OrderDetailDTO {
     private int quantity;
     private int AttributeID;
     private double unitPrice;
+    private boolean fromSaleOff;
 
     public OrderDetailDTO() {
     }
@@ -24,8 +25,6 @@ public class OrderDetailDTO {
         this.AttributeID = AttributeID;
         this.unitPrice = unitPrice;
     }
-
-
 
     public int getOrderID() {
         return orderID;
@@ -91,5 +90,11 @@ public class OrderDetailDTO {
         this.unitPrice = unitPrice;
     }
 
-   
+    public boolean isFromSaleOff() {
+        return fromSaleOff;
+    }
+
+    public void setFromSaleOff(boolean fromSaleOff) {
+        this.fromSaleOff = fromSaleOff;
+    }
 }

@@ -9,6 +9,7 @@ package dto;
  * @author Admin
  */
 public class ProductAttributeDTO {
+
     private int attributeID;
     private int productID;
     private String color;
@@ -18,7 +19,6 @@ public class ProductAttributeDTO {
     public ProductAttributeDTO() {
     }
 
-    
     public ProductAttributeDTO(int productID, String color, String size, int stock) {
         this.productID = productID;
         this.color = color;
@@ -65,6 +65,5 @@ public class ProductAttributeDTO {
     public void setStock(int stock) {
         this.stock = stock;
     }
-
 
 }

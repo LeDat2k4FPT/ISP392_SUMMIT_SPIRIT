@@ -6,6 +6,7 @@ import java.util.Map;
 import java.util.Collection;
 
 public class CartDTO implements Serializable {
+
     private int userID; // Liên kết giỏ hàng với người dùng
     private Map<String, CartItemDTO> cartItems; // ✅ Key: productID_size_color
 

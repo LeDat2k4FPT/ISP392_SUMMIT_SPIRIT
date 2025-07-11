@@ -3,8 +3,6 @@
 <%@ page import="dao.ProductVariantDAO, dao.ReviewDAO" %>
 <%@ page import="dto.ReviewDTO" %>
 <%@ page import="java.util.List" %>
-<%@ page import="dao.OrderDAO" %>
-
 <%
     int productID = Integer.parseInt(request.getParameter("id"));
     boolean fromSaleOff = "true".equals(request.getParameter("fromSaleOff")); // ✅ Check if from sale page
@@ -13,12 +11,6 @@
     String categoryParam = "";
 
     UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
-    boolean canReview = false;
-if (loginUser != null) {
-    OrderDAO orderDAO = new OrderDAO();
-    canReview = orderDAO.hasUserPurchasedProduct(loginUser.getUserID(), productID);
-}
-
     CartDTO cart = (CartDTO) session.getAttribute("CART");
     int totalQuantity = (cart != null) ? cart.getTotalQuantity() : 0;
     int cartItemCount = (cart != null) ? cart.getCartItems().size() : 0;
@@ -30,9 +22,6 @@ if (loginUser != null) {
     List<String> sizeList = new java.util.ArrayList<>();
     List<String> colorList = new java.util.ArrayList<>();
     List<ReviewDTO> reviews = new java.util.ArrayList<>();
-    int totalReviews = 0;
-double avgRating = 0;
-
 
     try {
         ProductDAO dao = new ProductDAO();
@@ -56,9 +45,6 @@ double avgRating = 0;
 
             ReviewDAO reviewDAO = new ReviewDAO();
             reviews = reviewDAO.getReviewsByProductID(productID);
-            totalReviews = reviewDAO.countReviewsByProduct(productID);
-avgRating = reviewDAO.averageRatingByProduct(productID);
-
         }
     } catch (Exception e) {
         e.printStackTrace();
@@ -204,45 +190,12 @@ avgRating = reviewDAO.averageRatingByProduct(productID);
             </div>
             <div class="thin-divider"></div>
             <div class="section-box">
-                <h3>
-    Customer Reviews
-    <% if (totalReviews > 0) { %>
-    <span style="font-size: 16px; font-weight: normal;">
-        ⭐ <%= String.format("%.1f", avgRating) %> / 5 (<%= totalReviews %> reviews)
-    </span>
-    <% } %>
-</h3>
-
-                <% if (canReview) { %>
-    <form action="SubmitReview" method="post" style="margin-bottom: 20px;">
-        <input type="hidden" name="productId" value="<%= productID %>" />
-        <label><strong>Rating:</strong></label>
-        <select name="rating">
-            <% for (int i = 1; i <= 5; i++) { %>
-                <option value="<%= i %>"><%= i %> ⭐</option>
-            <% } %>
-        </select><br/><br/>
-        <label><strong>Comment:</strong></label><br/>
-        <textarea name="comment" rows="4" cols="60" placeholder="Write your experience here..." required></textarea><br/><br/>
-        <input type="submit" value="Submit Review" style="padding: 8px 16px; background-color: #28a745; color: white; border: none;">
-    </form>
-<% } else if (loginUser != null) { %>
-    <p style="color: gray;"><i>Only customers who have purchased this product can write a review.</i></p>
-<% } else { %>
-    <p><a href="login.jsp">Login</a> to write a review.</p>
-<% } %>
-
+                <h3>Customer Reviews</h3>
                 <% if (reviews != null && !reviews.isEmpty()) {
             for (ReviewDTO review : reviews) { %>
                 <div style="margin-bottom: 15px; padding: 10px; border-bottom: 1px solid #ccc;">
-                    <strong>Rating:</strong>
-<% for (int i = 1; i <= 5; i++) { %>
-    <i class="fa<%= i <= review.getRating() ? 's' : 'r' %> fa-star" style="color: gold;"></i>
-<% } %>
-<br>
-
+                    <strong>Rating:</strong> <%= review.getRating() %> / 5<br>
                     <strong>Comment:</strong> <%= review.getComment() %><br>
-                    <strong>User:</strong> <%= review.getUserFullName() %><br>
                     <small><%= review.getReviewDate() %></small>
                 </div>
                 <% } } else { %>

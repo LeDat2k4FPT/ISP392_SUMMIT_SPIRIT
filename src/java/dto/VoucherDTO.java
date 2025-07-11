@@ -1,11 +1,15 @@
 package dto;
 
 public class VoucherDTO {
+
     private int voucherID;
     private String voucherCode;
     private double discountValue;
     private java.sql.Date expiryDate;
     private String status;
+
+    public VoucherDTO() {
+    }
 
     public VoucherDTO(int voucherID, String voucherCode, double discountValue, java.sql.Date expiryDate, String status) {
         this.voucherID = voucherID;

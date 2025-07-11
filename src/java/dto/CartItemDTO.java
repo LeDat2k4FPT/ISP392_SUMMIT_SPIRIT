@@ -1,6 +1,7 @@
 package dto;
 
 public class CartItemDTO {
+
     private ProductDTO product;
     private int quantity;
     private String color; // ✅ Thêm thuộc tính color

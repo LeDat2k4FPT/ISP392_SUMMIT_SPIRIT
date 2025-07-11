@@ -39,7 +39,7 @@ public class OrderDetailController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet OrderDetailController</title>");            
+            out.println("<title>Servlet OrderDetailController</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet OrderDetailController at " + request.getContextPath() + "</h1>");
@@ -58,7 +58,7 @@ public class OrderDetailController extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-   protected void doGet(HttpServletRequest request, HttpServletResponse response)
+    protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
             int orderID = Integer.parseInt(request.getParameter("orderID"));

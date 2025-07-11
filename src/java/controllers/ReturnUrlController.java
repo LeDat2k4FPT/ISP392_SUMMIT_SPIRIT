@@ -1,5 +1,6 @@
 package controllers;
 
+import com.vnpay.common.Config;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -39,7 +40,7 @@ public class ReturnUrlController extends HttpServlet {
         fields.remove("vnp_SecureHash");
 
         // Tạo lại chữ ký
-        String signValue = vnpay.Config.hashAllFields(fields);
+        String signValue = Config.hashAllFields(fields);
 
         if (signValue.equals(vnp_SecureHash)) {
             // Xác thực hợp lệ

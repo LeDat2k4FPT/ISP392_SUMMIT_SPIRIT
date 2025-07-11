@@ -1,6 +1,7 @@
 package dto;
 
 public class CategoryDTO {
+
     private int cateID;
     private String cateName;
 
@@ -27,4 +28,4 @@ public class CategoryDTO {
     public void setCateName(String cateName) {
         this.cateName = cateName;
     }
-} 
+}

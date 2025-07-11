@@ -9,19 +9,20 @@ public class ProductDTO {
     private String size;
     private String color;
     private double price;
-    private double discount;
+    private double discount; // ✅ Thêm thuộc tính discount
     private String status;
     private int stock;
     private int cateID;
     private String cateName;
-    private boolean fromSaleOff = false;
-    private int quantity = 1; // ✅ Đã thêm thuộc tính quantity
+    private int quantity = 1;
+    private boolean fromSaleOff = false; // ✅ Thêm thuộc tính này
+    private int attributeID;
 
     public ProductDTO() {
     }
 
     public ProductDTO(int productID, String productName, String productImage, String description,
-                      String size, double price, String status, int stock, int cateID) {
+            String size, double price, String status, int stock, int cateID) {
         this.productID = productID;
         this.productName = productName;
         this.productImage = productImage;
@@ -146,6 +147,7 @@ public class ProductDTO {
         this.cateID = cateID;
     }
 
+    // ✅ Getter/Setter for fromSaleOff
     public boolean isFromSaleOff() {
         return fromSaleOff;
     }
@@ -154,12 +156,19 @@ public class ProductDTO {
         this.fromSaleOff = fromSaleOff;
     }
 
-    // ✅ Getter/Setter for quantity
     public int getQuantity() {
         return quantity;
     }
 
     public void setQuantity(int quantity) {
         this.quantity = quantity;
+    }
+
+    public int getAttributeID() {
+        return attributeID;
+    }
+
+    public void setAttributeID(int attributeID) {
+        this.attributeID = attributeID;
     }
 }

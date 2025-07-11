@@ -10,6 +10,7 @@ import java.util.List;
 import utils.DBUtils;
 
 public class CategoryDAO {
+
     private static final String GET_ALL_CATEGORIES = "SELECT * FROM Category";
     private static final String GET_CATEGORY_BY_ID = "SELECT * FROM Category WHERE CateID = ?";
     private static final String CREATE_CATEGORY = "INSERT INTO Category (CateID, CateName) VALUES (?, ?)";
@@ -36,9 +37,15 @@ public class CategoryDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) rs.close();
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return list;
     }
@@ -64,9 +71,15 @@ public class CategoryDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (rs != null) rs.close();
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return category;
     }
@@ -86,8 +99,12 @@ public class CategoryDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return check;
     }
@@ -107,8 +124,12 @@ public class CategoryDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return check;
     }
@@ -127,9 +148,13 @@ public class CategoryDAO {
         } catch (Exception e) {
             e.printStackTrace();
         } finally {
-            if (ptm != null) ptm.close();
-            if (conn != null) conn.close();
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
         }
         return check;
     }
-} 
+}

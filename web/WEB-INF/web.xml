@@ -1,9 +1,5 @@
 <?xml version="1.0" encoding="UTF-8"?>
-<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee"
-         xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
-         xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee
-         http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
-
+<web-app version="3.1" xmlns="http://xmlns.jcp.org/xml/ns/javaee" xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance" xsi:schemaLocation="http://xmlns.jcp.org/xml/ns/javaee          http://xmlns.jcp.org/xml/ns/javaee/web-app_3_1.xsd">
     <servlet>
         <servlet-name>mnproduct</servlet-name>
         <servlet-class>mnproduct</servlet-class>
@@ -12,7 +8,6 @@
         <servlet-name>mnproduct</servlet-name>
         <url-pattern>/mnproduct</url-pattern>
     </servlet-mapping>
-
     <!-- ✅ Cấu hình servlet để xử lý mã giảm giá -->
     <servlet>
         <servlet-name>ApplyDiscountServlet</servlet-name>
@@ -22,16 +17,13 @@
         <servlet-name>ApplyDiscountServlet</servlet-name>
         <url-pattern>/ApplyDiscountServlet</url-pattern>
     </servlet-mapping>
-
     <!-- Cấu hình session và trang mặc định -->
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>
-
     <welcome-file-list>
         <welcome-file>MainController</welcome-file>
     </welcome-file-list>
-    
     <servlet>
         <servlet-name>UpdateOrderStatus</servlet-name>
         <servlet-class>staff.management.order.UpdateOrderStatus</servlet-class>
@@ -40,7 +32,6 @@
         <servlet-name>UpdateOrderStatus</servlet-name>
         <url-pattern>/UpdateOrderStatus</url-pattern>
     </servlet-mapping>
-
     <servlet>
         <servlet-name>ManageUserAccountController</servlet-name>
         <servlet-class>admin.ManageUserAccountController</servlet-class>
@@ -49,7 +40,6 @@
         <servlet-name>ManageUserAccountController</servlet-name>
         <url-pattern>/ManageUserAccountController</url-pattern>
     </servlet-mapping>
-
     <servlet>
         <servlet-name>ManageUserActionController</servlet-name>
         <servlet-class>admin.ManageUserActionController</servlet-class>
@@ -58,7 +48,6 @@
         <servlet-name>ManageUserActionController</servlet-name>
         <url-pattern>/ManageUserActionController</url-pattern>
     </servlet-mapping>
-
     <servlet>
         <servlet-name>AdminCreateUserController</servlet-name>
         <servlet-class>admin.AdminCreateUserController</servlet-class>
@@ -67,7 +56,6 @@
         <servlet-name>AdminCreateUserController</servlet-name>
         <url-pattern>/AdminCreateUserController</url-pattern>
     </servlet-mapping>
-
     <servlet>
         <servlet-name>ViewRevenueController</servlet-name>
         <servlet-class>admin.ViewRevenueController</servlet-class>
@@ -76,7 +64,6 @@
         <servlet-name>ViewRevenueController</servlet-name>
         <url-pattern>/ViewRevenueController</url-pattern>
     </servlet-mapping>
-
     <servlet>
         <servlet-name>ManageVoucherController</servlet-name>
         <servlet-class>admin.ManageVoucherController</servlet-class>
@@ -85,7 +72,6 @@
         <servlet-name>ManageVoucherController</servlet-name>
         <url-pattern>/ManageVoucherController</url-pattern>
     </servlet-mapping>
-
     <servlet>
         <servlet-name>ManagePotentialCustomerController</servlet-name>
         <servlet-class>admin.ManagePotentialCustomerController</servlet-class>
@@ -94,7 +80,6 @@
         <servlet-name>ManagePotentialCustomerController</servlet-name>
         <url-pattern>/ManagePotentialCustomerController</url-pattern>
     </servlet-mapping>
-
     <servlet>
         <servlet-name>ManageUpdateHistoryController</servlet-name>
         <servlet-class>admin.ManageUpdateHistoryController</servlet-class>
@@ -103,5 +88,20 @@
         <servlet-name>ManageUpdateHistoryController</servlet-name>
         <url-pattern>/ManageUpdateHistoryController</url-pattern>
     </servlet-mapping>
-
+    <servlet>
+        <servlet-name>ajaxServlet</servlet-name>
+        <servlet-class>com.vnpay.common.ajaxServlet</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>ajaxServlet</servlet-name>
+        <url-pattern>/payment</url-pattern>
+    </servlet-mapping>
+    <servlet>
+        <servlet-name>VnpayReturn</servlet-name>
+        <servlet-class>com.vnpay.common.VnpayReturn</servlet-class>
+    </servlet>
+    <servlet-mapping>
+        <servlet-name>VnpayReturn</servlet-name>
+        <url-pattern>/VnpayReturn</url-pattern>
+    </servlet-mapping>
 </web-app>

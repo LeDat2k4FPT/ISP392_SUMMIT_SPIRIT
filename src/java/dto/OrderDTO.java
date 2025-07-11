@@ -10,11 +10,19 @@ public class OrderDTO {
     private Date orderDate;
     private double totalAmount;
     private String status;
+    private double shipFee;
+    private Integer voucherID;
     private String paymentStatus;
     private Timestamp paymentDate;
     private String fullName;
     private String email;
     private String phoneNumber;
+    private String shippingAddress;
+    private String recipientName;
+    private String recipientPhone;
+    private String recipientEmail;
+    private String discountCode;
+    private double discountPercent;
 
     public OrderDTO() {
     }
@@ -43,6 +51,27 @@ public class OrderDTO {
         this.totalAmount = totalAmount;
         this.status = status;
         this.fullName = fullName;
+    }
+
+    public OrderDTO(int orderID, int userID, Date orderDate, double totalAmount, String status, double shipFee, Integer voucherID, String paymentStatus, Timestamp paymentDate, String fullName, String email, String phoneNumber, String shippingAddress, String recipientName, String recipientPhone, String recipientEmail, String discountCode, double discountPercent) {
+        this.orderID = orderID;
+        this.userID = userID;
+        this.orderDate = orderDate;
+        this.totalAmount = totalAmount;
+        this.status = status;
+        this.shipFee = shipFee;
+        this.voucherID = voucherID;
+        this.paymentStatus = paymentStatus;
+        this.paymentDate = paymentDate;
+        this.fullName = fullName;
+        this.email = email;
+        this.phoneNumber = phoneNumber;
+        this.shippingAddress = shippingAddress;
+        this.recipientName = recipientName;
+        this.recipientPhone = recipientPhone;
+        this.recipientEmail = recipientEmail;
+        this.discountCode = discountCode;
+        this.discountPercent = discountPercent;
     }
 
     public String getFullName() {
@@ -123,5 +152,74 @@ public class OrderDTO {
 
     public void setPhoneNumber(String phoneNumber) {
         this.phoneNumber = phoneNumber;
+    }
+
+    public double getShipFee() {
+        return shipFee;
+    }
+
+    public void setShipFee(double shipFee) {
+        this.shipFee = shipFee;
+    }
+
+    public Integer getVoucherID() {
+        return voucherID;
+    }
+
+    public void setVoucherID(Integer voucherID) {
+        this.voucherID = voucherID;
+    }
+
+    public String getShippingAddress() {
+        return shippingAddress;
+    }
+
+    public void setShippingAddress(String shippingAddress) {
+        this.shippingAddress = shippingAddress;
+    }
+
+    public String getRecipientName() {
+        return recipientName;
+    }
+
+    public void setRecipientName(String recipientName) {
+        this.recipientName = recipientName;
+    }
+
+    public String getRecipientPhone() {
+        return recipientPhone;
+    }
+
+    public void setRecipientPhone(String recipientPhone) {
+        this.recipientPhone = recipientPhone;
+    }
+
+    public String getRecipientEmail() {
+        return recipientEmail;
+    }
+
+    public void setRecipientEmail(String recipientEmail) {
+        this.recipientEmail = recipientEmail;
+    }
+
+    public String getDiscountCode() {
+        return discountCode;
+    }
+
+    public void setDiscountCode(String discountCode) {
+        this.discountCode = discountCode;
+    }
+
+    public double getDiscountPercent() {
+        return discountPercent;
+    }
+
+    public void setDiscountPercent(double discountPercent) {
+        this.discountPercent = discountPercent;
+    }
+
+    @Override
+    public String toString() {
+        return "OrderDTO{" + "orderID=" + orderID + ", userID=" + userID + ", orderDate=" + orderDate + ", totalAmount=" + totalAmount + ", status=" + status + ", shipFee=" + shipFee + ", voucherID=" + voucherID + ", paymentStatus=" + paymentStatus + ", paymentDate=" + paymentDate + ", fullName=" + fullName + ", email=" + email + ", phoneNumber=" + phoneNumber + ", shippingAddress=" + shippingAddress + ", recipientName=" + recipientName + ", recipientPhone=" + recipientPhone + ", recipientEmail=" + recipientEmail + ", discountCode=" + discountCode + ", discountPercent=" + discountPercent + '}';
     }
 }

@@ -8,29 +8,27 @@ import java.util.Optional;
 import utils.DBUtils;
 
 /**
- * CartDAO chứa các hàm xử lý logic liên quan đến giỏ hàng như kiểm tra mã giảm giá.
+ * CartDAO chứa các hàm xử lý logic liên quan đến giỏ hàng như kiểm tra mã giảm
+ * giá.
  */
 public class CartDAO {
 
     /**
-     * Kiểm tra mã giảm giá có hợp lệ hay không dựa trên điều kiện:
-     * - Mã tồn tại và đang hoạt động
-     * - Chưa hết hạn
+     * Kiểm tra mã giảm giá có hợp lệ hay không dựa trên điều kiện: - Mã tồn tại
+     * và đang hoạt động - Chưa hết hạn
      *
      * @param code Mã giảm giá
      * @return Optional chứa DiscountValue nếu hợp lệ, hoặc Optional.empty()
      */
     public Optional<Double> validateDiscountCode(String code, double cartTotal) {
         String sql = "SELECT DiscountValue FROM Voucher "
-                   + "WHERE VoucherCode = ? AND Status = 'Active' "
-                   + "AND ExpiryDate >= GETDATE()";
+                + "WHERE VoucherCode = ? AND Status = 'Active' "
+                + "AND ExpiryDate >= GETDATE()";
 
         try (
-            Connection conn = DBUtils.getConnection();
-            PreparedStatement stmt = conn.prepareStatement(sql)
-        ) {
+                 Connection conn = DBUtils.getConnection();  PreparedStatement stmt = conn.prepareStatement(sql)) {
             stmt.setString(1, code);
-            try (ResultSet rs = stmt.executeQuery()) {
+            try ( ResultSet rs = stmt.executeQuery()) {
                 if (rs.next()) {
                     return Optional.of(rs.getDouble("DiscountValue"));
                 }

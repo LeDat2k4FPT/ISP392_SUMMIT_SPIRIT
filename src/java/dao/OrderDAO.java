@@ -6,9 +6,11 @@ import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
 import java.sql.SQLException;
+import java.sql.Types;
 import java.util.ArrayList;
 import java.util.List;
 import utils.DBUtils;
+import java.sql.Statement;
 
 public class OrderDAO {
 
@@ -18,8 +20,10 @@ public class OrderDAO {
     private static final String CREATE_ORDER = "INSERT INTO Orders (userID, orderDate, total, status) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_ORDER_STATUS = "UPDATE Orders SET status = ? WHERE orderID = ?";
     private static final String DELETE_ORDER = "DELETE FROM Orders WHERE OrderID = ?";
-    private static final String INSERT_ORDER = "INSERT INTO Orders (UserID, OrderDate, TotalAmount, Status) VALUES (?, ?, ?, ?)";
+    private static final String INSERT_ORDER = "INSERT INTO Orders (UserID, TotalAmount) VALUES (?, ?)";
     private static final String UPDATE_STATUS = "UPDATE Orders SET Status = ? WHERE OrderID = ?";
+    private static final String ADD_ORDER = "INSERT INTO Orders (UserID, OrderDate, Status, TotalAmount, ShipFee, VoucherID) VALUES (?, ?, ?, ?, ?, ?)";
+    private static final String UPDATE_AFTER_PAYMENT = "UPDATE Orders SET Status = ? WHERE OrderID = ?";
 
     public List<OrderDTO> getAllOrders() throws SQLException, ClassNotFoundException {
         List<OrderDTO> list = new ArrayList<>();
@@ -319,26 +323,21 @@ public class OrderDAO {
             if (conn != null) {
                 ptm = conn.prepareStatement(INSERT_ORDER, PreparedStatement.RETURN_GENERATED_KEYS);
                 ptm.setInt(1, order.getUserID());
-                ptm.setTimestamp(2, order.getOrderDate() != null
-                        ? new java.sql.Timestamp(order.getOrderDate().getTime())
-                        : new java.sql.Timestamp(System.currentTimeMillis()));
-                ptm.setDouble(3, order.getTotalAmount());
-                ptm.setString(4, order.getStatus() != null ? order.getStatus() : "Pending");
+                ptm.setDouble(2, order.getTotalAmount());
                 int affectedRows = ptm.executeUpdate();
-                if (affectedRows > 0) {
-                    rs = ptm.getGeneratedKeys();
-                    if (rs.next()) {
-                        orderId = rs.getInt(1);
-                    }
-                } else {
-                    System.err.println("[insertOrder] Không insert được order vào DB. affectedRows=0");
+                if (affectedRows == 0) {
+                    throw new SQLException("Creating payment failed, no rows affected.");
                 }
-            } else {
-                System.err.println("[insertOrder] Không kết nối được DB.");
+                try ( ResultSet generatedKeys = ptm.getGeneratedKeys()) {
+                    if (generatedKeys.next()) {
+                        return generatedKeys.getInt(1);
+                    } else {
+                        throw new SQLException("Creating payment failed, no ID obtained.");
+                    }
+                }
             }
-        } catch (Exception ex) {
-            System.err.println("[insertOrder] Exception: " + ex.getMessage());
-            ex.printStackTrace();
+        } catch (SQLException e) {
+            System.out.println(e);
         } finally {
             if (rs != null) {
                 rs.close();
@@ -354,10 +353,6 @@ public class OrderDAO {
     }
 
     public boolean updateOrderStatus(OrderDTO order) throws SQLException, ClassNotFoundException {
-        if (order == null || order.getOrderID() <= 0 || order.getStatus() == null || order.getStatus().isEmpty()) {
-            System.err.println("[updateOrderStatus] Lỗi: order hoặc trường dữ liệu không hợp lệ. orderID=" + (order != null ? order.getOrderID() : "null") + ", status=" + (order != null ? order.getStatus() : "null"));
-            return false;
-        }
         boolean check = false;
         Connection conn = null;
         PreparedStatement ptm = null;
@@ -368,6 +363,8 @@ public class OrderDAO {
             ptm.setInt(2, order.getOrderID());
             int rowsAffected = ptm.executeUpdate();
             check = rowsAffected > 0;
+        } catch (SQLException e) {
+            e.printStackTrace();
         } finally {
             if (ptm != null) {
                 ptm.close();
@@ -413,9 +410,9 @@ public class OrderDAO {
 
     public double getTotalSpentByUser(int userID) throws SQLException, ClassNotFoundException {
         String sql = "SELECT SUM(TotalAmount) FROM Orders WHERE UserID = ? AND Status = 'Delivered'";
-        try (Connection con = DBUtils.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try ( Connection con = DBUtils.getConnection();  PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, userID);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getDouble(1);
                 }
@@ -426,9 +423,9 @@ public class OrderDAO {
 
     public int getOrderCountByUser(int userID) throws SQLException, ClassNotFoundException {
         String sql = "SELECT COUNT(*) FROM Orders WHERE UserID = ? AND Status = 'Delivered'";
-        try (Connection con = DBUtils.getConnection(); PreparedStatement ps = con.prepareStatement(sql)) {
+        try ( Connection con = DBUtils.getConnection();  PreparedStatement ps = con.prepareStatement(sql)) {
             ps.setInt(1, userID);
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
@@ -436,24 +433,105 @@ public class OrderDAO {
         }
         return 0;
     }
+
     public boolean hasUserPurchasedProduct(int userId, int productId) throws SQLException, ClassNotFoundException {
-    String sql = "SELECT COUNT(*) AS Total "
-               + "FROM Orders o "
-               + "JOIN OrderDetail od ON o.OrderID = od.OrderID "
-               + "JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID "
-               + "WHERE o.UserID = ? AND o.Status = 'Delivered' AND pv.ProductID = ?";
-    try (Connection conn = DBUtils.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, userId);
-        ps.setInt(2, productId);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                return rs.getInt("Total") > 0;
+        String sql = "SELECT COUNT(*) AS Total "
+                + "FROM Orders o "
+                + "JOIN OrderDetail od ON o.OrderID = od.OrderID "
+                + "JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID "
+                + "WHERE o.UserID = ? AND o.Status = 'Delivered' AND pv.ProductID = ?";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, userId);
+            ps.setInt(2, productId);
+            try ( ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("Total") > 0;
+                }
             }
         }
+        return false;
     }
-    return false;
-}
 
+    public int addOrder(OrderDTO order) throws SQLException {
+        int generatedOrderId = -1; // Giá trị mặc định nếu thất bại
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        ResultSet rs = null;
 
+        try {
+            conn = DBUtils.getConnection();
+            // Dùng RETURN_GENERATED_KEYS để lấy khóa tự tăng
+            ptm = conn.prepareStatement(ADD_ORDER, Statement.RETURN_GENERATED_KEYS);
+
+            ptm.setInt(1, order.getUserID());
+            ptm.setDate(2, order.getOrderDate());
+            ptm.setString(3, order.getStatus());
+            ptm.setDouble(4, order.getTotalAmount());
+            ptm.setDouble(5, 30000);
+            if (order.getVoucherID() != null) {
+                ptm.setInt(6, order.getVoucherID());
+            } else {
+                ptm.setNull(6, Types.INTEGER);
+            }
+
+            int affectedRows = ptm.executeUpdate();
+
+            if (affectedRows > 0) {
+                // Lấy orderID vừa được tạo
+                rs = ptm.getGeneratedKeys();
+                if (rs.next()) {
+                    generatedOrderId = rs.getInt(1);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+
+        return generatedOrderId;
+    }
+
+    public boolean updateOrderAfterPayment(OrderDTO order) throws SQLException, ClassNotFoundException {
+        boolean check = false;
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        try {
+            conn = DBUtils.getConnection();
+            ptm = conn.prepareStatement(UPDATE_AFTER_PAYMENT);
+            ptm.setString(1, order.getStatus());
+            ptm.setInt(2, order.getOrderID());
+            int rowsAffected = ptm.executeUpdate();
+            check = rowsAffected > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return check;
+    }
+
+    public int getNextOrderID() throws Exception {
+        int nextId = 1;
+        String sql = "SELECT ISNULL(MAX(OrderID), 0) + 1 AS NextID FROM Orders";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql);  ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                nextId = rs.getInt("NextID");
+            }
+        }
+        return nextId;
+    }
 }

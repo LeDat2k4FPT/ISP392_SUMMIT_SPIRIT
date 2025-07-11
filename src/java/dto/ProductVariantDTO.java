@@ -13,7 +13,6 @@ public class ProductVariantDTO {
     private String sizeName;
 
     // ========== Constructors ==========
-
     public ProductVariantDTO() {
     }
 
@@ -35,7 +34,6 @@ public class ProductVariantDTO {
     }
 
     // ========== Getters & Setters ==========
-
     public int getAttributeID() {
         return attributeID;
     }

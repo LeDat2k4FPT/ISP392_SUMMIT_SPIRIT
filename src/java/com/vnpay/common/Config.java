@@ -1,6 +1,5 @@
-package vnpay;
+package com.vnpay.common;
 
-import jakarta.servlet.http.HttpServletRequest;
 import java.io.UnsupportedEncodingException;
 import java.nio.charset.StandardCharsets;
 import java.security.MessageDigest;
@@ -13,17 +12,19 @@ import java.util.Map;
 import java.util.Random;
 import javax.crypto.Mac;
 import javax.crypto.spec.SecretKeySpec;
+import jakarta.servlet.http.HttpServletRequest;
+import java.net.URLEncoder;
 
 /**
  *
- * @author Admin
+ * @author gmt
  */
 public class Config {
 
-    public static final String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
-    public static String vnp_ReturnUrl = "http://localhost:8080/ISP392_SUMMIT_SPIRIT/vnpayReturn";
-    public static String vnp_TmnCode = "4YUP19I4";
-    public static String secretKey = "MDUIFDCRAKLNBPOFIAFNEKFRNMFBYEPX";
+    public static String vnp_PayUrl = "https://sandbox.vnpayment.vn/paymentv2/vpcpay.html";
+    public static String vnp_ReturnUrl = "http://localhost:8080/ISP392_SUMMIT_SPIRIT/VnpayReturn";
+    public static String vnp_TmnCode = "OCTU5KPU";
+    public static String secretKey = "LS0UQDKCQERRSVYO3DH6NW4KKOJIAYHN";
     public static String vnp_ApiUrl = "https://sandbox.vnpayment.vn/merchant_webapi/api/transaction";
 
     public static String md5(String message) {
@@ -74,7 +75,11 @@ public class Config {
             if ((fieldValue != null) && (fieldValue.length() > 0)) {
                 sb.append(fieldName);
                 sb.append("=");
-                sb.append(fieldValue);
+                try {
+                    sb.append(URLEncoder.encode(fieldValue, StandardCharsets.UTF_8.toString()));
+                } catch (UnsupportedEncodingException e) {
+                    sb.append(fieldValue); // fallback
+                }
             }
             if (itr.hasNext()) {
                 sb.append("&");
@@ -85,7 +90,6 @@ public class Config {
 
     public static String hmacSHA512(final String key, final String data) {
         try {
-
             if (key == null || data == null) {
                 throw new NullPointerException();
             }

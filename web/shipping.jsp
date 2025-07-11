@@ -1,5 +1,6 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.text.DecimalFormat, dto.CartDTO, dto.CartItemDTO, dto.ProductDTO, dto.UserDTO" %>
+<%@ page import="dto.VoucherDTO, dao.VoucherDAO" %>
 
 <%
     CartDTO cart = (CartDTO) session.getAttribute("CART");
@@ -28,6 +29,19 @@
         }
     }
 
+    String code = request.getParameter("discountCode");
+    VoucherDAO dao = new VoucherDAO();
+    VoucherDTO voucher = dao.getVoucherByCode(code);
+
+    if (voucher != null) {
+        request.setAttribute("DISCOUNT_CODE", voucher.getVoucherCode());
+        request.setAttribute("DISCOUNT_PERCENT", voucher.getDiscountValue());
+        request.setAttribute("VOUCHER_ID", voucher.getVoucherID());
+    } else {
+        request.setAttribute("DISCOUNT_ERROR", "Invalid or expired code!");
+    }
+
+
     String country = request.getParameter("country") != null ? request.getParameter("country") : "";
     String fullname = request.getParameter("fullname") != null ? request.getParameter("fullname") : "";
     String phone = request.getParameter("phone") != null ? request.getParameter("phone") : "";
@@ -35,6 +49,7 @@
     String address = request.getParameter("address") != null ? request.getParameter("address") : "";
     String district = request.getParameter("district") != null ? request.getParameter("district") : "";
     String city = request.getParameter("city") != null ? request.getParameter("city") : "";
+    Integer voucherID = (Integer) request.getAttribute("VOUCHER_ID");
 %>
 
 <!DOCTYPE html>
@@ -186,7 +201,7 @@
             </div>
         </div>
 
-        <form action="MainController" method="POST" onsubmit="return validateForm()">
+        <form id="checkoutForm" action="payment" method="POST" onsubmit="return validateForm()">
             <div class="container">
                 <div class="form-section">
                     <h3>Shipping Address</h3>
@@ -208,7 +223,7 @@
                     <div class="row">
                         <input type="hidden" name="sourcePage" value="shipping.jsp">
                         <input type="text" name="discountCode" placeholder="Discount code" value="<%= discountCode %>">
-                        <button type="submit" name="action" value="ApplyDiscount">Apply</button>
+                        <button type="submit" name="action" value="ApplyDiscount" onclick="setFormAction('MainController')">Apply</button>
                     </div>
                     <% if (discountError != null) { %>
                     <div class="error-message"><%= discountError %></div>
@@ -247,8 +262,13 @@
                         <input type="hidden" name="productName" value="<%= productNames.toString() %>">
                         <input type="hidden" name="size" value="<%= sizes.toString() %>">
                         <input type="hidden" name="color" value="<%= colors.toString() %>">
+                        <input type="hidden" name="discountCode" value="<%= discountCode != null ? discountCode : "" %>">
+                        <input type="hidden" name="discountPercent" value="<%= discountPercent %>">
+                        <% if (voucherID != null) { %>
+                        <input type="hidden" name="voucherID" value="<%= voucherID %>">
                         <% } %>
-                        <button type="submit" name="action" value="CheckoutVNPay" class="pay-btn">Continue To Pay</button>
+                        <% } %>
+                        <button type="submit" name="action" value="CheckoutVNPay" class="pay-btn" onclick="setFormAction('payment')">Continue To Pay</button>
                     </div>
                 </div>
 
@@ -293,6 +313,10 @@
         </form>
 
         <script>
+            function setFormAction(actionUrl) {
+                document.getElementById('checkoutForm').action = actionUrl;
+            }
+
             function validateForm() {
                 let valid = true;
                 document.getElementById('phoneError').innerText = "";
