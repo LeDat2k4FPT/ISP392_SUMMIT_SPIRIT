@@ -32,7 +32,8 @@ public class VoucherDAO {
             ps.setDouble(3, v.getDiscountValue());
             ps.setDate(4, v.getExpiryDate());
             ps.setString(5, v.getStatus());
-            return ps.executeUpdate() > 0;
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
         }
     }
 
@@ -47,14 +48,24 @@ public class VoucherDAO {
             return ps.executeUpdate() > 0;
         }
     }
-
-    public boolean deleteVoucher(int voucherID) throws SQLException, ClassNotFoundException {
-        String sql = "DELETE FROM Voucher WHERE VoucherID=?";
-        try ( Connection con = DBUtils.getConnection();  PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, voucherID);
-            return ps.executeUpdate() > 0;
-        }
-    }
+//
+//    <<<<<<< HEAD
+//
+//    public boolean deleteVoucher(int voucherID) throws SQLException, ClassNotFoundException {
+//        String sql = "DELETE FROM Voucher WHERE VoucherID=?";
+//        try ( Connection con = DBUtils.getConnection();  PreparedStatement ps = con.prepareStatement(sql)) {
+//            ps.setInt(1, voucherID);
+//             == == == =
+//
+//    public boolean updateVoucherStatus(int voucherID, String status) throws SQLException, ClassNotFoundException {
+//        String sql = "UPDATE Voucher SET Status=? WHERE VoucherID=?";
+//        try ( Connection con = DBUtils.getConnection();  PreparedStatement ps = con.prepareStatement(sql)) {
+//            ps.setString(1, status);
+//            ps.setInt(2, voucherID);
+//             >>> >>> > f5f8255bfd21166a4049a4a6ef157d511682c680
+//            return ps.executeUpdate() > 0;
+//        }
+//    }
 
     public VoucherDTO getVoucherById(int voucherID) throws SQLException, ClassNotFoundException {
         String sql = "SELECT * FROM Voucher WHERE VoucherID=?";
@@ -96,3 +107,22 @@ public class VoucherDAO {
         return voucher;
     }
 }
+//
+//    public List<VoucherDTO> getActiveVouchers() throws SQLException, ClassNotFoundException {
+//        List<VoucherDTO> list = new ArrayList<>();
+//        String sql = "SELECT * FROM Voucher WHERE Status = 'Active'";
+//        try (Connection con = DBUtils.getConnection(); PreparedStatement ps = con.prepareStatement(sql); ResultSet rs = ps.executeQuery()) {
+//            while (rs.next()) {
+//                list.add(new VoucherDTO(
+//                    rs.getInt("VoucherID"),
+//                    rs.getString("VoucherCode"),
+//                    rs.getDouble("DiscountValue"),
+//                    rs.getDate("ExpiryDate"),
+//                    rs.getString("Status")
+//                ));
+//            }
+//        }
+//        return list;
+//    }
+//}
+

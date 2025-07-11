@@ -1,3 +1,4 @@
+
 <%@ page contentType="text/html; charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="dto.OrderDTO" %>
@@ -19,37 +20,72 @@
     NumberFormat nf = NumberFormat.getInstance();
 %>
 
-<% if (order == null) { %>
-<h2 style="color:red;">Order not found!</h2>
-<% } else { %>
-<h2>🧾 Order Details - ID: <%= order.getOrderID() %></h2>
-<p><strong>Customer:</strong> <%= order.getFullName() %></p>
-<p><strong>Email:</strong> <%= order.getEmail() %></p>
-<p><strong>Phone:</strong> <%= order.getPhoneNumber() %></p>
-<p><strong>Order Date:</strong> <%= order.getOrderDate() %></p>
-<p><strong>Status:</strong> <%= order.getStatus() %></p>
-<p><strong>Total:</strong> <%= nf.format(order.getTotalAmount()) %></p>
+<!DOCTYPE html>
+<html>
+    <head>
+        <meta charset="UTF-8">
+        <title>Order Details</title>
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/orderDetail.css">
+    </head>
+    <body>
+        <div class="container"> 
+            <% if (order == null) { %>
+            <div class="alert">
+                <h2>🚫 Order Not Found!</h2>
+                <p>No order exists with ID: <%= orderID %></p>
+                <button class="btn" onclick="history.back()">← Back</button>
+            </div>
+            <% } else { %>
 
-<h3>📦 Order Items</h3>
-<table border="1" cellspacing="0" cellpadding="5">
-    <tr>
-        <th>Product ID</th>
-        <th>Product Name</th>
-        <th>Size</th>
-        <th>Color</th>
-        <th>Quantity</th>
-        <th>Unit Price</th>
-    </tr>
-    <% for (OrderDetailDTO od : orderDetails) { %>
-    <tr>
-        <td><%= od.getProductID() %></td>
-        <td><%= od.getProductName() %></td>
-        <td><%= od.getSizeName() %></td>
-        <td><%= od.getColorName() %></td>
-        <td><%= od.getQuantity() %></td>
-        <td><%= nf.format(od.getUnitPrice()) %></td>
-    </tr>
-    <% } %>
-</table>
-<button class="btn btn-secondary" onclick="history.back()">Back</button>
-<% } %>
+            <div class="order-card">
+                <h2>Order #<%= order.getOrderID() %></h2>
+                <div class="order-info">
+                    <div><span></span> <strong>Customer:</strong> <%= order.getFullName() %></div>
+                    <div><span></span> <strong>Email:</strong> <%= order.getEmail() %></div>
+                    <div><span></span> <strong>Phone:</strong> <%= order.getPhoneNumber() %></div>
+                    <div><span></span> <strong>Date:</strong> <%= order.getOrderDate() %></div>
+                    <div>
+                        <span></span> <strong>Status:</strong> 
+                        <%
+                            String status = order.getStatus();
+                            String badgeClass = "";
+                            if ("Shipped".equalsIgnoreCase(status)) {
+                                badgeClass = "status-badge status-shipped";
+                            } else if ("Processing".equalsIgnoreCase(status)) {
+                                badgeClass = "status-badge status-processing";
+                            } else if ("Cancelled".equalsIgnoreCase(status)) {
+                                badgeClass = "status-badge status-canceled";
+                            } else if ("Delivered".equalsIgnoreCase(status)) {
+                                badgeClass = "status-badge status-delivered";
+                            } else {
+                                badgeClass = "status-badge";
+                            }
+                        %>
+                        <span class="<%= badgeClass %>"><%= status %></span>
+                    </div>
+
+                    <div><span></span> <strong>Total:</strong> <%= nf.format(order.getTotalAmount()) %> ₫</div>
+                </div>
+            </div>
+
+            <h3>📦 Products</h3>
+            <div class="products-list">
+                <% for (OrderDetailDTO od : orderDetails) { %>
+                <div class="product-box">
+                    <p><strong>Product ID:</strong> <%= od.getProductID() %></p>
+                    <p><strong>Name:</strong> <%= od.getProductName() %></p>
+                    <p><strong>Size:</strong> <%= od.getSizeName() %></p>
+                    <p><strong>Color:</strong> <%= od.getColorName() %></p>
+                    <p><strong>Quantity:</strong> <%= od.getQuantity() %></p>
+                    <p><strong>Unit Price:</strong> <%= nf.format(od.getUnitPrice()) %> ₫</p>
+                </div>
+                <% } %>
+            </div>
+            <a class="btn" href="<%= request.getContextPath() %>/staffDashboard.jsp?page=staff/orderlist.jsp">← Back to Order List</a>
+            <% } %>
+        </div>
+    </body>
+</html>
+
+
+

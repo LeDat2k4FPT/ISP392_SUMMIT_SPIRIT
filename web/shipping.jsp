@@ -9,7 +9,7 @@
     double discountPercent = 0.0;
     String discountCode = "";
     String discountError = null;
-
+    int cartItemCount = (cart != null) ? cart.getCartItems().size() : 0;
     // ✅ Nhận từ request thay vì session
     Double appliedDiscountPercent = (Double) request.getAttribute("DISCOUNT_PERCENT");
     String appliedDiscountCode = (String) request.getAttribute("DISCOUNT_CODE");
@@ -59,147 +59,44 @@
         <title>Shipping Address - Summit Spirit</title>
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <style>
-            body {
-                font-family: 'Kumbh Sans', sans-serif;
-                margin: 0;
-                background-color: #f9f9f9;
-            }
-            .header {
-                background-color: #004080;
-                padding: 15px 30px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                color: white;
-            }
-            .header .logo {
-                font-size: 24px;
-                font-weight: bold;
-                color: white;
-                text-decoration: none;
-            }
-            .nav-links a {
-                color: white;
-                margin: 0 10px;
-                text-decoration: none;
-                font-size: 16px;
-            }
-            .container {
-                display: flex;
-                padding: 40px;
-                gap: 40px;
-            }
-            .form-section {
-                flex: 1;
-                background: #fff;
-                padding: 30px;
-                border-radius: 10px;
-            }
-            .form-section input {
-                width: 100%;
-                padding: 10px;
-                margin-bottom: 15px;
-                border-radius: 4px;
-                border: 1px solid #ccc;
-                font-size: 14px;
-            }
-            .form-section .row {
-                display: flex;
-                gap: 10px;
-            }
-            .form-section button {
-                background-color: #2f4f4f;
-                color: white;
-                padding: 10px 20px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-            .cart-preview {
-                flex: 1;
-                background: #f4f4f4;
-                padding: 20px;
-                border-radius: 10px;
-            }
-            .cart-item {
-                display: flex;
-                gap: 15px;
-                padding: 15px 0;
-                border-bottom: 1px solid #ccc;
-            }
-            .cart-item img {
-                width: 80px;
-                height: auto;
-            }
-            .cart-info h4 {
-                margin: 0;
-                font-size: 16px;
-            }
-            .cart-info p {
-                margin: 4px 0;
-                font-size: 14px;
-            }
-            .quantity-box {
-                display: flex;
-                gap: 10px;
-                margin-top: 8px;
-                align-items: center;
-            }
-            .summary-line {
-                display: flex;
-                justify-content: space-between;
-                margin: 10px 0;
-                font-size: 15px;
-            }
-            .total-line {
-                font-weight: bold;
-                font-size: 18px;
-                margin-top: 10px;
-            }
-            .footer-buttons {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 20px;
-            }
-            .footer-buttons a, .footer-buttons button {
-                padding: 10px 20px;
-                font-size: 14px;
-                border: none;
-                border-radius: 4px;
-                text-decoration: none;
-                color: white;
-            }
-            .back-btn {
-                background-color: gray;
-            }
-            .pay-btn {
-                background-color: #2f4f4f;
-            }
-            .error-message {
-                color: red;
-                margin-top: -10px;
-                margin-bottom: 10px;
-                font-size: 14px;
-            }
-            .success-message {
-                color: green;
-                margin-top: -10px;
-                margin-bottom: 10px;
-                font-size: 14px;
-            }
-        </style>
+        <link rel="stylesheet" href="css/shipping.css">
     </head>
     <body>
 
         <div class="header">
-            <a href="homepage.jsp" class="logo"> Summit Spirit</a>
+            <a href="homepage.jsp">
+                <img src="image/summit_logo.png" alt="Logo">
+            </a>
             <div class="nav-links">
-                <a href="homepage.jsp">Home</a>
-                <a href="cart.jsp">Cart</a>
-                <a href="profile.jsp"><i class="fa fa-user"></i></a>
+                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="cart.jsp" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <% if (cartItemCount > 0) { %>
+                    <span class="cart-badge"><%= cartItemCount %></span>
+                    <% } %>
+                </a>
+                <div class="user-dropdown">
+                    <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
+                    <div id="dropdown" class="dropdown-menu">
+                        <a href="profile.jsp"><%= loginUser != null ? loginUser.getFullName() : "Account" %></a>
+                        <a href="MainController?action=Logout">Logout</a>
+                    </div>
+                </div>
             </div>
         </div>
+        <script>
+            function toggleMenu() {
+                const menu = document.getElementById("dropdown");
+                menu.style.display = menu.style.display === "block" ? "none" : "block";
+            }
+            document.addEventListener("click", function (event) {
+                const dropdown = document.getElementById("dropdown");
+                const userBtn = document.querySelector(".user-name");
+                if (!dropdown.contains(event.target) && !userBtn.contains(event.target)) {
+                    dropdown.style.display = "none";
+                }
+            });
+        </script>
 
         <form id="checkoutForm" action="payment" method="POST" onsubmit="return validateForm()">
             <div class="container">

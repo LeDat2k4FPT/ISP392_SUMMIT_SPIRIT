@@ -10,7 +10,12 @@
         <link rel="stylesheet" type="text/css" href="css/register.css">
     </head>
     <body>
-        <img src="image/summit_logo.png" alt="Summit Spirit Logo" class="logo">
+        <div class="logo" >  
+            <a href="homepage.jsp">
+                <img src="image/summit_logo.png" alt="Logo">
+            </a>
+        </div>      
+        
         <div class="container register-box">
             <h2>Welcome to Summit Spirit</h2>
             <h5>Register your account</h5>
