@@ -137,4 +137,11 @@ public class CartDTO implements Serializable {
             }
         }
     }
+    // ✅ Trả về số lượng đã có trong giỏ cho 1 biến thể
+public int getQuantityByVariant(int productID, String size, String color) {
+    String key = buildKey(productID, size, color);
+    CartItemDTO item = cartItems.get(key);
+    return (item != null) ? item.getQuantity() : 0;
+}
+
 }

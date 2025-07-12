@@ -19,47 +19,14 @@
 %>
 <!DOCTYPE html>
 <html>
-    <<<<<<< HEAD
-    <head>
-        <title>Cart</title>
-        <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
-        <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <style>
-            body {
-                font-family: 'Kumbh Sans', sans-serif;
-                margin: 0;
-                background-color: #f9f9f9;
-                /*
-                =======
-                <head>
-                    <title>Cart</title>
-                    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
-                    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-                    <link rel="stylesheet" type="text/css" href="css/cart.css">
-                </head>
-                <body>
-                <div class="header">
-                            <a href="homepage.jsp">
-                                <img src="image/summit_logo.png" alt="Logo">
-                            </a>
-                            <div class="nav-links">
-                                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                                <a href="cart.jsp" class="cart-icon">
-                                    <i class="fas fa-shopping-cart"></i>
-                <% if (cartItemCount > 0) { %>
-                <span class="cart-badge"><%= cartItemCount %></span>
-                <% } %>
-            </a>
-            <div class="user-dropdown">
-                <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i>
-                    <div id="dropdown" class="dropdown-menu">
-                        <a href="profile.jsp"><%= loginUser.getFullName() %></a>
-                        <a href="MainController?action=Logout">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-    </div>
+<head>
+    <title>Cart</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
+    <link rel="stylesheet" type="text/css" href="css/cart.css">
+</head>
+<body>
+
 
 <script>
 function toggleMenu() {
@@ -73,53 +40,9 @@ document.addEventListener("click", function (event) {
         dropdown.style.display = "none";
     }
 });
-
-function updateQuantityOnServer(productKey, quantity) {
-    const parts = productKey.split('_');
-    const productID = parts[0];
-    const size = parts[1];
-    const color = parts[2];
-
-    fetch('UpdateQuantityServlet', {
-        method: 'POST',
-        headers: { 'Content-Type': 'application/x-www-form-urlencoded' },
-        body: 'productID=' + encodeURIComponent(productID) +
-            '&size=' + encodeURIComponent(size) +
-            '&color=' + encodeURIComponent(color) +
-            '&quantity=' + encodeURIComponent(quantity)
-    }).catch(err => console.error("Error updating quantity:", err));
-}
-
-function increase(id, stock) {
-    const input = document.getElementById("qty_" + id);
-    let value = parseInt(input.value);
-    if (value >= stock) {
-        alert("Product quantity exceeds stock");
-        input.value = stock;
-        return;
-    }
-    input.value = value + 1;
-    updateQuantityOnServer(id, input.value);
-    updateTotal();
-}
-
-function decrease(id) {
-    const input = document.getElementById("qty_" + id);
-    let value = parseInt(input.value);
-    if (value <= 1) {
-        if (confirm("Quantity is 0. Remove this item from cart?")) {
-            const parts = id.split('_');
-            const productID = parts[0];
-            const size = parts[1];
-            const color = parts[2];
-            window.location.href = "RemoveFromCartServlet?productID=" + productID + "&size=" + size + "&color=" + color;
-            return;
-        } else {
-            input.value = 1;
->>>>>>> f5f8255bfd21166a4049a4a6ef157d511682c680
-                */
-            }
-            .header {
+</script>
+<style>
+    .header {
                 background-color: #004080;
                 padding: 15px 30px;
                 display: flex;
@@ -261,7 +184,7 @@ function decrease(id) {
                 font-size: 20px;
                 padding: 80px 0;
             }
-        </style>
+</style>        
     </head>
     <body>
         <div class="header">

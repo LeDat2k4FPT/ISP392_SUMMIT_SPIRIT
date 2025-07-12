@@ -174,6 +174,46 @@ public class ProductVariantDAO {
             throw e;
         }
     }
+public int getAvailableQuantity(int productId, String sizeName, String colorName) throws SQLException, ClassNotFoundException {
+    int quantity = 0;
+    String sql = "SELECT pv.Quantity " +
+                 "FROM ProductVariant pv " +
+                 "JOIN Size s ON pv.SizeID = s.SizeID " +
+                 "JOIN Color c ON pv.ColorID = c.ColorID " +
+                 "WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, productId);
+        ps.setString(2, sizeName);
+        ps.setString(3, colorName);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                quantity = rs.getInt("Quantity");
+            }
+        }
+    }
+    return quantity;
+}
+public double getPriceByVariant(int productId, String sizeName, String colorName) throws SQLException, ClassNotFoundException {
+    double price = 0;
+    String sql = "SELECT pv.Price " +
+                 "FROM ProductVariant pv " +
+                 "JOIN Size s ON pv.SizeID = s.SizeID " +
+                 "JOIN Color c ON pv.ColorID = c.ColorID " +
+                 "WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, productId);
+        ps.setString(2, sizeName);
+        ps.setString(3, colorName);
+        try (ResultSet rs = ps.executeQuery()) {
+            if (rs.next()) {
+                price = rs.getDouble("Price");
+            }
+        }
+    }
+    return price;
+}
 
     public int getAttributeIDByName(int productId, String size, String color) throws SQLException, ClassNotFoundException {
         String sql = "SELECT AttributeID FROM ProductVariant WHERE ProductID = ? AND Size = ? AND Color = ?";
