@@ -81,7 +81,7 @@
                 </div>
                 <% } %>
             </div>
-            <a class="btn" href="<%= request.getContextPath() %>/staffDashboard.jsp?page=staff/orderlist.jsp">← Back to Order List</a>
+            <button class="btn" onclick="history.back()">← Back to Order List</button>
             <% } %>
         </div>
     </body>
