@@ -1,5 +1,6 @@
 package controllers;
 
+import dao.OrderDAO;
 import dao.ReviewDAO;
 import dto.UserDTO;
 import jakarta.servlet.ServletException;
@@ -17,7 +18,7 @@ public class SubmitReviewController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Lấy thông tin từ session
+            // Lấy người dùng từ session
             UserDTO user = (UserDTO) request.getSession().getAttribute("LOGIN_USER");
             if (user == null) {
                 response.sendRedirect("login.jsp");
@@ -29,16 +30,22 @@ public class SubmitReviewController extends HttpServlet {
             int rating = Integer.parseInt(request.getParameter("rating"));
             String comment = request.getParameter("comment");
 
+            // ✅ Kiểm tra đã từng mua & đơn đã Delivered
+            OrderDAO orderDAO = new OrderDAO();
+            boolean isEligible = orderDAO.hasUserPurchasedProduct(userId, productId);
+
+            if (!isEligible) {
+                // ❌ Không đủ điều kiện đánh giá
+                response.sendRedirect("productDetail.jsp?id=" + productId + "&error=unauthorized");
+                return;
+            }
+
+            // ✅ Tiếp tục nếu hợp lệ
             ReviewDAO reviewDAO = new ReviewDAO();
-
-            // Kiểm tra nếu user đã đánh giá sản phẩm này trước đó → xóa để chỉ cho 1 lần đánh giá (nếu cần)
-            reviewDAO.deleteExistingReview(userId, productId);
-
-            // Lưu review mới
+            reviewDAO.deleteExistingReview(userId, productId); // Optional
             reviewDAO.insertReview(userId, productId, rating, comment);
 
-            // Quay lại trang sản phẩm
-            response.sendRedirect("productDetail.jsp?id=" + productId);
+            response.sendRedirect("productDetail.jsp?id=" + productId + "&review=success");
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("error.jsp");
