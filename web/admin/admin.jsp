@@ -138,7 +138,7 @@
                 <nav class="col-auto col-md-3 col-xl-2 px-sm-2 px-0 sidebar-custom d-flex flex-column align-items-stretch py-3">
                     <ul class="nav nav-pills flex-column mb-auto gap-2">
                         <li class="nav-item">
-                            <button class="nav-link text-start w-100" onclick="loadContent('adminHome.jsp')"><i class="bi bi-house"></i> Home</button>
+                            <button class="nav-link text-start w-100" onclick="loadContent('admin/adminHome.jsp')"><i class="bi bi-house"></i> Home</button>
                         </li>
                         <li>
                             <button class="nav-link text-start w-100" onclick="loadContent('viewRevenue.jsp')"><i class="bi bi-bar-chart"></i> View Revenue</button>

@@ -3,6 +3,13 @@
 <%@page import="dto.VoucherDTO"%>
 <%
     List<VoucherDTO> vouchers = (List<VoucherDTO>) request.getAttribute("vouchers");
+    String msg = request.getParameter("msg");
+    String type = request.getParameter("type") != null ? request.getParameter("type") : "success";
+    if (msg != null) {
+%>
+    <div class="alert alert-<%=type%> mt-2"><%=msg%></div>
+<%
+    }
 %>
 <!DOCTYPE html>
 <html>
@@ -63,5 +70,66 @@
         </tbody>
     </table>
 </div>
+<script>
+// Xử lý submit form add voucher bằng AJAX
+const addForm = document.querySelector('form[action="ManageVoucherController"][method="post"]');
+if (addForm) {
+    addForm.addEventListener('submit', function(e) {
+        e.preventDefault();
+        const formData = new FormData(addForm);
+        fetch('ManageVoucherController', {
+            method: 'POST',
+            body: formData
+        })
+        .then(res => res.text())
+        .then(html => {
+            // Lấy thông báo từ HTML trả về (nếu có)
+            let msg = '';
+            let type = 'success';
+            const match = html.match(/<div class=\"alert alert-(.*?) mt-2\">(.*?)<\/div>/);
+            if (match) {
+                type = match[1];
+                msg = match[2];
+            }
+            // Reload lại nội dung chính
+            if (typeof loadContent === 'function') {
+                loadContent('ManageVoucherController', msg, type);
+            } else {
+                location.reload();
+            }
+        });
+    });
+}
+// Xử lý submit form delete voucher bằng AJAX
+const table = document.querySelector('table');
+if (table) {
+    table.addEventListener('submit', function(e) {
+        if (e.target && e.target.matches('form[action="ManageVoucherController"]')) {
+            e.preventDefault();
+            if (!confirm('Are you sure you want to delete (deactivate) this voucher?')) return;
+            const formData = new FormData(e.target);
+            fetch('ManageVoucherController', {
+                method: 'POST',
+                body: formData
+            })
+            .then(res => res.text())
+            .then(html => {
+                let msg = '';
+                let type = 'success';
+                const match = html.match(/<div class=\"alert alert-(.*?) mt-2\">(.*?)<\/div>/);
+                if (match) {
+                    type = match[1];
+                    msg = match[2];
+                }
+                if (typeof loadContent === 'function') {
+                    loadContent('ManageVoucherController', msg, type);
+                } else {
+                    location.reload();
+                }
+            });
+        }
+    });
+}
+</script>
 </body>
 </html> 

@@ -28,14 +28,29 @@ public class ManageVoucherController extends HttpServlet {
         VoucherDAO dao = new VoucherDAO();
         try {
             if ("add".equals(action)) {
-                VoucherDTO v = new VoucherDTO(
-                    0,
-                    request.getParameter("voucherCode"),
-                    Double.parseDouble(request.getParameter("discountValue")),
-                    java.sql.Date.valueOf(request.getParameter("expiryDate")),
-                    request.getParameter("status")
-                );
-                dao.addVoucher(v);
+                try {
+                    VoucherDTO v = new VoucherDTO(
+                        0,
+                        request.getParameter("voucherCode"),
+                        Double.parseDouble(request.getParameter("discountValue")),
+                        java.sql.Date.valueOf(request.getParameter("expiryDate")),
+                        request.getParameter("status")
+                    );
+                    boolean ok = dao.addVoucher(v);
+                    if (ok) {
+                        response.sendRedirect("ManageVoucherController?msg=Voucher+added+successfully&type=success");
+                    } else {
+                        response.sendRedirect("ManageVoucherController?msg=Failed+to+add+voucher&type=danger");
+                    }
+                } catch (Exception e) {
+                    String msg = e.getMessage();
+                    if (msg != null && (msg.toLowerCase().contains("duplicate") || msg.toLowerCase().contains("unique"))) {
+                        response.sendRedirect("ManageVoucherController?msg=Voucher+code+already+exists!+Please+choose+another+code.&type=danger");
+                    } else {
+                        response.sendRedirect("ManageVoucherController?msg=Error:+" + (msg != null ? msg.replaceAll("[\\r\\n]+", " ") : "Unknown error") + "&type=danger");
+                    }
+                }
+                return;
             } else if ("update".equals(action)) {
                 int voucherID = Integer.parseInt(request.getParameter("voucherID"));
                 String status = request.getParameter("status");
