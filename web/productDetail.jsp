@@ -3,12 +3,8 @@
 <%@ page import="dao.ProductVariantDAO, dao.ReviewDAO" %>
 <%@ page import="dto.ReviewDTO" %>
 <%@ page import="java.util.List" %>
-
 <%@ page import="dao.OrderDAO" %>
 <%@ page import="java.util.Map, java.util.HashMap" %>
-
-
-
 <%
     int productID = Integer.parseInt(request.getParameter("id"));
     boolean fromSaleOff = "true".equals(request.getParameter("fromSaleOff")); // ✅ Check if from sale page
@@ -147,27 +143,27 @@ double avgRating = 0;
                     <h1><%= product.getProductName() %></h1>
 
                     <% if (fromSaleOff) { %>
-<div class="price">
-    <span style="text-decoration: line-through; color: gray;">
-        <%= String.format("%,.0f", originalPrice) %> VND
-    </span><br>
-    <span style="color: red; font-weight: bold;">
-        <%= String.format("%,.0f", discountedPrice) %> VND (-20%)
-    </span>
-</div>
-<% } else { %>
-<div class="price" id="price-display" style="font-weight:bold;">
-    <%= String.format("%,.0f", originalPrice) %> VND
-</div>
-<% } %>
+                    <div class="price">
+                        <span style="text-decoration: line-through; color: gray;">
+                            <%= String.format("%,.0f", originalPrice) %> VND
+                        </span><br>
+                        <span style="color: red; font-weight: bold;">
+                            <%= String.format("%,.0f", discountedPrice) %> VND (-20%)
+                        </span>
+                    </div>
+                    <% } else { %>
+                    <div class="price" id="price-display" style="font-weight:bold;">
+                        <%= String.format("%,.0f", originalPrice) %> VND
+                    </div>
+                    <% } %>
 
                     <script>
-    const variantStockMap = {
-        <% for (Map.Entry<String, Integer> entry : variantStockMap.entrySet()) { %>
-        "<%= entry.getKey() %>": <%= entry.getValue() %>,
-        <% } %>
-    };
-</script>
+                        const variantStockMap = {
+                        <% for (Map.Entry<String, Integer> entry : variantStockMap.entrySet()) { %>
+                            "<%= entry.getKey() %>": <%= entry.getValue() %>,
+                        <% } %>
+                        };
+                    </script>
 
                     <form action="MainController" method="post" onsubmit="return validateBeforeSubmit(window.maxAvailable)">
                         <input type="hidden" name="productID" value="<%= product.getProductID() %>">
@@ -179,9 +175,11 @@ double avgRating = 0;
                             <label>Size:</label>
                             <div class="option-buttons" id="size-options">
                                 <% for (String size : sizeList) { %>
-    <button type="button" class="option-btn"
-        onclick="selectSize('<%= size %>', this); updateStockInfo(); fetchPriceByVariant();"><%= size %></button>
-<% } %>
+                                <button type="button" class="option-btn"
+                                        onclick="selectSize('<%= size %>', this);
+                                                updateStockInfo();
+                                                fetchPriceByVariant();"><%= size %></button>
+                                <% } %>
                             </div>
                             <input type="hidden" name="size" id="size" value="">
                             <small id="size-error">Please choose size!</small>
@@ -195,9 +193,11 @@ double avgRating = 0;
                             <label>Color:</label>
                             <div class="option-buttons" id="color-options">
                                 <% for (String color : colorList) { %>
-    <button type="button" class="option-btn"
-        onclick="selectColor('<%= color %>', this); updateStockInfo(); fetchPriceByVariant();"><%= color %></button>
-<% } %>
+                                <button type="button" class="option-btn"
+                                        onclick="selectColor('<%= color %>', this);
+                                                updateStockInfo();
+                                                fetchPriceByVariant();"><%= color %></button>
+                                <% } %>
 
                             </div>
                             <input type="hidden" name="color" id="color" value="">
@@ -218,9 +218,9 @@ double avgRating = 0;
                         </div>
 
                         <div class="add-to-cart">
-    <button type="submit" class="checkout-btn" name="action" value="AddToCart">Add to Cart</button>
-    <button type="button" class="checkout-btn" onclick="submitBuyNow()">Buy Now</button>
-</div>
+                            <button type="submit" class="checkout-btn" name="action" value="AddToCart">Add to Cart</button>
+                            <button type="button" class="checkout-btn" onclick="submitBuyNow()">Buy Now</button>
+                        </div>
 
                     </form>
                 </div>
@@ -309,17 +309,17 @@ double avgRating = 0;
             }
 
             function increaseQuantity(dummy) {
-    const input = document.getElementById("quantity");
-    const display = document.getElementById("quantity-display");
-    const maxAvailable = window.maxAvailable || 0;
-    let val = parseInt(input.value);
-    if (val < maxAvailable) {
-        input.value = val + 1;
-        display.textContent = val + 1;
-    } else {
-        alert("Số lượng vượt quá tồn kho.");
-    }
-}
+                const input = document.getElementById("quantity");
+                const display = document.getElementById("quantity-display");
+                const maxAvailable = window.maxAvailable || 0;
+                let val = parseInt(input.value);
+                if (val < maxAvailable) {
+                    input.value = val + 1;
+                    display.textContent = val + 1;
+                } else {
+                    alert("Số lượng vượt quá tồn kho.");
+                }
+            }
 
 
             function validateBeforeSubmit(maxAvailable) {
@@ -382,102 +382,104 @@ double avgRating = 0;
                 document.body.appendChild(form);
                 form.submit();
             }
-            
+
 
 // ✅ THÊM Ở ĐÂY:
-function updateStockInfo() {
-    const size = document.getElementById("size").value;
-    const color = document.getElementById("color").value;
-    if (!size || !color) return;
+            function updateStockInfo() {
+                const size = document.getElementById("size").value;
+                const color = document.getElementById("color").value;
+                if (!size || !color)
+                    return;
 
-    const key = size + "_" + color;
-    const available = variantStockMap[key] || 0;
+                const key = size + "_" + color;
+                const available = variantStockMap[key] || 0;
 
-    const quantity = document.getElementById("quantity");
-    const display = document.getElementById("quantity-display");
-    if (parseInt(quantity.value) > available) {
-        quantity.value = available > 0 ? 1 : 0;
-        display.textContent = quantity.value;
-    }
+                const quantity = document.getElementById("quantity");
+                const display = document.getElementById("quantity-display");
+                if (parseInt(quantity.value) > available) {
+                    quantity.value = available > 0 ? 1 : 0;
+                    display.textContent = quantity.value;
+                }
 
-    const addToCartBtn = document.querySelector("button[name='action'][value='AddToCart']");
-    const buyNowBtn = document.querySelector("button[onclick='submitBuyNow()']");
-    if (available > 0) {
-        addToCartBtn.disabled = false;
-        addToCartBtn.style.backgroundColor = '';
-        addToCartBtn.textContent = 'Add to Cart';
-        buyNowBtn.disabled = false;
-        buyNowBtn.style.backgroundColor = '';
-    } else {
-        addToCartBtn.disabled = true;
-        addToCartBtn.style.backgroundColor = '#ccc';
-        addToCartBtn.textContent = 'Sold Out';
-        buyNowBtn.disabled = true;
-        buyNowBtn.style.backgroundColor = '#ccc';
-    }
+                const addToCartBtn = document.querySelector("button[name='action'][value='AddToCart']");
+                const buyNowBtn = document.querySelector("button[onclick='submitBuyNow()']");
+                if (available > 0) {
+                    addToCartBtn.disabled = false;
+                    addToCartBtn.style.backgroundColor = '';
+                    addToCartBtn.textContent = 'Add to Cart';
+                    buyNowBtn.disabled = false;
+                    buyNowBtn.style.backgroundColor = '';
+                } else {
+                    addToCartBtn.disabled = true;
+                    addToCartBtn.style.backgroundColor = '#ccc';
+                    addToCartBtn.textContent = 'Sold Out';
+                    buyNowBtn.disabled = true;
+                    buyNowBtn.style.backgroundColor = '#ccc';
+                }
 
-    window.maxAvailable = available;
+                window.maxAvailable = available;
 
-    // ✅ GỌI FETCH GIÁ Ở ĐÂY
-    fetchPriceByVariant();
-}
+                // ✅ GỌI FETCH GIÁ Ở ĐÂY
+                fetchPriceByVariant();
+            }
 
 
-<% if (!fromSaleOff) { %>
-document.querySelectorAll("#size-options .option-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        updateStockInfo();
-        fetchPriceByVariant();
-    });
-});
-document.querySelectorAll("#color-options .option-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        updateStockInfo();
-        fetchPriceByVariant();
-    });
-});
-<% } else { %>
-document.querySelectorAll("#size-options .option-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        updateStockInfo(); // 👈 chỉ update số lượng tồn kho
-    });
-});
-document.querySelectorAll("#color-options .option-btn").forEach(btn => {
-    btn.addEventListener("click", () => {
-        updateStockInfo();
-    });
-});
-<% } %>
+            <% if (!fromSaleOff) { %>
+            document.querySelectorAll("#size-options .option-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    updateStockInfo();
+                    fetchPriceByVariant();
+                });
+            });
+            document.querySelectorAll("#color-options .option-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    updateStockInfo();
+                    fetchPriceByVariant();
+                });
+            });
+            <% } else { %>
+            document.querySelectorAll("#size-options .option-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    updateStockInfo(); // 👈 chỉ update số lượng tồn kho
+                });
+            });
+            document.querySelectorAll("#color-options .option-btn").forEach(btn => {
+                btn.addEventListener("click", () => {
+                    updateStockInfo();
+                });
+            });
+            <% } %>
 
 
 
 
         </script>
         <script>
-function fetchPriceByVariant() {
-    const size = document.getElementById("size").value;
-    const color = document.getElementById("color").value;
-    if (!size || !color) return;
+            function fetchPriceByVariant() {
+                const size = document.getElementById("size").value;
+                const color = document.getElementById("color").value;
+                if (!size || !color)
+                    return;
 
-    const productId = '<%= product.getProductID() %>';
+                const productId = '<%= product.getProductID() %>';
 
-    fetch("<%=request.getContextPath()%>/GetPriceByVariantServlet?productId=" + productId + "&size=" + size + "&color=" + color)
+                fetch("<%=request.getContextPath()%>/GetPriceByVariantServlet?productId=" + productId + "&size=" + size + "&color=" + color)
 
-        .then(res => res.json())
-        .then(data => {
-            if (data.price !== undefined) {
-                const priceElement = document.getElementById("price-display");
-                priceElement.textContent = Number(data.price).toLocaleString() + " VND";
-                
-                // ✅ Cập nhật giá vào input ẩn để truyền đi khi submit
-                document.querySelector("input[name='price']").value = data.price;
+                        .then(res => res.json())
+                        .then(data => {
+                            if (data.price !== undefined) {
+                                const priceElement = document.getElementById("price-display");
+                                priceElement.textContent = Number(data.price).toLocaleString() + " VND";
+
+                                // ✅ Cập nhật giá vào input ẩn để truyền đi khi submit
+                                document.querySelector("input[name='price']").value = data.price;
+                            }
+                        })
+                        .catch(err => console.error("Lỗi khi lấy giá: ", err));
             }
-        })
-        .catch(err => console.error("Lỗi khi lấy giá: ", err));
-}
-</script>
+        </script>
 
 
     </body>
-    
+
 </html>

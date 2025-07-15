@@ -6,7 +6,9 @@
 package com.vnpay.common;
 
 import dao.OrderDAO;
+import dao.UserAddressDAO;
 import dto.OrderDTO;
+import dto.UserAddressDTO;
 import dto.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
@@ -77,8 +79,8 @@ public class ajaxServlet extends HttpServlet {
         order.setNote("Unpaid order");
 
         Integer tempOrderId = (Integer) session.getAttribute("TEMP_ORDER_ID");
-        if (tempOrderId != null) {
-            try {
+        try {
+            if (tempOrderId != null) {
                 OrderDTO existingOrder = orderDAO.getOrderById(tempOrderId);
                 if (existingOrder != null && "Pending".equals(existingOrder.getStatus())) {
                     orderId_new = tempOrderId;
@@ -88,23 +90,46 @@ public class ajaxServlet extends HttpServlet {
                     orderId_new = orderDAO.addOrder(order);
                     session.setAttribute("TEMP_ORDER_ID", orderId_new);
                 }
-            } catch (SQLException | ClassNotFoundException ex) {
-                Logger.getLogger(ajaxServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
-        } else {
-            try {
+            } else {
                 // Chưa có thì tạo mới
                 orderId_new = orderDAO.addOrder(order);
                 session.setAttribute("TEMP_ORDER_ID", orderId_new);
-            } catch (SQLException ex) {
-                Logger.getLogger(ajaxServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
+        } catch (SQLException | ClassNotFoundException ex) {
+            Logger.getLogger(ajaxServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
         if (orderId_new < 0) {
             resp.sendRedirect("error.jsp");
             return;
         }
         String vnp_TxnRef = orderId_new + "-" + System.currentTimeMillis();
+
+        // Lấy thông tin địa chỉ từ form
+        String country = req.getParameter("country");
+        String fullName = req.getParameter("fullname");
+        String phone = req.getParameter("phone");
+        String email = req.getParameter("email");
+        String address = req.getParameter("address");
+        String district = req.getParameter("district");
+        String city = req.getParameter("city");
+
+        // Lưu địa chỉ giao hàng vào DB
+        try {
+            UserAddressDTO addressDTO = new UserAddressDTO();
+            addressDTO.setOrderID(orderId_new);
+            addressDTO.setCountry(country);
+            addressDTO.setFullName(fullName);
+            addressDTO.setPhone(phone);
+            addressDTO.setEmail(email);
+            addressDTO.setAddress(address);
+            addressDTO.setDistrict(district);
+            addressDTO.setCity(city);
+
+            UserAddressDAO addressDAO = new UserAddressDAO();
+            addressDAO.insertAddressInfo(addressDTO);
+        } catch (Exception ex) {
+            Logger.getLogger(ajaxServlet.class.getName()).log(Level.SEVERE, null, ex);
+        }
 
         // Lưu vào session để sử dụng sau khi thanh toán thành công
         Map<String, Object> pendingOrder = new HashMap<>();
@@ -115,10 +140,10 @@ public class ajaxServlet extends HttpServlet {
         pendingOrder.put("email", loginUser.getEmail());
         pendingOrder.put("phone", loginUser.getPhone());
         pendingOrder.put("txnRef", vnp_TxnRef);
-        pendingOrder.put("country", req.getParameter("country"));
-        pendingOrder.put("address", req.getParameter("address"));
-        pendingOrder.put("district", req.getParameter("district"));
-        pendingOrder.put("city", req.getParameter("city"));
+        pendingOrder.put("country", country);
+        pendingOrder.put("address", address);
+        pendingOrder.put("district", district);
+        pendingOrder.put("city", city);
         pendingOrder.put("discountCode", req.getParameter("discountCode"));
         pendingOrder.put("discountPercent", req.getParameter("discountPercent"));
         pendingOrder.put("productId", req.getParameter("productId"));
@@ -126,9 +151,8 @@ public class ajaxServlet extends HttpServlet {
         pendingOrder.put("size", req.getParameter("size"));
         pendingOrder.put("color", req.getParameter("color"));
         pendingOrder.put("fromSaleOff", req.getParameter("fromSaleOff"));
-        pendingOrder.put("checkoutType", req.getParameter("checkoutType"));
+        pendingOrder.put("checkoutType", checkoutType);
         session.setAttribute("PENDING_ORDER", pendingOrder);
-        session.setAttribute("TEMP_ORDER_ID", orderId_new);
 
         // Chuẩn bị redirect sang VNPay
         String vnp_Version = "2.1.0";
@@ -164,9 +188,10 @@ public class ajaxServlet extends HttpServlet {
         Calendar cld = Calendar.getInstance(TimeZone.getTimeZone("Etc/GMT+7"));
         SimpleDateFormat formatter = new SimpleDateFormat("yyyyMMddHHmmss");
         String vnp_CreateDate = formatter.format(cld.getTime());
-        vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
         cld.add(Calendar.MINUTE, 15);
         String vnp_ExpireDate = formatter.format(cld.getTime());
+
+        vnp_Params.put("vnp_CreateDate", vnp_CreateDate);
         vnp_Params.put("vnp_ExpireDate", vnp_ExpireDate);
 
         List<String> fieldNames = new ArrayList<>(vnp_Params.keySet());
