@@ -17,7 +17,14 @@ public class ManageVoucherController extends HttpServlet {
             VoucherDAO dao = new VoucherDAO();
             List<VoucherDTO> vouchers = dao.getActiveVouchers();
             request.setAttribute("vouchers", vouchers);
-            request.getRequestDispatcher("admin/manageVoucher.jsp").forward(request, response);
+            String msg = request.getParameter("msg");
+            String type = request.getParameter("type") != null ? request.getParameter("type") : "success";
+            if (msg != null) {
+                request.setAttribute("msg", msg);
+                request.setAttribute("type", type);
+            }
+            request.setAttribute("page", "manageVoucher.jsp");
+            request.getRequestDispatcher("admin/admin.jsp").forward(request, response);
         } catch (SQLException | ClassNotFoundException e) {
             throw new ServletException(e);
         }

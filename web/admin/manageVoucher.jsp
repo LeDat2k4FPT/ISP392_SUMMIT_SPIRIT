@@ -4,119 +4,91 @@
 <%
     List<VoucherDTO> vouchers = (List<VoucherDTO>) request.getAttribute("vouchers");
     String msg = request.getParameter("msg");
+    if (msg == null) msg = (String) request.getAttribute("msg");
     String type = request.getParameter("type") != null ? request.getParameter("type") : "success";
-    if (msg != null) {
+    if (type == null) type = (String) request.getAttribute("type");
 %>
+
+<div class="container-fluid mt-3">
+    <h2 style="color:#234C45;font-weight:600;">Manage Vouchers</h2>
+    <% if (msg != null) { %>
     <div class="alert alert-<%=type%> mt-2"><%=msg%></div>
-<%
-    }
-%>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Manage Vouchers</title>
-    <link rel="stylesheet" href="../css/admin.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
-<div class="container mt-4">
-    <h2>Manage Vouchers</h2>
-    <hr>
-    <form method="post" action="ManageVoucherController">
+    <% } %>
+
+    <form method="post" action="<%=request.getContextPath()%>/ManageVoucherController" class="row g-2 align-items-center mt-3 mb-4">
         <input type="hidden" name="action" value="add">
-        <div class="row g-2">
-            <div class="col-md-2"><input class="form-control" name="voucherCode" placeholder="Code" required></div>
-            <div class="col-md-2"><input class="form-control" name="discountValue" placeholder="Discount" type="number" step="0.01" required></div>
-            <div class="col-md-3"><input class="form-control" name="expiryDate" type="date" required></div>
-            <div class="col-md-2">
-                <select class="form-control" name="status">
-                    <option value="Active">Active</option>
-                    <option value="Inactive">Inactive</option>
-                </select>
-            </div>
-            <div class="col-md-1">
-                <button class="btn btn-success" type="submit">Add</button>
-            </div>
+        <div class="col-md-2">
+            <input class="form-control" name="voucherCode" placeholder="Code" required>
+        </div>
+        <div class="col-md-2">
+            <input class="form-control" name="discountValue" placeholder="Discount" type="number" step="0.01" required>
+        </div>
+        <div class="col-md-3">
+            <input class="form-control" name="expiryDate" type="date" required>
+        </div>
+        <div class="col-md-2">
+            <select class="form-select" name="status">
+                <option value="Active">Active</option>
+                <option value="Inactive">Inactive</option>
+            </select>
+        </div>
+        <div class="col-md-1">
+            <button class="btn btn-success" style="background:#234C45;" type="submit">Add</button>
         </div>
     </form>
-    <table class="table table-bordered mt-3">
-        <thead>
-        <tr>
-            <th>ID</th>
-            <th>Code</th>
-            <th>Discount</th>
-            <th>Expiry Date</th>
-            <th>Status</th>
-            <th>Action</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% if (vouchers != null) for (VoucherDTO v : vouchers) { %>
-            <tr>
-                <td><%=v.getVoucherID()%></td>
-                <td><%=v.getVoucherCode()%></td>
-                <td><%=v.getDiscountValue()%></td>
-                <td><%=v.getExpiryDate()%></td>
-                <td><%=v.getStatus()%></td>
-                <td>
-                    <form method="post" action="ManageVoucherController" style="display:inline;" onsubmit="return confirm('Are you sure you want to delete (deactivate) this voucher?');">
-                        <input type="hidden" name="voucherID" value="<%=v.getVoucherID()%>">
-                        <input type="hidden" name="action" value="delete">
-                        <button class="btn btn-danger btn-sm" type="submit">Delete</button>
-                    </form>
-                </td>
-            </tr>
-        <% } %>
-        </tbody>
-    </table>
+
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle bg-white">
+            <thead class="table-light">
+                <tr>
+                    <th>ID</th>
+                    <th>Code</th>
+                    <th>Discount</th>
+                    <th>Expiry Date</th>
+                    <th>Status</th>
+                    <th>Action</th>
+                </tr>
+            </thead>
+            <tbody>
+                <% if (vouchers != null) for (VoucherDTO v : vouchers) { %>
+                    <tr>
+                        <td><%=v.getVoucherID()%></td>
+                        <td><%=v.getVoucherCode()%></td>
+                        <td><%=v.getDiscountValue()%></td>
+                        <td><%=v.getExpiryDate()%></td>
+                        <td><%=v.getStatus()%></td>
+                        <td>
+                            <form method="post" action="<%=request.getContextPath()%>/ManageVoucherController" style="display:inline;">
+                                <input type="hidden" name="voucherID" value="<%=v.getVoucherID()%>">
+                                <input type="hidden" name="action" value="delete">
+                                <button class="btn btn-danger btn-sm" type="submit"
+                                        onclick="return confirm('Are you sure you want to delete (deactivate) voucher <%=v.getVoucherCode()%>?');">
+                                    Delete
+                                </button>
+                            </form>
+                        </td>
+                    </tr>
+                <% } %>
+            </tbody>
+        </table>
+    </div>
 </div>
+
 <script>
-// Xử lý submit form add voucher bằng AJAX
-const addForm = document.querySelector('form[action="ManageVoucherController"][method="post"]');
-if (addForm) {
-    addForm.addEventListener('submit', function(e) {
-        e.preventDefault();
-        const formData = new FormData(addForm);
-        fetch('ManageVoucherController', {
-            method: 'POST',
-            body: formData
-        })
-        .then(res => res.text())
-        .then(html => {
-            // Lấy thông báo từ HTML trả về (nếu có)
-            let msg = '';
-            let type = 'success';
-            const match = html.match(/<div class=\"alert alert-(.*?) mt-2\">(.*?)<\/div>/);
-            if (match) {
-                type = match[1];
-                msg = match[2];
-            }
-            // Reload lại nội dung chính
-            if (typeof loadContent === 'function') {
-                loadContent('ManageVoucherController', msg, type);
-            } else {
-                location.reload();
-            }
-        });
-    });
-}
-// Xử lý submit form delete voucher bằng AJAX
-const table = document.querySelector('table');
-if (table) {
-    table.addEventListener('submit', function(e) {
-        if (e.target && e.target.matches('form[action="ManageVoucherController"]')) {
+document.addEventListener("DOMContentLoaded", () => {
+    const addForm = document.querySelector('form[action="ManageVoucherController"][method="post"]');
+    if (addForm) {
+        addForm.addEventListener('submit', function(e) {
             e.preventDefault();
-            if (!confirm('Are you sure you want to delete (deactivate) this voucher?')) return;
-            const formData = new FormData(e.target);
+            const formData = new FormData(addForm);
             fetch('ManageVoucherController', {
                 method: 'POST',
                 body: formData
             })
             .then(res => res.text())
             .then(html => {
-                let msg = '';
-                let type = 'success';
-                const match = html.match(/<div class=\"alert alert-(.*?) mt-2\">(.*?)<\/div>/);
+                const match = html.match(/<div class="alert alert-(.*?) mt-2">(.*?)<\/div>/);
+                let msg = '', type = 'success';
                 if (match) {
                     type = match[1];
                     msg = match[2];
@@ -127,9 +99,36 @@ if (table) {
                     location.reload();
                 }
             });
-        }
-    });
-}
+        });
+    }
+
+    const table = document.querySelector('table');
+    if (table) {
+        table.addEventListener('submit', function(e) {
+            if (e.target && e.target.matches('form[action="ManageVoucherController"]')) {
+                e.preventDefault();
+                if (!confirm('Are you sure you want to delete (deactivate) this voucher?')) return;
+                const formData = new FormData(e.target);
+                fetch('ManageVoucherController', {
+                    method: 'POST',
+                    body: formData
+                })
+                .then(res => res.text())
+                .then(html => {
+                    const match = html.match(/<div class="alert alert-(.*?) mt-2">(.*?)<\/div>/);
+                    let msg = '', type = 'success';
+                    if (match) {
+                        type = match[1];
+                        msg = match[2];
+                    }
+                    if (typeof loadContent === 'function') {
+                        loadContent('ManageVoucherController', msg, type);
+                    } else {
+                        location.reload();
+                    }
+                });
+            }
+        });
+    }
+});
 </script>
-</body>
-</html> 

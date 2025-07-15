@@ -17,7 +17,8 @@ public class ManageUpdateHistoryController extends HttpServlet {
             UpdateHistoryDAO dao = new UpdateHistoryDAO();
             List<UpdateHistoryDTO> logs = dao.getAllLogs();
             request.setAttribute("logs", logs);
-            request.getRequestDispatcher("admin/updateHistory.jsp").forward(request, response);
+            request.setAttribute("page", "updateHistory.jsp");
+            request.getRequestDispatcher("admin/admin.jsp").forward(request, response);
         } catch (SQLException | ClassNotFoundException e) {
             throw new ServletException(e);
         }

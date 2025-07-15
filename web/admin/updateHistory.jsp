@@ -4,18 +4,10 @@
 <%
     List<UpdateHistoryDTO> logs = (List<UpdateHistoryDTO>) request.getAttribute("logs");
 %>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Update History</title>
-    <link rel="stylesheet" href="../css/admin.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
 <div class="container mt-4">
     <h2>Update History</h2>
     <table class="table table-bordered mt-3">
-        <thead>
+        <thead class="table-light">
         <tr>
             <th>LogID</th>
             <th>Action</th>
@@ -43,5 +35,3 @@
         </tbody>
     </table>
 </div>
-</body>
-</html> 

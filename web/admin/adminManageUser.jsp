@@ -22,7 +22,11 @@
             <button type="submit" class="btn btn-success" style="background:#234C45;">Search</button>
         </div>
         <div class="col-auto">
-            <button type="button" class="btn btn-outline-success" style="color:#234C45;border-color:#234C45;" onclick="loadContent('admin/createUserAccount.jsp')">Create New Account</button>
+            <a href="${pageContext.request.contextPath}/AdminCreateUserController" 
+                class="btn btn-outline-success" 
+                style="color:#234C45;border-color:#234C45;">
+                Create New Account
+             </a>
         </div>
     </form>
 
