@@ -99,6 +99,7 @@
         </script>
 
         <form id="checkoutForm" action="payment" method="POST" onsubmit="return validateForm()">
+            <input type="hidden" name="checkoutType" value="<%= session.getAttribute("BUY_NOW_PRODUCT") != null ? "BUY_NOW" : "CART" %>">
             <div class="container">
                 <div class="form-section">
                     <h3>Shipping Address</h3>

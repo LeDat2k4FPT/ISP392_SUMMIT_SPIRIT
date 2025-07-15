@@ -19,11 +19,10 @@ public class OrderDAO {
     private static final String GET_ORDERS_BY_USER = "SELECT OrderID, OrderDate, Status, TotalAmount FROM Orders WHERE UserID = ? ORDER BY OrderDate DESC";
     private static final String CREATE_ORDER = "INSERT INTO Orders (userID, orderDate, total, status) VALUES (?, ?, ?, ?)";
     private static final String UPDATE_ORDER_STATUS = "UPDATE Orders SET status = ? WHERE orderID = ?";
-    private static final String DELETE_ORDER = "DELETE FROM Orders WHERE OrderID = ?";
     private static final String INSERT_ORDER = "INSERT INTO Orders (UserID, TotalAmount) VALUES (?, ?)";
     private static final String UPDATE_STATUS = "UPDATE Orders SET Status = ? WHERE OrderID = ?";
-    private static final String ADD_ORDER = "INSERT INTO Orders (UserID, OrderDate, Status, TotalAmount, ShipFee, VoucherID) VALUES (?, ?, ?, ?, ?, ?)";
-    private static final String UPDATE_AFTER_PAYMENT = "UPDATE Orders SET Status = ? WHERE OrderID = ?";
+    private static final String ADD_ORDER = "INSERT INTO Orders (UserID, OrderDate, Status, TotalAmount, ShipFee, VoucherID, Note) VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String UPDATE_AFTER_PAYMENT = "UPDATE Orders SET Status = ?, Note = ? WHERE OrderID = ?";
 
     public List<OrderDTO> getAllOrders() throws SQLException, ClassNotFoundException {
         List<OrderDTO> list = new ArrayList<>();
@@ -124,80 +123,6 @@ public class OrderDAO {
         return orders;
     }
 
-//    public List<OrderDTO> getOrdersByUserID(int userID) {
-//    List<OrderDTO> list = new ArrayList<>();
-//    try {
-//        String sql = "SELECT OrderID, OrderDate, Status, TotalAmount FROM Orders WHERE UserID=? ORDER BY OrderDate DESC";
-//        PreparedStatement ps = connection.prepareStatement(sql);
-//        ps.setInt(1, userID);
-//        ResultSet rs = ps.executeQuery();
-//        while (rs.next()) {
-//            OrderDTO o = new OrderDTO();
-//            o.setOrderID(rs.getInt("OrderID"));
-//            o.setOrderDate(rs.getDate("OrderDate"));
-//            o.setStatus(rs.getString("Status"));
-//            o.setTotalAmount(rs.getDouble("TotalAmount"));
-//            list.add(o);
-//        }
-//    } catch (Exception e) {
-//        e.printStackTrace();
-//    }
-//    return list;
-//}
-//    public boolean createOrder(OrderDTO order) throws SQLException {
-//        boolean check = false;
-//        Connection conn = null;
-//        PreparedStatement ptm = null;
-//        try {
-//            conn = DBUtils.getConnection();
-//            if (conn != null) {
-//                ptm = conn.prepareStatement(CREATE_ORDER);
-//                ptm.setInt(1, order.getUserID());
-//                ptm.setDate(2, order.getOrderDate());
-//                ptm.setDouble(3, order.getTotal());
-//                ptm.setString(4, order.getStatus());
-//                check = ptm.executeUpdate() > 0;
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (ptm != null) {
-//                ptm.close();
-//            }
-//            if (conn != null) {
-//                conn.close();
-//            }
-//        }
-//        return check;
-//    }
-//    public boolean updateOrderStatus(int orderID, String status) throws SQLException {
-//        boolean check = false;
-//        Connection conn = null;
-//        PreparedStatement ptm = null;
-//        try {
-//            conn = DBUtils.getConnection();
-//            if (conn != null) {
-//                ptm = conn.prepareStatement(UPDATE_ORDER_STATUS);
-//                ptm.setString(1, status);
-//                ptm.setInt(2, orderID);
-//                check = ptm.executeUpdate() > 0;
-//                System.out.println("Executing update: orderID=" + orderID + ", status=" + status);
-//                int rows = ptm.executeUpdate();
-//                System.out.println("Updated rows: " + rows);
-//                check = rows > 0;
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (ptm != null) {
-//                ptm.close();
-//            }
-//            if (conn != null) {
-//                conn.close();
-//            }
-//        }
-//        return check;
-//    }
     public boolean updateOrderStatus(int orderID, String status) throws SQLException {
 
         if (orderID <= 0 || status == null || status.isEmpty()) {
@@ -217,55 +142,6 @@ public class OrderDAO {
                 int count = ptm.executeUpdate();
                 System.out.println("[DAO] Updated rows = " + count);
                 check = count > 0;
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        } finally {
-            if (ptm != null) {
-                ptm.close();
-            }
-            if (conn != null) {
-                conn.close();
-            }
-        }
-
-//        boolean check = false;
-//        Connection conn = null;
-//        PreparedStatement ptm = null;
-//        try {
-//            conn = DBUtils.getConnection();
-//            if (conn != null) {
-//                System.out.println("[DAO] Preparing to update orderID=" + orderID + " to status=" + status);
-//                ptm = conn.prepareStatement("UPDATE Orders SET status = ? WHERE orderID = ?");
-//                ptm.setString(1, status);
-//                ptm.setInt(2, orderID);
-//                int count = ptm.executeUpdate();
-//                System.out.println("[DAO] Updated rows = " + count);
-//                check = count > 0;
-//            }
-//        } catch (Exception e) {
-//            e.printStackTrace();
-//        } finally {
-//            if (ptm != null) {
-//                ptm.close();
-//            }
-//            if (conn != null) {
-//                conn.close();
-//            }
-//        }
-        return check;
-    }
-
-    public boolean deleteOrder(int orderID) throws SQLException {
-        boolean check = false;
-        Connection conn = null;
-        PreparedStatement ptm = null;
-        try {
-            conn = DBUtils.getConnection();
-            if (conn != null) {
-                ptm = conn.prepareStatement(DELETE_ORDER);
-                ptm.setInt(1, orderID);
-                check = ptm.executeUpdate() > 0;
             }
         } catch (Exception e) {
             e.printStackTrace();
@@ -404,10 +280,6 @@ public class OrderDAO {
         return list;
     }
 
-    public List<OrderDetailDTO> getOrderDetailsByOrderID(int orderID) {
-        throw new UnsupportedOperationException("Not supported yet."); // Generated from nbfs://nbhost/SystemFileSystem/Templates/Classes/Code/GeneratedMethodBody
-    }
-
     public double getTotalSpentByUser(int userID) throws SQLException, ClassNotFoundException {
         String sql = "SELECT SUM(TotalAmount) FROM Orders WHERE UserID = ? AND Status = 'Delivered'";
         try ( Connection con = DBUtils.getConnection();  PreparedStatement ps = con.prepareStatement(sql)) {
@@ -473,7 +345,7 @@ public class OrderDAO {
             } else {
                 ptm.setNull(6, Types.INTEGER);
             }
-
+            ptm.setString(7, order.getNote());
             int affectedRows = ptm.executeUpdate();
 
             if (affectedRows > 0) {
@@ -508,7 +380,8 @@ public class OrderDAO {
             conn = DBUtils.getConnection();
             ptm = conn.prepareStatement(UPDATE_AFTER_PAYMENT);
             ptm.setString(1, order.getStatus());
-            ptm.setInt(2, order.getOrderID());
+            ptm.setString(2, order.getNote());
+            ptm.setInt(3, order.getOrderID());
             int rowsAffected = ptm.executeUpdate();
             check = rowsAffected > 0;
         } catch (Exception e) {
@@ -533,5 +406,59 @@ public class OrderDAO {
             }
         }
         return nextId;
+    }
+
+    public boolean updateOrderStatusAndNote(OrderDTO order) {
+        String sql = "UPDATE Orders SET Status = ?, Note = ? WHERE OrderID = ?";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, order.getStatus());
+            ps.setString(2, order.getNote());
+            ps.setInt(3, order.getOrderID());
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return false;
+    }
+
+    public void cancelOrder(int orderID, String reason) throws ClassNotFoundException, SQLException {
+        Connection conn = null;
+        PreparedStatement ps = null;
+        try {
+            conn = DBUtils.getConnection();
+            String sql = "UPDATE Orders SET Status = 'Cancelled', Note = ? WHERE OrderID = ?";
+            ps = conn.prepareStatement(sql);
+            ps.setString(1, reason);
+            ps.setInt(2, orderID);
+            ps.executeUpdate();
+        } finally {
+            if (ps != null) {
+                ps.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+    }
+
+    public OrderDTO getOrderByID(int orderID) {
+        OrderDTO order = null;
+        String sql = "SELECT * FROM Orders WHERE OrderID = ?";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, orderID);
+            ResultSet rs = ps.executeQuery();
+            if (rs.next()) {
+                order = new OrderDTO();
+                order.setOrderID(rs.getInt("OrderID"));
+                order.setUserID(rs.getInt("UserID"));
+                order.setOrderDate(rs.getDate("OrderDate"));
+                order.setStatus(rs.getString("Status"));
+                order.setTotalAmount(rs.getDouble("TotalAmount"));
+                order.setNote(rs.getString("Note"));
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        }
+        return order;
     }
 }

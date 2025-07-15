@@ -42,8 +42,6 @@ public class MainController extends HttpServlet {
     private static final String ADD_TO_CART_CONTROLLER = "AddToCartServlet";
     private static final String APPLY_DISCOUNT = "ApplyDiscount";
     private static final String APPLY_DISCOUNT_CONTROLLER = "ApplyDiscountServlet";
-    private static final String CHECKOUT = "CheckoutVNPay";
-    private static final String CHECKOUT_CONTROLLER = "CheckoutVNPayController";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -83,10 +81,7 @@ public class MainController extends HttpServlet {
                 url = ADD_TO_CART_CONTROLLER;
             } else if (APPLY_DISCOUNT.equals(action)) {
                 url = APPLY_DISCOUNT_CONTROLLER;
-            } else if (CHECKOUT.equals(action)) {
-                url = CHECKOUT_CONTROLLER;
-            }
-            else if (PRODUCT_LIST.equals(action)) {
+            } else if (PRODUCT_LIST.equals(action)) {
                 url = PRODUCT_LIST_CONTROLLER;
             }
         } catch (Exception e) {

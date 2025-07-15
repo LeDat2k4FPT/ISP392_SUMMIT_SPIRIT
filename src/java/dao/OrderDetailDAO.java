@@ -160,21 +160,54 @@ public class OrderDetailDAO {
     }
 
     public int getAttributeIdByProductSizeColor(int productId, String color, String size) throws SQLException, ClassNotFoundException {
-        String sql = "SELECT pv.AttributeID "
+        int attributeId = -1;
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        ResultSet rs = null;
+        StringBuilder sql = new StringBuilder("SELECT pv.AttributeID "
                 + "FROM ProductVariant pv "
-                + "JOIN Color c ON pv.ColorID = c.ColorID "
-                + "JOIN Size s ON pv.SizeID = s.SizeID "
-                + "WHERE pv.ProductID = ? AND c.ColorName = ? AND s.SizeName = ?";
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, productId);
-            ps.setString(2, color);
-            ps.setString(3, size);
-            ResultSet rs = ps.executeQuery();
+                + "LEFT JOIN Color c ON pv.ColorID = c.ColorID "
+                + "LEFT JOIN Size s ON pv.SizeID = s.SizeID "
+                + "WHERE pv.ProductID = ?");
+
+        List<Object> parameters = new ArrayList<>();
+        parameters.add(productId);
+        if (color != null && !color.trim().isEmpty()) {
+            sql.append(" AND c.ColorName = ?");
+            parameters.add(color);
+        } else {
+            sql.append(" AND pv.ColorID IS NULL");
+        }
+        if (size != null && !size.trim().isEmpty()) {
+            sql.append(" AND s.SizeName = ?");
+            parameters.add(size);
+        } else {
+            sql.append(" AND pv.SizeID IS NULL");
+        }
+        try {
+            conn = DBUtils.getConnection();
+            ptm = conn.prepareStatement(sql.toString());
+            for (int i = 0; i < parameters.size(); i++) {
+                ptm.setObject(i + 1, parameters.get(i));
+            }
+            rs = ptm.executeQuery();
             if (rs.next()) {
-                return rs.getInt("AttributeID");
+                attributeId = rs.getInt("AttributeID");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
             }
         }
-        throw new SQLException("Không tìm thấy AttributeID phù hợp.");
+        return attributeId;
     }
 
     public double getUnitPriceByAttributeId(int attributeId) throws SQLException, ClassNotFoundException {
@@ -187,5 +220,135 @@ public class OrderDetailDAO {
             }
         }
         throw new SQLException("Không tìm thấy Price cho AttributeID=" + attributeId);
+    }
+
+    public int getAttributeIdByProduct(int productId) throws SQLException {
+        int attributeId = -1;
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        ResultSet rs = null;
+        String sql = "SELECT AttributeID "
+                + "FROM ProductVariant "
+                + "WHERE ProductID = ? ";
+        try {
+            conn = DBUtils.getConnection();
+            ptm = conn.prepareStatement(sql);
+            ptm.setInt(1, productId);
+            rs = ptm.executeQuery();
+            if (rs.next()) {
+                attributeId = rs.getInt("AttributeID");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return attributeId;
+    }
+
+    public int getAttributeIdByProductColor(int productId, String color) throws SQLException {
+        int attributeId = -1;
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        ResultSet rs = null;
+        String sql = "SELECT pv.AttributeID "
+                + "FROM ProductVariant pv "
+                + "JOIN Color c ON pv.ColorID = c.ColorID "
+                + "WHERE pv.ProductID = ? AND "
+                + (color != null ? "c.ColorName = ?" : "c.ColorName IS NULL");
+        try {
+            conn = DBUtils.getConnection();
+            ptm = conn.prepareStatement(sql);
+            ptm.setInt(1, productId);
+            if (color != null) {
+                ptm.setString(2, color);
+            }
+            rs = ptm.executeQuery();
+            if (rs.next()) {
+                attributeId = rs.getInt("AttributeID");
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return attributeId;
+    }
+
+    public int getAttributeIdByProductSize(int productId, String size) throws SQLException {
+        int attributeId = -1;
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        ResultSet rs = null;
+        String sql = "SELECT pv.AttributeID "
+                + "FROM ProductVariant pv "
+                + "JOIN Size s ON pv.SizeID = s.SizeID "
+                + "WHERE pv.ProductID = ? AND "
+                + (size != null ? "s.SizeName = ?" : "s.SizeName IS NULL");
+        try {
+            conn = DBUtils.getConnection();
+            ptm = conn.prepareStatement(sql);
+            ptm.setInt(1, productId);
+            if (size != null) {
+                ptm.setString(2, size);
+                rs = ptm.executeQuery();
+                if (rs.next()) {
+                    return rs.getInt("AttributeID");
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (rs != null) {
+                rs.close();
+            }
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return attributeId;
+    }
+
+    public boolean updateProductVariantQuantity(int attributeId, int quantityPurchased) throws SQLException {
+        boolean check = false;
+        Connection conn = null;
+        PreparedStatement ptm = null;
+        String sql = "UPDATE ProductVariant SET Quantity = Quantity - ? WHERE AttributeID = ?";
+        try {
+            conn = DBUtils.getConnection();
+            ptm = conn.prepareStatement(sql);
+            ptm.setInt(1, quantityPurchased);
+            ptm.setInt(2, attributeId);
+            return ptm.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+        } finally {
+            if (ptm != null) {
+                ptm.close();
+            }
+            if (conn != null) {
+                conn.close();
+            }
+        }
+        return check;
     }
 }

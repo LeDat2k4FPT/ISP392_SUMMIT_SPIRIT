@@ -12,6 +12,7 @@ public class OrderDTO {
     private String status;
     private double shipFee;
     private Integer voucherID;
+    private String note;
     private String paymentStatus;
     private Timestamp paymentDate;
     private String fullName;
@@ -170,6 +171,14 @@ public class OrderDTO {
         this.voucherID = voucherID;
     }
 
+    public String getNote() {
+        return note;
+    }
+
+    public void setNote(String note) {
+        this.note = note;
+    }
+
     public String getShippingAddress() {
         return shippingAddress;
     }
@@ -216,10 +225,5 @@ public class OrderDTO {
 
     public void setDiscountPercent(double discountPercent) {
         this.discountPercent = discountPercent;
-    }
-
-    @Override
-    public String toString() {
-        return "OrderDTO{" + "orderID=" + orderID + ", userID=" + userID + ", orderDate=" + orderDate + ", totalAmount=" + totalAmount + ", status=" + status + ", shipFee=" + shipFee + ", voucherID=" + voucherID + ", paymentStatus=" + paymentStatus + ", paymentDate=" + paymentDate + ", fullName=" + fullName + ", email=" + email + ", phoneNumber=" + phoneNumber + ", shippingAddress=" + shippingAddress + ", recipientName=" + recipientName + ", recipientPhone=" + recipientPhone + ", recipientEmail=" + recipientEmail + ", discountCode=" + discountCode + ", discountPercent=" + discountPercent + '}';
     }
 }

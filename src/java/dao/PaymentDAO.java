@@ -4,7 +4,7 @@
  */
 package dao;
 
-import dto.PaymentLogDTO;
+import dto.PaymentDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.SQLException;
@@ -14,12 +14,12 @@ import utils.DBUtils;
  *
  * @author gmt
  */
-public class PaymentLogDAO {
+public class PaymentDAO {
 
-    private static final String ADD_PAYMENT = "INSERT INTO PaymentLog (OrderID, txnRef, transactionNo, amount, responseCode, status, createdAt) "
-            + "VALUES (?, ?, ?, ?, ?, ?, ?)";
+    private static final String ADD_PAYMENT = "INSERT INTO Payment (OrderID, PaymentMethod, PaymentStatus, PaymentDate, TransactionCode) "
+            + "VALUES (?, ?, ?, ?, ?)";
 
-    public boolean addPaymentLog(PaymentLogDTO log) throws SQLException, ClassNotFoundException {
+    public boolean addPayment(PaymentDTO paymentDTO) throws SQLException, ClassNotFoundException {
         boolean check = false;
         Connection conn = null;
         PreparedStatement ptm = null;
@@ -27,13 +27,11 @@ public class PaymentLogDAO {
             conn = DBUtils.getConnection();
             if (conn != null) {
                 ptm = conn.prepareStatement(ADD_PAYMENT);
-                ptm.setInt(1, log.getOrderID());
-                ptm.setString(2, log.getTxnRef());
-                ptm.setString(3, log.getTransactionNo());
-                ptm.setDouble(4, log.getAmount());
-                ptm.setString(5, log.getResponseCode());
-                ptm.setString(6, log.getStatus());
-                ptm.setDate(7, new java.sql.Date(log.getCreatedAt().getTime()));
+                ptm.setInt(1, paymentDTO.getOrderID());
+                ptm.setString(2, paymentDTO.getPaymentMethod());
+                ptm.setString(3, paymentDTO.getPaymentStatus());
+                ptm.setDate(4, new java.sql.Date(paymentDTO.getPaymentDate().getTime()));
+                ptm.setString(5, paymentDTO.getTransactionCode());
                 check = ptm.executeUpdate() > 0;
             }
         } catch (Exception e) {

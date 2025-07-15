@@ -6,7 +6,7 @@
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@page import="dto.UserDTO, dao.ProductDAO, dto.ProductDTO"%>
-<%@page import="java.util.List, java.util.ArrayList" %>
+<%@page import="java.util.List, java.util.ArrayList, java.util.Map" %>
 <%@page import="dao.ProductVariantDAO" %>
 <%@page import="dto.VoucherDTO, dao.VoucherDAO" %>
 <%--<%@taglib prefix="c" uri="http://java.sun.com/jsp/jstl/core"%>--%>
@@ -46,6 +46,20 @@
         request.setAttribute("DISCOUNT_ERROR", "Invalid or expired code!");
     }
 
+    boolean hasSaleOffProduct = false;
+    if (session.getAttribute("PENDING_ORDER") != null && request.getParameter("retry") != null) {
+        Map<String, Object> orderSession = (Map<String, Object>) session.getAttribute("PENDING_ORDER");
+
+        paramProductId = String.valueOf(orderSession.get("productId"));
+        paramSize = (String) orderSession.get("size");
+        paramColor = (String) orderSession.get("color");
+        paramQuantity = String.valueOf(orderSession.get("quantity"));
+        hasSaleOffProduct = Boolean.parseBoolean(String.valueOf(orderSession.get("fromSaleOff")));
+
+        discountCode = (String) orderSession.get("discountCode");
+        discountPercent = Double.parseDouble(String.valueOf(orderSession.getOrDefault("discountPercent", "0")));
+    }
+
     if (paramProductId != null) {
         int productId = Integer.parseInt(paramProductId);
         ProductVariantDAO variantDAO = new ProductVariantDAO();
@@ -59,7 +73,6 @@
 
     ProductDTO product = null;
     int quantity = 1;
-    boolean hasSaleOffProduct = false;
 
     if (paramProductId != null && paramQuantity != null) {
         int productId = Integer.parseInt(paramProductId);
@@ -72,11 +85,10 @@
             if (paramSize != null) product.setSize(paramSize);
             if (paramColor != null) product.setColor(paramColor);
             product.setQuantity(quantity);
-            boolean fromSaleOff = "true".equals(request.getParameter("fromSaleOff"));
+            boolean fromSaleOff = hasSaleOffProduct || "true".equals(request.getParameter("fromSaleOff"));
             product.setFromSaleOff(fromSaleOff); // ✅ Đánh dấu giảm giá
             session.setAttribute("BUY_NOW_PRODUCT", product); // ✅ Lưu session để servlet dùng
             session.setAttribute("FROM_BUY_NOW", true);
-            hasSaleOffProduct = fromSaleOff;
         }
     }
 
@@ -88,6 +100,18 @@
     String district = request.getParameter("district") != null ? request.getParameter("district") : "";
     String city = request.getParameter("city") != null ? request.getParameter("city") : "";
     Integer voucherID = (Integer) request.getAttribute("VOUCHER_ID");
+
+    // Nếu quay lại từ lỗi thanh toán, lấy info từ session
+    if (session.getAttribute("PENDING_ORDER") != null && request.getParameter("retry") != null) {
+        Map<String, Object> orderSession = (Map<String, Object>) session.getAttribute("PENDING_ORDER");
+        country = (String) orderSession.get("country");
+        fullname = (String) orderSession.get("fullName");
+        phone = (String) orderSession.get("phone");
+        email = (String) orderSession.get("email");
+        address = (String) orderSession.get("address");
+        district = (String) orderSession.get("district");
+        city = (String) orderSession.get("city");
+    }
 %>
 
 <!DOCTYPE html>
@@ -237,7 +261,15 @@
                 <a href="profile.jsp"><i class="fa fa-user"></i></a>
             </div>
         </div>
+
+        <% if (request.getParameter("retry") != null) { %>
+        <div style="padding: 10px; background-color: #ffdddd; border: 1px solid red; color: red; margin: 20px;">
+            ⚠️ Payment transaction failed. Please check the information and pay again.
+        </div>
+        <% } %>
+
         <form id="checkoutForm" action="payment" method="POST" onsubmit="return validateForm()">
+            <input type="hidden" name="checkoutType" value="<%= session.getAttribute("BUY_NOW_PRODUCT") != null ? "BUY_NOW" : "CART" %>">
             <div class="container">
                 <div class="form-section">
                     <h3>Shipping Address</h3>

@@ -37,6 +37,8 @@ public class ajaxServlet extends HttpServlet {
             return;
         }
 
+        String checkoutType = req.getParameter("checkoutType");
+
         // Nhận dữ liệu từ form
         String amountParam = req.getParameter("amount");
         double amountDouble;
@@ -72,35 +74,31 @@ public class ajaxServlet extends HttpServlet {
         order.setTotalAmount(amountDouble);
         order.setShipFee(30000);
         order.setVoucherID(voucherID);
+        order.setNote("Unpaid order");
 
         Integer tempOrderId = (Integer) session.getAttribute("TEMP_ORDER_ID");
         if (tempOrderId != null) {
-            OrderDTO existingOrder = null;
             try {
-                existingOrder = orderDAO.getOrderById(tempOrderId);
+                OrderDTO existingOrder = orderDAO.getOrderById(tempOrderId);
+                if (existingOrder != null && "Pending".equals(existingOrder.getStatus())) {
+                    orderId_new = tempOrderId;
+                } else {
+                    // Nếu đơn hàng đã được xử lý rồi, xóa khỏi session và tạo đơn mới
+                    session.removeAttribute("TEMP_ORDER_ID");
+                    orderId_new = orderDAO.addOrder(order);
+                    session.setAttribute("TEMP_ORDER_ID", orderId_new);
+                }
             } catch (SQLException | ClassNotFoundException ex) {
                 Logger.getLogger(ajaxServlet.class.getName()).log(Level.SEVERE, null, ex);
-            }
-            if (existingOrder != null && "Pending".equals(existingOrder.getStatus())) {
-                orderId_new = tempOrderId;
-            } else {
-                // Nếu đơn hàng đã được xử lý rồi, xóa khỏi session và tạo đơn mới
-                session.removeAttribute("TEMP_ORDER_ID");
-                try {
-                    orderId_new = orderDAO.addOrder(order);
-                } catch (SQLException ex) {
-                    Logger.getLogger(ajaxServlet.class.getName()).log(Level.SEVERE, null, ex);
-                }
-                session.setAttribute("TEMP_ORDER_ID", orderId_new);
             }
         } else {
             try {
                 // Chưa có thì tạo mới
                 orderId_new = orderDAO.addOrder(order);
+                session.setAttribute("TEMP_ORDER_ID", orderId_new);
             } catch (SQLException ex) {
                 Logger.getLogger(ajaxServlet.class.getName()).log(Level.SEVERE, null, ex);
             }
-            session.setAttribute("TEMP_ORDER_ID", orderId_new);
         }
         if (orderId_new < 0) {
             resp.sendRedirect("error.jsp");
@@ -128,6 +126,7 @@ public class ajaxServlet extends HttpServlet {
         pendingOrder.put("size", req.getParameter("size"));
         pendingOrder.put("color", req.getParameter("color"));
         pendingOrder.put("fromSaleOff", req.getParameter("fromSaleOff"));
+        pendingOrder.put("checkoutType", req.getParameter("checkoutType"));
         session.setAttribute("PENDING_ORDER", pendingOrder);
         session.setAttribute("TEMP_ORDER_ID", orderId_new);
 
@@ -150,7 +149,7 @@ public class ajaxServlet extends HttpServlet {
             vnp_Params.put("vnp_BankCode", bankCode);
         }
         vnp_Params.put("vnp_TxnRef", vnp_TxnRef);
-        vnp_Params.put("vnp_OrderInfo", "Thanh toan don hang:" + vnp_TxnRef);
+        vnp_Params.put("vnp_OrderInfo", "Order Payment:" + vnp_TxnRef);
         vnp_Params.put("vnp_OrderType", orderType);
 
         String locate = req.getParameter("language");

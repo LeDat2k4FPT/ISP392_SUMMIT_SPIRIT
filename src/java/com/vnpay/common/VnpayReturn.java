@@ -6,10 +6,10 @@ package com.vnpay.common;
 
 import dao.OrderDAO;
 import dao.OrderDetailDAO;
-import dao.PaymentLogDAO;
+import dao.PaymentDAO;
 import dto.OrderDTO;
 import dto.OrderDetailDTO;
-import dto.PaymentLogDTO;
+import dto.PaymentDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import java.io.IOException;
@@ -25,7 +25,7 @@ public class VnpayReturn extends HttpServlet {
 
     private final OrderDAO orderDao = new OrderDAO();
     private final OrderDetailDAO detailDao = new OrderDetailDAO();
-    private final PaymentLogDAO logDao = new PaymentLogDAO();
+    private final PaymentDAO paymentDao = new PaymentDAO();
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -51,10 +51,9 @@ public class VnpayReturn extends HttpServlet {
 
             String signValue = Config.hashAllFields(fields);
             if (!signValue.equals(vnp_SecureHash)) {
-                System.out.println("Chữ ký không hợp lệ!");
                 request.setAttribute("paymentResult", "invalid");
-                request.setAttribute("message", "❌ Chữ ký không hợp lệ! Dữ liệu có thể đã bị thay đổi.");
                 request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
+                request.setAttribute("retryLink", "checkout.jsp?retry=true");
                 return;
             }
 
@@ -62,6 +61,7 @@ public class VnpayReturn extends HttpServlet {
             String fullTxnRef = request.getParameter("vnp_TxnRef");
             String transactionNo = request.getParameter("vnp_TransactionNo");
             long amount = Long.parseLong(request.getParameter("vnp_Amount")) / 100;
+            String cardType = request.getParameter("vnp_CardType");
 
             int orderId;
             try {
@@ -69,108 +69,114 @@ public class VnpayReturn extends HttpServlet {
                 orderId = Integer.parseInt(parts[0]); // tách orderId từ txnRef
                 System.out.println("Parsed orderId from vnp_TxnRef: " + orderId);
             } catch (Exception ex) {
-                System.out.println("Không thể lấy orderId từ mã giao dịch: " + fullTxnRef);
                 request.setAttribute("paymentResult", "error");
-                request.setAttribute("message", "❌ Không thể lấy orderId từ mã giao dịch.");
                 request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
+                request.setAttribute("retryLink", "checkout.jsp?retry=true");
                 return;
             }
 
             HttpSession session = request.getSession();
             Object sessionObj = session.getAttribute("PENDING_ORDER");
             if (!(sessionObj instanceof Map)) {
-                System.out.println("Thiếu dữ liệu đơn hàng trong session.");
                 request.setAttribute("paymentResult", "error");
-                request.setAttribute("message", "❌ Thiếu dữ liệu đơn hàng trong session.");
                 request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
+                request.setAttribute("retryLink", "checkout.jsp?retry=true");
                 return;
             }
             Map<String, Object> orderSessionData = (Map<String, Object>) sessionObj;
 
-            PaymentLogDTO log = new PaymentLogDTO();
-            log.setOrderID(orderId);
-            log.setTxnRef(fullTxnRef);
-            log.setTransactionNo(transactionNo);
-            log.setAmount((double) amount);
-            log.setResponseCode(responseCode);
-            log.setStatus("00".equals(responseCode) ? "SUCCESS" : "FAILED");
-            log.setCreatedAt(new java.sql.Date(System.currentTimeMillis()));
-            logDao.addPaymentLog(log);
+            PaymentDTO paymentDTO = new PaymentDTO();
+            paymentDTO.setOrderID(orderId);
+            paymentDTO.setPaymentMethod(cardType);
+            String paymentStatus = null;
+            if ("00".equals(responseCode)) {
+                paymentStatus = "Paid";
+            } else if ("24".equals(responseCode)) {
+                paymentStatus = "Unpaid";
+            } else {
+                paymentStatus = "Unpaid";
+            }
+            paymentDTO.setPaymentStatus(paymentStatus);
+            paymentDTO.setPaymentDate(new java.sql.Date(System.currentTimeMillis()));
+            paymentDTO.setTransactionCode(transactionNo);
+            paymentDao.addPayment(paymentDTO);
 
+            String checkoutType = (String) orderSessionData.get("checkoutType");
             if ("00".equals(responseCode) && orderSessionData != null) {
-                // Thanh toán thành công
-                int userId = (int) orderSessionData.get("userID");
-                double totalAmount = (double) orderSessionData.get("totalAmount");
-
-                String discountCode = (String) orderSessionData.getOrDefault("discountCode", "");
-                double discountPercent = 0;
-                try {
-                    discountPercent = Double.parseDouble(orderSessionData.getOrDefault("discountPercent", "0").toString());
-                } catch (Exception e) {
-                    discountPercent = 0;
-                }
-
-                String country = (String) orderSessionData.get("country");
-                String fullName = (String) orderSessionData.get("fullName");
-                String phone = (String) orderSessionData.get("phone");
-                String email = (String) orderSessionData.get("email");
-                String address = (String) orderSessionData.get("address");
-                String district = (String) orderSessionData.get("district");
-                String city = (String) orderSessionData.get("city");
-
-                // Cập nhật đơn hàng
+                // Cập nhật trạng thái đơn hàng
                 OrderDTO order = new OrderDTO();
-                order.setStatus("Preparing");
+                order.setStatus("Processing");
                 order.setOrderID(orderId);
-
-                System.out.println("Order info before update: " + order);
+                order.setNote("");
                 boolean updated = orderDao.updateOrderAfterPayment(order);
-                System.out.println("Order update result: " + updated);
+
                 if (updated) {
-                    // Thêm chi tiết đơn hàng
-                    int productId = Integer.parseInt(String.valueOf(orderSessionData.get("productId")));
-                    int quantity = Integer.parseInt(String.valueOf(orderSessionData.get("quantity")));
-                    String size = (String) orderSessionData.get("size");
-                    String color = (String) orderSessionData.get("color");
-                    boolean fromSaleOff = Boolean.parseBoolean(String.valueOf(orderSessionData.get("fromSaleOff")));
-                    int attributeId = detailDao.getAttributeIdByProductSizeColor(productId, color, size);
-                    double unitPrice = detailDao.getUnitPriceByAttributeId(attributeId);
+                    if ("BUY_NOW".equals(checkoutType)) {
+                        int productId = Integer.parseInt(String.valueOf(orderSessionData.get("productId")));
+                        int quantity = Integer.parseInt(String.valueOf(orderSessionData.get("quantity")));
+                        String size = (String) orderSessionData.get("size");
+                        String color = (String) orderSessionData.get("color");
+                        boolean fromSaleOff = Boolean.parseBoolean(String.valueOf(orderSessionData.get("fromSaleOff")));
+                        int attributeId = 0;
+                        if ((size == null || size.isEmpty()) && (color == null || color.isEmpty())) {
+                            attributeId = detailDao.getAttributeIdByProduct(productId);
+                        } else if (size == null || size.isEmpty()) {
+                            attributeId = detailDao.getAttributeIdByProductColor(productId, color);
+                        } else if (color == null || color.isEmpty()) {
+                            attributeId = detailDao.getAttributeIdByProductSize(productId, size);
+                        } else {
+                            attributeId = detailDao.getAttributeIdByProductSizeColor(productId, color, size);
+                        }
+                        double unitPrice = detailDao.getUnitPriceByAttributeId(attributeId);
+                        OrderDetailDTO detail = new OrderDetailDTO(orderId, attributeId, quantity, unitPrice);
+                        detailDao.addOrderDetail(detail);
+                        detailDao.updateProductVariantQuantity(attributeId, quantity);
+                    } else if ("CART".equals(checkoutType)) {
+                        // Xử lý giỏ hàng
+                        Object cartObj = session.getAttribute("CART");
+                        if (cartObj != null && cartObj instanceof dto.CartDTO) {
+                            dto.CartDTO cart = (dto.CartDTO) cartObj;
+                            for (dto.CartItemDTO item : cart.getCartItems()) {
+                                dto.ProductDTO product = item.getProduct();
+                                int attributeId = detailDao.getAttributeIdByProductSizeColor(
+                                        product.getProductID(), product.getColor(), product.getSize());
+                                double unitPrice = detailDao.getUnitPriceByAttributeId(attributeId);
+                                OrderDetailDTO detail = new OrderDetailDTO(orderId, attributeId, item.getQuantity(), unitPrice);
+                                detailDao.addOrderDetail(detail);
+                                detailDao.updateProductVariantQuantity(attributeId, item.getQuantity());
+                            }
+                            // Sau khi xử lý xong, có thể xóa giỏ hàng
+                            session.removeAttribute("CART");
+                        }
+                    }
 
-                    OrderDetailDTO detail = new OrderDetailDTO();
-                    detail.setOrderID(orderId);
-                    detail.setAttributeID(attributeId);
-                    detail.setQuantity(quantity);
-                    detail.setUnitPrice(unitPrice);
-
-                    detailDao.addOrderDetail(detail);
                     // Xóa session tạm
                     session.removeAttribute("PENDING_ORDER");
                     session.removeAttribute("TEMP_ORDER_ID");
                     request.setAttribute("paymentResult", "success");
-                    request.setAttribute("message", "✅ Thanh toán thành công!");
                     request.setAttribute("transactionId", request.getParameter("vnp_TransactionNo"));
                     request.setAttribute("amount", String.format("%,.0f", (double) amount));
                     request.setAttribute("orderInfo", request.getParameter("vnp_OrderInfo"));
                 } else {
-                    System.out.println("Không thể cập nhật đơn hàng với orderId=" + orderId);
                     request.setAttribute("paymentResult", "error");
-                    request.setAttribute("message", "❌ Không thể cập nhật đơn hàng.");
+                    request.setAttribute("retryLink", "checkout.jsp?retry=true");
                 }
             } else {
                 // Giao dịch thất bại hoặc không có session
-                System.out.println("Thanh toán thất bại hoặc không có session. orderId=" + orderId + ", responseCode=" + responseCode);
                 OrderDTO order = new OrderDTO();
                 order.setOrderID(orderId);
                 order.setStatus("Failed");
-                orderDao.updateOrderStatus(order);
-                request.setAttribute("paymentResult", "failed");
-                request.setAttribute("message", "❌ Thanh toán thất bại! Mã lỗi: " + responseCode);
+                order.setNote("Order payment failed");
+                boolean updated = orderDao.updateOrderStatusAndNote(order);
+                if (updated) {
+                    request.setAttribute("paymentResult", "failed");
+                    request.setAttribute("retryLink", "checkout.jsp?retry=true");
+                }
             }
         } catch (Exception e) {
             Logger.getLogger(VnpayReturn.class.getName()).log(Level.SEVERE, null, e);
-            System.out.println("Lỗi xử lý giao dịch: " + e.getMessage());
             request.setAttribute("paymentResult", "error");
-            request.setAttribute("message", "❌ Lỗi xử lý giao dịch: " + e.getMessage());
+            request.setAttribute("retryLink", "checkout.jsp?retry=true");
         }
         // Hiển thị trang kết quả
         request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
