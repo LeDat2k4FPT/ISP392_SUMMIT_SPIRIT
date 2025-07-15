@@ -157,4 +157,29 @@ public class CategoryDAO {
         }
         return check;
     }
+
+    public int getOrInsertCategoryByName(String cateName) throws SQLException, ClassNotFoundException {
+        String checkSql = "SELECT CateID FROM Category WHERE CateName = ?";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(checkSql)) {
+            ps.setString(1, cateName);
+            try ( ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    return rs.getInt("CateID");
+                }
+            }
+        }
+
+        // Nếu chưa tồn tại, thì insert
+        String insertSql = "INSERT INTO Category (CateName) VALUES (?)";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(insertSql, PreparedStatement.RETURN_GENERATED_KEYS)) {
+            ps.setString(1, cateName);
+            ps.executeUpdate();
+            try ( ResultSet rs = ps.getGeneratedKeys()) {
+                if (rs.next()) {
+                    return rs.getInt(1);
+                }
+            }
+        }
+        throw new SQLException("Failed to insert or retrieve new CategoryID.");
+    }
 }
