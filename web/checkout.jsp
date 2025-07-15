@@ -5,7 +5,7 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@page import="dto.UserDTO, dao.ProductDAO, dto.ProductDTO"%>
+<%@page import="dto.UserDTO, dao.ProductDAO, dto.ProductDTO, dto.CartDTO"%>
 <%@page import="java.util.List, java.util.ArrayList, java.util.Map" %>
 <%@page import="dao.ProductVariantDAO" %>
 <%@page import="dto.VoucherDTO, dao.VoucherDAO" %>
@@ -18,36 +18,25 @@
     String discountCode = "";
     String discountError = null;
 
-    Double appliedDiscountPercent = (Double) request.getAttribute("DISCOUNT_PERCENT");
-    String appliedDiscountCode = (String) request.getAttribute("DISCOUNT_CODE");
-    String discountErrorMsg = (String) request.getAttribute("DISCOUNT_ERROR");
-
-    if (appliedDiscountPercent != null) discountPercent = appliedDiscountPercent;
-    if (appliedDiscountCode != null) discountCode = appliedDiscountCode;
-    if (discountErrorMsg != null) discountError = discountErrorMsg;
-
     List<String> sizeList = new ArrayList<>();
     List<String> colorList = new ArrayList<>();
 
-    // Lấy thông tin sản phẩm từ request
     String paramProductId = request.getParameter("productId");
     String paramSize = request.getParameter("size");
     String paramColor = request.getParameter("color");
     String paramQuantity = request.getParameter("quantity");
-    String code = request.getParameter("discountCode");
-    VoucherDAO dao = new VoucherDAO();
-    VoucherDTO voucher = dao.getVoucherByCode(code);
-
-    if (voucher != null) {
-        request.setAttribute("DISCOUNT_CODE", voucher.getVoucherCode());
-        request.setAttribute("DISCOUNT_PERCENT", voucher.getDiscountValue());
-        request.setAttribute("VOUCHER_ID", voucher.getVoucherID());
-    } else {
-        request.setAttribute("DISCOUNT_ERROR", "Invalid or expired code!");
-    }
 
     boolean hasSaleOffProduct = false;
-    if (session.getAttribute("PENDING_ORDER") != null && request.getParameter("retry") != null) {
+    boolean isRetry = request.getParameter("retry") != null;
+
+    ProductDTO product = null;
+    int quantity = 1;
+
+    CartDTO cart = (CartDTO) session.getAttribute("CART");
+    int cartItemCount = (cart != null) ? cart.getCartItems().size() : 0;
+
+    // Nếu là retry từ giỏ hàng, không xử lý buy now
+    if (session.getAttribute("PENDING_ORDER") != null && isRetry) {
         Map<String, Object> orderSession = (Map<String, Object>) session.getAttribute("PENDING_ORDER");
 
         paramProductId = String.valueOf(orderSession.get("productId"));
@@ -55,40 +44,58 @@
         paramColor = (String) orderSession.get("color");
         paramQuantity = String.valueOf(orderSession.get("quantity"));
         hasSaleOffProduct = Boolean.parseBoolean(String.valueOf(orderSession.get("fromSaleOff")));
-
         discountCode = (String) orderSession.get("discountCode");
         discountPercent = Double.parseDouble(String.valueOf(orderSession.getOrDefault("discountPercent", "0")));
-    }
 
-    if (paramProductId != null) {
-        int productId = Integer.parseInt(paramProductId);
-        ProductVariantDAO variantDAO = new ProductVariantDAO();
-        try {
-            sizeList = variantDAO.getAvailableSizesByProductId(productId);
-            colorList = variantDAO.getAvailableColorsByProductId(productId);
-        } catch (Exception e) {
-            e.printStackTrace();
+        // Không set BUY_NOW_PRODUCT nếu là từ giỏ hàng
+        session.removeAttribute("BUY_NOW_PRODUCT");
+        session.removeAttribute("FROM_BUY_NOW");
+    } else {
+        String code = request.getParameter("discountCode");
+        if (code != null && !code.trim().isEmpty()) {
+            VoucherDAO dao = new VoucherDAO();
+            VoucherDTO voucher = dao.getVoucherByCode(code);
+            if (voucher != null) {
+                discountCode = voucher.getVoucherCode();
+                discountPercent = voucher.getDiscountValue();
+                request.setAttribute("VOUCHER_ID", voucher.getVoucherID());
+            } else {
+                discountError = "Invalid or expired code!";
+            }
         }
     }
 
-    ProductDTO product = null;
-    int quantity = 1;
+    if (paramProductId != null && !paramProductId.isEmpty()) {
+        try {
+            int productId = Integer.parseInt(paramProductId);
+            ProductVariantDAO variantDAO = new ProductVariantDAO();
+            sizeList = variantDAO.getAvailableSizesByProductId(productId);
+            colorList = variantDAO.getAvailableColorsByProductId(productId);
 
-    if (paramProductId != null && paramQuantity != null) {
-        int productId = Integer.parseInt(paramProductId);
-        quantity = Integer.parseInt(paramQuantity);
+            ProductDAO productDAO = new ProductDAO();
+            product = productDAO.getProductByID(productId);
 
-        ProductDAO productDAO = new ProductDAO();
-        product = productDAO.getProductByID(productId);
+            try {
+                quantity = Integer.parseInt(paramQuantity);
+            } catch (NumberFormatException e) {
+                quantity = 1;
+            }
 
-        if (product != null) {
-            if (paramSize != null) product.setSize(paramSize);
-            if (paramColor != null) product.setColor(paramColor);
-            product.setQuantity(quantity);
-            boolean fromSaleOff = hasSaleOffProduct || "true".equals(request.getParameter("fromSaleOff"));
-            product.setFromSaleOff(fromSaleOff); // ✅ Đánh dấu giảm giá
-            session.setAttribute("BUY_NOW_PRODUCT", product); // ✅ Lưu session để servlet dùng
-            session.setAttribute("FROM_BUY_NOW", true);
+            if (product != null) {
+                if (paramSize != null) product.setSize(paramSize);
+                if (paramColor != null) product.setColor(paramColor);
+                product.setQuantity(quantity);
+                boolean fromSaleOff = hasSaleOffProduct || "true".equals(request.getParameter("fromSaleOff"));
+                product.setFromSaleOff(fromSaleOff);
+
+                // Nếu không phải retry từ giỏ hàng thì set BUY_NOW_PRODUCT
+                if (!isRetry && request.getParameter("fromCart") == null) {
+                    session.setAttribute("BUY_NOW_PRODUCT", product);
+                    session.setAttribute("FROM_BUY_NOW", true);
+                }
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
     }
 
@@ -101,8 +108,7 @@
     String city = request.getParameter("city") != null ? request.getParameter("city") : "";
     Integer voucherID = (Integer) request.getAttribute("VOUCHER_ID");
 
-    // Nếu quay lại từ lỗi thanh toán, lấy info từ session
-    if (session.getAttribute("PENDING_ORDER") != null && request.getParameter("retry") != null) {
+    if (session.getAttribute("PENDING_ORDER") != null && isRetry) {
         Map<String, Object> orderSession = (Map<String, Object>) session.getAttribute("PENDING_ORDER");
         country = (String) orderSession.get("country");
         fullname = (String) orderSession.get("fullName");
@@ -121,146 +127,44 @@
         <title>Checkout Page</title>
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <style>
-            body {
-                font-family: 'Kumbh Sans', sans-serif;
-                margin: 0;
-                background-color: #f9f9f9;
-            }
-            .header {
-                background-color: #004080;
-                padding: 15px 30px;
-                display: flex;
-                justify-content: space-between;
-                align-items: center;
-                color: white;
-            }
-            .header .logo {
-                font-size: 24px;
-                font-weight: bold;
-                color: white;
-                text-decoration: none;
-            }
-            .nav-links a {
-                color: white;
-                margin: 0 10px;
-                text-decoration: none;
-                font-size: 16px;
-            }
-            .container {
-                display: flex;
-                padding: 40px;
-                gap: 40px;
-            }
-            .form-section {
-                flex: 1;
-                background: #fff;
-                padding: 30px;
-                border-radius: 10px;
-            }
-            .form-section input {
-                width: 100%;
-                padding: 10px;
-                margin-bottom: 15px;
-                border-radius: 4px;
-                border: 1px solid #ccc;
-                font-size: 14px;
-            }
-            .form-section .row {
-                display: flex;
-                gap: 10px;
-            }
-            .form-section button {
-                background-color: #2f4f4f;
-                color: white;
-                padding: 10px 20px;
-                border: none;
-                border-radius: 4px;
-                cursor: pointer;
-            }
-            .cart-preview {
-                flex: 1;
-                background: #f4f4f4;
-                padding: 20px;
-                border-radius: 10px;
-            }
-            .cart-item {
-                display: flex;
-                gap: 15px;
-                padding: 15px 0;
-                border-bottom: 1px solid #ccc;
-            }
-            .cart-item img {
-                width: 80px;
-                height: auto;
-            }
-            .cart-info h4 {
-                margin: 0;
-                font-size: 16px;
-            }
-            .cart-info p {
-                margin: 4px 0;
-                font-size: 14px;
-            }
-            .quantity-box {
-                display: flex;
-                gap: 10px;
-                margin-top: 8px;
-                align-items: center;
-            }
-            .summary-line {
-                display: flex;
-                justify-content: space-between;
-                margin: 10px 0;
-                font-size: 15px;
-            }
-            .total-line {
-                font-weight: bold;
-                font-size: 18px;
-                margin-top: 10px;
-            }
-            .footer-buttons {
-                display: flex;
-                justify-content: space-between;
-                margin-top: 20px;
-            }
-            .footer-buttons a, .footer-buttons button {
-                padding: 10px 20px;
-                font-size: 14px;
-                border: none;
-                border-radius: 4px;
-                text-decoration: none;
-                color: white;
-            }
-            .back-btn {
-                background-color: gray;
-            }
-            .pay-btn {
-                background-color: #2f4f4f;
-            }
-            .error-message {
-                color: red;
-                margin-top: -10px;
-                margin-bottom: 10px;
-                font-size: 14px;
-            }
-            .success-message {
-                color: green;
-                margin-top: -10px;
-                margin-bottom: 10px;
-                font-size: 14px;
-            }
-        </style>
+        <link rel="stylesheet" type="text/css" href="css/checkout.css">
     </head>
     <body>
+        <!-- Header -->
         <div class="header">
-            <a href="homepage.jsp" class="logo"> Summit Spirit</a>
+            <a href="homepage.jsp">
+                <img src="image/summit_logo.png" alt="Logo">
+            </a>
             <div class="nav-links">
-                <a href="homepage.jsp">Home</a>
-                <a href="cart.jsp">Cart</a>
-                <a href="profile.jsp"><i class="fa fa-user"></i></a>
+                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="cart.jsp" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <% if (cartItemCount > 0) { %>
+                    <span class="cart-badge"><%= cartItemCount %></span>
+                    <% } %>
+                </a>
+                <div class="user-dropdown">
+                    <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
+                    <div id="dropdown" class="dropdown-menu">
+                        <a href="profile.jsp"><%= loginUser.getFullName() %></a>
+                        <a href="MainController?action=Logout">Logout</a>
+                    </div>
+                </div>
             </div>
         </div>
+        <script>
+            function toggleMenu() {
+                const menu = document.getElementById("dropdown");
+                menu.style.display = menu.style.display === "block" ? "none" : "block";
+            }
+            document.addEventListener("click", function (event) {
+                const dropdown = document.getElementById("dropdown");
+                const userBtn = document.querySelector(".user-name");
+                if (!dropdown.contains(event.target) && !userBtn.contains(event.target)) {
+                    dropdown.style.display = "none";
+                }
+            });
+        </script>
 
         <% if (request.getParameter("retry") != null) { %>
         <div style="padding: 10px; background-color: #ffdddd; border: 1px solid red; color: red; margin: 20px;">
@@ -293,7 +197,7 @@
                         <input type="hidden" name="productId" value="<%= paramProductId %>">
                         <input type="hidden" name="quantity" value="<%= paramQuantity %>">
                         <input type="text" name="discountCode" placeholder="Discount code" value="<%= discountCode %>">
-                        <button type="submit" name="action" value="ApplyDiscount" onclick="setFormAction('MainController')">Apply</button>
+                        <button type="submit" class="apply-btn" name="action" value="ApplyDiscount" onclick="setFormAction('MainController')">Apply</button>
                     </div>
                     <% if (discountError != null) { %>
                     <div class="error-message"><%= discountError %></div>
@@ -305,6 +209,7 @@
                     <% } %>
 
                     <div class="footer-buttons">
+                        <a href="cart.jsp" class="back-btn">← Return To Cart</a>
                         <% if (product != null) {
                             double total = product.getPrice() * quantity;
                             double shipFee = 30000;
@@ -328,7 +233,7 @@
                     </div>
                 </div>
 
-                <div>
+                <div class="cart-preview">
                     <h3>Your Order</h3>
                     <% if (product != null) {
                             double total = product.getPrice() * quantity;

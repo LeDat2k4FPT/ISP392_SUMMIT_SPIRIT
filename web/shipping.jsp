@@ -1,24 +1,45 @@
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.text.DecimalFormat, dto.CartDTO, dto.CartItemDTO, dto.ProductDTO, dto.UserDTO" %>
 <%@ page import="dto.VoucherDTO, dao.VoucherDAO" %>
+<%@ page import="java.util.Map" %>
+<%@ page import="java.util.HashMap" %>
 
 <%
     CartDTO cart = (CartDTO) session.getAttribute("CART");
     UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
 
+    // Khai báo 1 lần duy nhất
+    String country = "", fullname = "", phone = "", email = "", address = "", district = "", city = "", discountCode = "";
     double discountPercent = 0.0;
-    String discountCode = "";
     String discountError = null;
+
     int cartItemCount = (cart != null) ? cart.getCartItems().size() : 0;
-    // ✅ Nhận từ request thay vì session
+
+    // Nhận từ request
     Double appliedDiscountPercent = (Double) request.getAttribute("DISCOUNT_PERCENT");
     String appliedDiscountCode = (String) request.getAttribute("DISCOUNT_CODE");
     String discountErrorMsg = (String) request.getAttribute("DISCOUNT_ERROR");
 
+    // Nhận từ session nếu có đơn đang chờ
+    Map<String, Object> pendingOrder = (Map<String, Object>) session.getAttribute("PENDING_ORDER");
+    if (pendingOrder != null) {
+        country = (String) pendingOrder.getOrDefault("country", country);
+        fullname = (String) pendingOrder.getOrDefault("fullName", fullname);
+        phone = (String) pendingOrder.getOrDefault("phone", phone);
+        email = (String) pendingOrder.getOrDefault("email", email);
+        address = (String) pendingOrder.getOrDefault("address", address);
+        district = (String) pendingOrder.getOrDefault("district", district);
+        city = (String) pendingOrder.getOrDefault("city", city);
+        discountCode = (String) pendingOrder.getOrDefault("discountCode", discountCode);
+        discountPercent = Double.parseDouble(String.valueOf(pendingOrder.getOrDefault("discountPercent", discountPercent)));
+    }
+
+    // Ghi đè nếu có giá trị mới từ request
     if (appliedDiscountPercent != null) discountPercent = appliedDiscountPercent;
     if (appliedDiscountCode != null) discountCode = appliedDiscountCode;
     if (discountErrorMsg != null) discountError = discountErrorMsg;
 
+    // Kiểm tra sp giảm giá
     boolean hasSaleOffProduct = false;
     if (cart != null) {
         for (CartItemDTO item : cart.getCartItems()) {
@@ -29,6 +50,7 @@
         }
     }
 
+    // Lấy voucher nếu có mã trong request
     String code = request.getParameter("discountCode");
     VoucherDAO dao = new VoucherDAO();
     VoucherDTO voucher = dao.getVoucherByCode(code);
@@ -41,17 +63,17 @@
         request.setAttribute("DISCOUNT_ERROR", "Invalid or expired code!");
     }
 
+    // Gán giá trị từ request nếu có
+    if (request.getParameter("country") != null) country = request.getParameter("country");
+    if (request.getParameter("fullname") != null) fullname = request.getParameter("fullname");
+    if (request.getParameter("phone") != null) phone = request.getParameter("phone");
+    if (request.getParameter("email") != null) email = request.getParameter("email");
+    if (request.getParameter("address") != null) address = request.getParameter("address");
+    if (request.getParameter("district") != null) district = request.getParameter("district");
+    if (request.getParameter("city") != null) city = request.getParameter("city");
 
-    String country = request.getParameter("country") != null ? request.getParameter("country") : "";
-    String fullname = request.getParameter("fullname") != null ? request.getParameter("fullname") : "";
-    String phone = request.getParameter("phone") != null ? request.getParameter("phone") : "";
-    String email = request.getParameter("email") != null ? request.getParameter("email") : "";
-    String address = request.getParameter("address") != null ? request.getParameter("address") : "";
-    String district = request.getParameter("district") != null ? request.getParameter("district") : "";
-    String city = request.getParameter("city") != null ? request.getParameter("city") : "";
     Integer voucherID = (Integer) request.getAttribute("VOUCHER_ID");
 %>
-
 <!DOCTYPE html>
 <html>
     <head>
@@ -121,7 +143,7 @@
                     <div class="row">
                         <input type="hidden" name="sourcePage" value="shipping.jsp">
                         <input type="text" name="discountCode" placeholder="Discount code" value="<%= discountCode %>">
-                        <button type="submit" name="action" value="ApplyDiscount" onclick="setFormAction('MainController')">Apply</button>
+                        <button type="submit" class ="apply-btn" name="action" value="ApplyDiscount" onclick="setFormAction('MainController')">Apply</button>
                     </div>
                     <% if (discountError != null) { %>
                     <div class="error-message"><%= discountError %></div>

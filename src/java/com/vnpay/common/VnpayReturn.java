@@ -10,6 +10,9 @@ import dao.PaymentDAO;
 import dto.OrderDTO;
 import dto.OrderDetailDTO;
 import dto.PaymentDTO;
+import dto.CartDTO;
+import dto.CartItemDTO;
+import dto.ProductDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.http.*;
 import java.io.IOException;
@@ -17,10 +20,6 @@ import java.util.*;
 import java.util.logging.Level;
 import java.util.logging.Logger;
 
-/**
- *
- * @author gmt
- */
 public class VnpayReturn extends HttpServlet {
 
     private final OrderDAO orderDao = new OrderDAO();
@@ -29,22 +28,23 @@ public class VnpayReturn extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        // Log đầu vào
         System.out.println("==== VNPay Return ====");
         Enumeration<String> params = request.getParameterNames();
         while (params.hasMoreElements()) {
             String param = params.nextElement();
             System.out.println(param + "=" + request.getParameter(param));
         }
+
         try {
             Map<String, String> fields = new HashMap<>();
             for (Enumeration<String> params2 = request.getParameterNames(); params2.hasMoreElements();) {
-                String fieldName = (String) params2.nextElement();
+                String fieldName = params2.nextElement();
                 String fieldValue = request.getParameter(fieldName);
                 if (fieldValue != null && !fieldValue.isEmpty()) {
                     fields.put(fieldName, fieldValue);
                 }
             }
+
             String vnp_SecureHash = request.getParameter("vnp_SecureHash");
             fields.remove("vnp_SecureHashType");
             fields.remove("vnp_SecureHash");
@@ -52,8 +52,8 @@ public class VnpayReturn extends HttpServlet {
             String signValue = Config.hashAllFields(fields);
             if (!signValue.equals(vnp_SecureHash)) {
                 request.setAttribute("paymentResult", "invalid");
-                request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
                 request.setAttribute("retryLink", "checkout.jsp?retry=true");
+                request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
                 return;
             }
 
@@ -66,12 +66,12 @@ public class VnpayReturn extends HttpServlet {
             int orderId;
             try {
                 String[] parts = fullTxnRef.split("-");
-                orderId = Integer.parseInt(parts[0]); // tách orderId từ txnRef
+                orderId = Integer.parseInt(parts[0]);
                 System.out.println("Parsed orderId from vnp_TxnRef: " + orderId);
             } catch (Exception ex) {
                 request.setAttribute("paymentResult", "error");
-                request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
                 request.setAttribute("retryLink", "checkout.jsp?retry=true");
+                request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
                 return;
             }
 
@@ -79,31 +79,24 @@ public class VnpayReturn extends HttpServlet {
             Object sessionObj = session.getAttribute("PENDING_ORDER");
             if (!(sessionObj instanceof Map)) {
                 request.setAttribute("paymentResult", "error");
-                request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
                 request.setAttribute("retryLink", "checkout.jsp?retry=true");
+                request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
                 return;
             }
+
             Map<String, Object> orderSessionData = (Map<String, Object>) sessionObj;
 
             PaymentDTO paymentDTO = new PaymentDTO();
             paymentDTO.setOrderID(orderId);
             paymentDTO.setPaymentMethod(cardType);
-            String paymentStatus = null;
-            if ("00".equals(responseCode)) {
-                paymentStatus = "Paid";
-            } else if ("24".equals(responseCode)) {
-                paymentStatus = "Unpaid";
-            } else {
-                paymentStatus = "Unpaid";
-            }
-            paymentDTO.setPaymentStatus(paymentStatus);
+            paymentDTO.setPaymentStatus("00".equals(responseCode) ? "Paid" : "Unpaid");
             paymentDTO.setPaymentDate(new java.sql.Date(System.currentTimeMillis()));
             paymentDTO.setTransactionCode(transactionNo);
             paymentDao.addPayment(paymentDTO);
 
             String checkoutType = (String) orderSessionData.get("checkoutType");
-            if ("00".equals(responseCode) && orderSessionData != null) {
-                // Cập nhật trạng thái đơn hàng
+
+            if ("00".equals(responseCode)) {
                 OrderDTO order = new OrderDTO();
                 order.setStatus("Processing");
                 order.setOrderID(orderId);
@@ -116,8 +109,7 @@ public class VnpayReturn extends HttpServlet {
                         int quantity = Integer.parseInt(String.valueOf(orderSessionData.get("quantity")));
                         String size = (String) orderSessionData.get("size");
                         String color = (String) orderSessionData.get("color");
-                        boolean fromSaleOff = Boolean.parseBoolean(String.valueOf(orderSessionData.get("fromSaleOff")));
-                        int attributeId = 0;
+                        int attributeId;
                         if ((size == null || size.isEmpty()) && (color == null || color.isEmpty())) {
                             attributeId = detailDao.getAttributeIdByProduct(productId);
                         } else if (size == null || size.isEmpty()) {
@@ -132,12 +124,11 @@ public class VnpayReturn extends HttpServlet {
                         detailDao.addOrderDetail(detail);
                         detailDao.updateProductVariantQuantity(attributeId, quantity);
                     } else if ("CART".equals(checkoutType)) {
-                        // Xử lý giỏ hàng
                         Object cartObj = session.getAttribute("CART");
-                        if (cartObj != null && cartObj instanceof dto.CartDTO) {
-                            dto.CartDTO cart = (dto.CartDTO) cartObj;
-                            for (dto.CartItemDTO item : cart.getCartItems()) {
-                                dto.ProductDTO product = item.getProduct();
+                        if (cartObj instanceof CartDTO) {
+                            CartDTO cart = (CartDTO) cartObj;
+                            for (CartItemDTO item : cart.getCartItems()) {
+                                ProductDTO product = item.getProduct();
                                 int attributeId = detailDao.getAttributeIdByProductSizeColor(
                                         product.getProductID(), product.getColor(), product.getSize());
                                 double unitPrice = detailDao.getUnitPriceByAttributeId(attributeId);
@@ -145,52 +136,41 @@ public class VnpayReturn extends HttpServlet {
                                 detailDao.addOrderDetail(detail);
                                 detailDao.updateProductVariantQuantity(attributeId, item.getQuantity());
                             }
-                            // Sau khi xử lý xong, có thể xóa giỏ hàng
                             session.removeAttribute("CART");
                         }
                     }
 
-                    // Xóa session tạm
                     session.removeAttribute("PENDING_ORDER");
                     session.removeAttribute("TEMP_ORDER_ID");
+
                     request.setAttribute("paymentResult", "success");
-                    request.setAttribute("transactionId", request.getParameter("vnp_TransactionNo"));
+                    request.setAttribute("transactionId", transactionNo);
                     request.setAttribute("amount", String.format("%,.0f", (double) amount));
                     request.setAttribute("orderInfo", request.getParameter("vnp_OrderInfo"));
                 } else {
                     request.setAttribute("paymentResult", "error");
-                    request.setAttribute("retryLink", "checkout.jsp?retry=true");
+                    String retryLink = "BUY_NOW".equals(checkoutType) ? "checkout.jsp?retry=true" : "shipping.jsp?retry=true";
+                    request.setAttribute("retryLink", retryLink);
                 }
             } else {
-                // Giao dịch thất bại hoặc không có session
                 OrderDTO order = new OrderDTO();
                 order.setOrderID(orderId);
                 order.setStatus("Failed");
                 order.setNote("Order payment failed");
                 boolean updated = orderDao.updateOrderStatusAndNote(order);
-                if (updated) {
-                    request.setAttribute("paymentResult", "failed");
-                    request.setAttribute("retryLink", "checkout.jsp?retry=true");
-                }
+                request.setAttribute("paymentResult", "failed");
+                String retryLink = "BUY_NOW".equals(checkoutType) ? "checkout.jsp?retry=true" : "shipping.jsp?retry=true";
+                request.setAttribute("retryLink", retryLink);
             }
         } catch (Exception e) {
             Logger.getLogger(VnpayReturn.class.getName()).log(Level.SEVERE, null, e);
             request.setAttribute("paymentResult", "error");
             request.setAttribute("retryLink", "checkout.jsp?retry=true");
         }
-        // Hiển thị trang kết quả
+
         request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
     }
 
-// <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -203,14 +183,8 @@ public class VnpayReturn extends HttpServlet {
         processRequest(request, response);
     }
 
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
     @Override
     public String getServletInfo() {
         return "Handles VNPay return and creates order";
-    }// </editor-fold>
-
+    }
 }
