@@ -2,6 +2,7 @@ package dao;
 
 import dto.OrderDTO;
 import dto.OrderDetailDTO;
+import dto.UserAddressDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
@@ -461,4 +462,32 @@ public class OrderDAO {
         }
         return order;
     }
+    
+public UserAddressDTO getUserAddressInfoByOrderId(int orderId) {
+    UserAddressDTO info = null;
+    String sql = "SELECT * FROM UserAddressInfo WHERE OrderID = ?";
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, orderId);
+        ResultSet rs = ps.executeQuery();
+        if (rs.next()) {
+            info = new UserAddressDTO(
+                rs.getInt("InfoID"),
+                rs.getInt("OrderID"),
+                rs.getString("Country"),
+                rs.getString("FullName"),
+                rs.getString("Phone"),
+                rs.getString("Email"),
+                rs.getString("Address"),
+                rs.getString("District"),
+                rs.getString("City")
+            );
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+    return info;
+}
+
+
 }
