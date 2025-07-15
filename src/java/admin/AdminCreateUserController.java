@@ -1,25 +1,20 @@
- /*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
- */
 package admin;
 
 import dao.UserDAO;
 import dto.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
-import jakarta.servlet.http.*;
-
+import jakarta.servlet.http.HttpServlet;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+
 /**
  *
  * @author Hanne
  */
 @WebServlet(name = "AdminCreateUserController", urlPatterns = {"/AdminCreateUserController"})
 public class AdminCreateUserController extends HttpServlet {
-
-    private static final String ERROR = "admin/createUserAccount.jsp";
-    private static final String SUCCESS = "ManageUserAccountController";
 
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
@@ -64,14 +59,15 @@ public class AdminCreateUserController extends HttpServlet {
                 UserDTO user = new UserDTO(0, fullName, address, password, phone, email, role);
                 boolean success = dao.create(user);
                 if (success) {
-                    response.sendRedirect(request.getContextPath() + "/admin/admin.jsp?page=ManageUserAccountController");
+                    // Redirect để load lại user list
+                    response.sendRedirect(request.getContextPath() + "/ManageUserAccountController");
                     return;
                 } else {
                     message = "❌ Failed to create user. Please try again.";
                 }
             }
 
-            // Giữ lại dữ liệu nhập lại nếu lỗi
+            // Giữ lại dữ liệu nếu lỗi
             request.setAttribute("message", message);
             request.setAttribute("fullName", fullName);
             request.setAttribute("address", address);
@@ -81,12 +77,24 @@ public class AdminCreateUserController extends HttpServlet {
             request.setAttribute("confirm", confirm);
             request.setAttribute("role", role);
 
-            request.getRequestDispatcher(ERROR).forward(request, response);
+            // Đưa vào layout admin với page là createUserAccount.jsp
+            request.setAttribute("page", "createUserAccount.jsp");
+            request.getRequestDispatcher("admin/admin.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();
             request.setAttribute("message", "❌ Error: " + e.getMessage());
-            request.getRequestDispatcher(ERROR).forward(request, response);
+            request.setAttribute("page", "createUserAccount.jsp");
+            request.getRequestDispatcher("admin/admin.jsp").forward(request, response);
         }
     }
+
+
+    @Override
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    request.setAttribute("page", "createUserAccount.jsp");
+    request.getRequestDispatcher("admin/admin.jsp").forward(request, response);
+}
+
 }

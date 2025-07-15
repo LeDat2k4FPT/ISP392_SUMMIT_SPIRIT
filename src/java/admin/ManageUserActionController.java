@@ -92,21 +92,7 @@ public class ManageUserActionController extends HttpServlet {
             request.setAttribute("ERROR", "Failed to perform action: " + e.getMessage());
         }
 
-        response.sendRedirect(request.getContextPath() + "/admin/admin.jsp?page=ManageUserAccountController"); // Reload the list with layer
-
-//        UserDAO dao = new UserDAO();
-//
-//        if ("editRole".equals(action)) {
-//            // Get current role from DAO
-//            String currentRole = dao.getUserRole(userID);
-//            String newRole = currentRole.equalsIgnoreCase("user") ? "staff" : "user";
-//            dao.updateUserRole(userID, newRole);
-//        } else if ("deactivate".equals(action)) {
-//            dao.deactivateUser(userID);  // cập nhật role thành 'deactivated' hoặc status 'inactive'
-//        }
-//
-//        // Redirect lại trang quản lý
-//        response.sendRedirect("manageUser");
+        response.sendRedirect(request.getContextPath() + "/ManageUserAccountController"); // Reload the list with layer
     }
 
     /**
