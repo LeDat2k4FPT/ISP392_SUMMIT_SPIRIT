@@ -6,6 +6,8 @@ import java.sql.*;
 import java.text.DecimalFormat;
 import java.util.ArrayList;
 import java.util.List;
+import java.util.logging.Level;
+import java.util.logging.Logger;
 
 public class ProductDAO {
 
@@ -131,28 +133,32 @@ public class ProductDAO {
     }
 
     public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
-        List<ProductDTO> list = new ArrayList<>();
-        String sql = "SELECT p.ProductID, p.ProductName, c.CateName, "
-                + "MIN(pv.Price) AS Price, SUM(pv.Quantity) AS Stock "
-                + "FROM Product p "
-                + "JOIN Category c ON p.CateID = c.CateID "
-                + "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID "
-                + "GROUP BY p.ProductID, p.ProductName, c.CateName";
+    List<ProductDTO> list = new ArrayList<>();
+    String sql = "SELECT p.ProductID, p.ProductName, c.CateName, p.status, "
+               + "MIN(pv.Price) AS Price, SUM(pv.Quantity) AS Stock "
+               + "FROM Product p "
+               + "JOIN Category c ON p.CateID = c.CateID "
+               + "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID "
+               + "GROUP BY p.ProductID, p.ProductName, c.CateName, p.status";
 
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql);  ResultSet rs = ps.executeQuery()) {
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
 
-            while (rs.next()) {
-                ProductDTO p = new ProductDTO();
-                p.setProductID(rs.getInt("ProductID"));
-                p.setProductName(rs.getString("ProductName"));
-                p.setCateName(rs.getString("CateName"));
-                p.setPrice(rs.getDouble("Price"));
-                p.setStock(rs.getInt("Stock"));
-                list.add(p);
-            }
+        while (rs.next()) {
+            ProductDTO p = new ProductDTO();
+            p.setProductID(rs.getInt("ProductID"));
+            p.setProductName(rs.getString("ProductName"));
+            p.setCateName(rs.getString("CateName"));
+            p.setStatus(rs.getString("status")); // ⚠ đây là dòng thêm
+            p.setPrice(rs.getDouble("Price"));
+            p.setStock(rs.getInt("Stock"));
+            list.add(p);
         }
-        return list;
     }
+    return list;
+}
+
 
     public List<ProductDTO> getTopSalesFromCategory(int cateID, int limit)
             throws SQLException, ClassNotFoundException {
@@ -188,44 +194,13 @@ public class ProductDAO {
         return dto;
     }
 
-    public boolean deleteProductByID(int productID) throws Exception {
-        Connection con = null;
-        PreparedStatement ps = null;
-        boolean result = false;
-
-        try {
-            con = DBUtils.getConnection();
-            con.setAutoCommit(false);
-
-            ProductVariantDAO variantDAO = new ProductVariantDAO();
-            variantDAO.deleteByProductID(productID);
-
-            ProductImageDAO imageDAO = new ProductImageDAO();
-            imageDAO.deleteByProductID(productID);
-
-            String sql = "DELETE FROM Product WHERE ProductID = ?";
-            ps = con.prepareStatement(sql);
+    public boolean deleteProductByID(int productID) throws SQLException, ClassNotFoundException {
+        String sql = "UPDATE Product SET status = 'inactive' WHERE productID = ?";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productID);
             int rows = ps.executeUpdate();
-
-            con.commit();
-            result = rows > 0;
-
-        } catch (Exception e) {
-            if (con != null) {
-                con.rollback();
-            }
-            throw e;
-        } finally {
-            if (ps != null) {
-                ps.close();
-            }
-            if (con != null) {
-                con.setAutoCommit(true);
-                con.close();
-            }
+            return rows > 0;
         }
-        return result;
     }
 
     public ProductDTO getProductByID(int productID) throws SQLException, ClassNotFoundException {

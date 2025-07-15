@@ -19,18 +19,17 @@
     String msg = (String) request.getAttribute("message");
     if (msg != null) {
 %>
-
     <div class="success-box"><%= msg %></div>
 <%
     }
 %>
+
 <div class="search-bar" style="margin-bottom:15px;">
     <form method="get" action="<%= request.getContextPath() %>/ProductListController">
         <input type="text" name="keyword" value="<%= keyword %>" placeholder="🔍 Search product name..." style="padding:5px; width:200px;">
         <button type="submit">Search</button>
     </form>
 </div>
-
 
 <div class="product-section">
     <div class="product-header">
@@ -61,6 +60,11 @@
             <%
                 if (productList != null && !productList.isEmpty()) {
                     for (ProductDTO p : productList) {
+                        // ✅ Chỉ bỏ qua nếu status rõ ràng là inactive
+                        if (p.getStatus() != null && !"active".equalsIgnoreCase(p.getStatus())) {
+                            continue;
+                        }
+
                         List<ProductVariantDTO> variants = variantMap != null ? variantMap.get(p.getProductID()) : null;
                         if (variants != null) {
                             variants.sort(Comparator.comparing(ProductVariantDTO::getSizeName, Comparator.nullsLast(String::compareTo))
@@ -86,7 +90,9 @@
                         <td rowspan="<%= variantCount %>"><%= p.getStatus() != null ? p.getStatus() : "active" %></td>
                         <td rowspan="<%= variantCount %>" class="actions">
                             <a href="<%= request.getContextPath()%>/EditProductController?productID=<%= p.getProductID() %>" title="Edit">🖋️</a>
-                            <a href="<%= request.getContextPath()%>/DeleteProductController?productID=<%= p.getProductID() %>" title="Delete" onclick="return confirm('Are you sure?')">🗑️</a>
+                            <a href="<%= request.getContextPath()%>/DeleteProductController?productID=<%= p.getProductID() %>"
+                               title="Deactivate"
+                               onclick="return confirm('Are you sure you want to deactivate this product?')">🗑️</a>
                         </td>
                     <% } %>
                 </tr>
@@ -104,7 +110,9 @@
                     <td><%= p.getStatus() != null ? p.getStatus() : "active" %></td>
                     <td class="actions">
                         <a href="<%= request.getContextPath()%>/EditProductController?productID=<%= p.getProductID() %>" title="Edit">🖋️</a>
-                        <a href="<%= request.getContextPath()%>/DeleteProductController?productID=<%= p.getProductID() %>" title="Delete" onclick="return confirm('Are you sure?')">🗑️</a>
+                        <a href="<%= request.getContextPath()%>/DeleteProductController?productID=<%= p.getProductID() %>"
+                           title="Deactivate"
+                           onclick="return confirm('Are you sure you want to deactivate this product?')">🗑️</a>
                     </td>
                 </tr>
             <%
