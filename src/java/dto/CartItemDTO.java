@@ -4,8 +4,8 @@ public class CartItemDTO {
 
     private ProductDTO product;
     private int quantity;
-    private String color; // ✅ Thêm thuộc tính color
-    private boolean fromSaleOff = false; // ✅ Thêm thuộc tính fromSaleOff
+    private String color; // ✅ Thuộc tính color
+    private boolean fromSaleOff = false; // ✅ Thuộc tính fromSaleOff
 
     // ✅ Constructor đầy đủ với color và fromSaleOff
     public CartItemDTO(ProductDTO product, int quantity, String color, boolean fromSaleOff) {
@@ -70,5 +70,21 @@ public class CartItemDTO {
 
     public void setFromSaleOff(boolean fromSaleOff) {
         this.fromSaleOff = fromSaleOff;
+    }
+
+    // ✅ PHẦN QUAN TRỌNG: Tạo variant key phân biệt biến thể size-color
+    public String getVariantKey() {
+        String size = (getSize() != null && !getSize().isEmpty()) ? getSize() : "";
+        String color = (getColor() != null && !getColor().isEmpty()) ? getColor() : "";
+
+        if (!size.isEmpty() && !color.isEmpty()) {
+            return size + "_" + color;
+        } else if (!size.isEmpty()) {
+            return size;
+        } else if (!color.isEmpty()) {
+            return color;
+        } else {
+            return "default";
+        }
     }
 }

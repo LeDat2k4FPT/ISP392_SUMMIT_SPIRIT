@@ -171,4 +171,23 @@ public class ProductDTO {
     public void setAttributeID(int attributeID) {
         this.attributeID = attributeID;
     }
+
+    // === COPY CONSTRUCTOR: Tạo đối tượng ProductDTO mới dựa trên 1 ProductDTO khác ===
+    public ProductDTO(ProductDTO other) {
+        this.productID = other.productID;
+        this.productName = other.productName;
+        this.productImage = other.productImage;
+        this.description = other.description;
+        this.size = other.size;
+        this.color = other.color;
+        this.price = other.price;
+        this.discount = other.discount;
+        this.status = other.status;
+        this.stock = other.stock;
+        this.cateID = other.cateID;
+        this.cateName = other.cateName;
+        this.quantity = other.quantity;
+        this.fromSaleOff = other.fromSaleOff;
+        this.attributeID = other.attributeID;
+    }
 }

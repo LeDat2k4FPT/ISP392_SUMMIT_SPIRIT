@@ -165,18 +165,32 @@ public class ProductVariantDAO {
         }
     }
 
+    // ==== Sửa hàm lấy tồn kho cho trường hợp size hoặc color có thể NULL ====
     public int getAvailableQuantity(int productId, String sizeName, String colorName) throws SQLException, ClassNotFoundException {
         int quantity = 0;
-        String sql = "SELECT pv.Quantity "
-                + "FROM ProductVariant pv "
-                + "JOIN Size s ON pv.SizeID = s.SizeID "
-                + "JOIN Color c ON pv.ColorID = c.ColorID "
-                + "WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = null;
+        if ((sizeName == null || sizeName.isEmpty()) && (colorName == null || colorName.isEmpty())) {
+            sql = "SELECT Quantity FROM ProductVariant WHERE ProductID = ? AND SizeID IS NULL AND ColorID IS NULL";
+        } else if (sizeName == null || sizeName.isEmpty()) {
+            sql = "SELECT pv.Quantity FROM ProductVariant pv JOIN Color c ON pv.ColorID = c.ColorID WHERE pv.ProductID = ? AND c.ColorName = ? AND pv.SizeID IS NULL";
+        } else if (colorName == null || colorName.isEmpty()) {
+            sql = "SELECT pv.Quantity FROM ProductVariant pv JOIN Size s ON pv.SizeID = s.SizeID WHERE pv.ProductID = ? AND s.SizeName = ? AND pv.ColorID IS NULL";
+        } else {
+            sql = "SELECT pv.Quantity FROM ProductVariant pv JOIN Size s ON pv.SizeID = s.SizeID JOIN Color c ON pv.ColorID = c.ColorID WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
+        }
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productId);
-            ps.setString(2, sizeName);
-            ps.setString(3, colorName);
-            try ( ResultSet rs = ps.executeQuery()) {
+            if ((sizeName == null || sizeName.isEmpty()) && (colorName == null || colorName.isEmpty())) {
+                // only productId param
+            } else if (sizeName == null || sizeName.isEmpty()) {
+                ps.setString(2, colorName);
+            } else if (colorName == null || colorName.isEmpty()) {
+                ps.setString(2, sizeName);
+            } else {
+                ps.setString(2, sizeName);
+                ps.setString(3, colorName);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     quantity = rs.getInt("Quantity");
                 }
@@ -185,18 +199,32 @@ public class ProductVariantDAO {
         return quantity;
     }
 
+    // ==== Sửa hàm lấy giá cho trường hợp size hoặc color có thể NULL ====
     public double getPriceByVariant(int productId, String sizeName, String colorName) throws SQLException, ClassNotFoundException {
         double price = 0;
-        String sql = "SELECT pv.Price "
-                + "FROM ProductVariant pv "
-                + "JOIN Size s ON pv.SizeID = s.SizeID "
-                + "JOIN Color c ON pv.ColorID = c.ColorID "
-                + "WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+        String sql = null;
+        if ((sizeName == null || sizeName.isEmpty()) && (colorName == null || colorName.isEmpty())) {
+            sql = "SELECT Price FROM ProductVariant WHERE ProductID = ? AND SizeID IS NULL AND ColorID IS NULL";
+        } else if (sizeName == null || sizeName.isEmpty()) {
+            sql = "SELECT pv.Price FROM ProductVariant pv JOIN Color c ON pv.ColorID = c.ColorID WHERE pv.ProductID = ? AND c.ColorName = ? AND pv.SizeID IS NULL";
+        } else if (colorName == null || colorName.isEmpty()) {
+            sql = "SELECT pv.Price FROM ProductVariant pv JOIN Size s ON pv.SizeID = s.SizeID WHERE pv.ProductID = ? AND s.SizeName = ? AND pv.ColorID IS NULL";
+        } else {
+            sql = "SELECT pv.Price FROM ProductVariant pv JOIN Size s ON pv.SizeID = s.SizeID JOIN Color c ON pv.ColorID = c.ColorID WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
+        }
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productId);
-            ps.setString(2, sizeName);
-            ps.setString(3, colorName);
-            try ( ResultSet rs = ps.executeQuery()) {
+            if ((sizeName == null || sizeName.isEmpty()) && (colorName == null || colorName.isEmpty())) {
+                // only productId param
+            } else if (sizeName == null || sizeName.isEmpty()) {
+                ps.setString(2, colorName);
+            } else if (colorName == null || colorName.isEmpty()) {
+                ps.setString(2, sizeName);
+            } else {
+                ps.setString(2, sizeName);
+                ps.setString(3, colorName);
+            }
+            try (ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     price = rs.getDouble("Price");
                 }

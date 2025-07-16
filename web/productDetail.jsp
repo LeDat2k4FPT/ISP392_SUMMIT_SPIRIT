@@ -159,9 +159,23 @@ double avgRating = 0;
 
                     <script>
                         const variantStockMap = {
-                        <% for (Map.Entry<String, Integer> entry : variantStockMap.entrySet()) { %>
-                            "<%= entry.getKey() %>": <%= entry.getValue() %>,
-                        <% } %>
+                        <%
+    for (String size : sizeList.isEmpty() ? java.util.Arrays.asList("") : sizeList) {
+        for (String color : colorList.isEmpty() ? java.util.Arrays.asList("") : colorList) {
+            int stock = new ProductVariantDAO().getAvailableQuantity(productID, size, color);
+            int inCart = (cart != null) ? cart.getQuantityByVariant(productID, size, color) : 0;
+            int available = stock - inCart;
+            if (available < 0) available = 0;
+            String key = (size.isEmpty() && color.isEmpty()) ? "default" :
+                         (!size.isEmpty() && !color.isEmpty()) ? size + "_" + color :
+                         size.isEmpty() ? color : size;
+%>
+    "<%= key %>": <%= available %>,
+<%
+        }
+    }
+%>
+
                         };
                     </script>
 
@@ -311,7 +325,15 @@ double avgRating = 0;
             function increaseQuantity(dummy) {
                 const input = document.getElementById("quantity");
                 const display = document.getElementById("quantity-display");
-                const maxAvailable = window.maxAvailable || 0;
+                const size = document.getElementById("size").value;
+const color = document.getElementById("color").value;
+let key = "default";
+if (size && color) key = size + "_" + color;
+else if (size) key = size;
+else if (color) key = color;
+
+const maxAvailable = variantStockMap[key] || 0;
+
                 let val = parseInt(input.value);
                 if (val < maxAvailable) {
                     input.value = val + 1;
@@ -387,12 +409,19 @@ double avgRating = 0;
 // ✅ THÊM Ở ĐÂY:
             function updateStockInfo() {
                 const size = document.getElementById("size").value;
-                const color = document.getElementById("color").value;
-                if (!size || !color)
-                    return;
+const color = document.getElementById("color").value;
 
-                const key = size + "_" + color;
-                const available = variantStockMap[key] || 0;
+let key = "default";
+if (size && color) {
+    key = size + "_" + color;
+} else if (size) {
+    key = size;
+} else if (color) {
+    key = color;
+}
+
+const available = variantStockMap[key] || 0;
+
 
                 const quantity = document.getElementById("quantity");
                 const display = document.getElementById("quantity-display");
@@ -478,8 +507,28 @@ double avgRating = 0;
                         .catch(err => console.error("Lỗi khi lấy giá: ", err));
             }
         </script>
+ <script>
+            window.onload = function() {
+                const sizeInput = document.getElementById("size");
+                const colorInput = document.getElementById("color");
 
+                // Nếu chưa có size đã chọn, chọn size đầu tiên nếu có
+                if (sizeInput && sizeInput.value === "" && <%= !sizeList.isEmpty() %>) {
+                    sizeInput.value = "<%= sizeList.isEmpty() ? "" : sizeList.get(0) %>";
+                    const firstSizeBtn = document.querySelector("#size-options .option-btn");
+                    if (firstSizeBtn) firstSizeBtn.classList.add("active");
+                }
 
+                // Nếu chưa có color đã chọn, chọn color đầu tiên nếu có
+                if (colorInput && colorInput.value === "" && <%= !colorList.isEmpty() %>) {
+                    colorInput.value = "<%= colorList.isEmpty() ? "" : colorList.get(0) %>";
+                    const firstColorBtn = document.querySelector("#color-options .option-btn");
+                    if (firstColorBtn) firstColorBtn.classList.add("active");
+                }
+
+                updateStockInfo();
+                fetchPriceByVariant();
+            }
+        </script>
     </body>
-
 </html>
