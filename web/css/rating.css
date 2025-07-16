@@ -1,0 +1,81 @@
+body {
+    font-family: 'Kumbh Sans', sans-serif;
+    margin: 0;
+    padding: 0;
+    background: #f9f9f9;
+}
+
+.container {
+    display: flex;
+    padding: 40px;
+    max-width: 1000px;
+    margin: auto;
+    background: #fff;
+    box-shadow: 0 0 20px rgba(0,0,0,0.1);
+    border-radius: 10px;
+}
+
+.review-left {
+    flex: 1;
+    margin-right: 40px;
+}
+
+.review-left h2 {
+    margin-bottom: 20px;
+    color: #244833;
+}
+
+.review-left label {
+    display: block;
+    margin-top: 15px;
+    margin-bottom: 5px;
+}
+
+.review-left input, .review-left textarea {
+    width: 100%;
+    padding: 10px;
+    border: 1px solid #ccc;
+    border-radius: 6px;
+}
+
+.rating-stars {
+    display: flex;
+    gap: 10px;
+}
+
+.rating-stars input[type="radio"] {
+    display: none;
+}
+
+.rating-stars label {
+    cursor: pointer;
+    font-size: 20px;
+    color: gray;
+}
+
+.rating-stars input:checked + label,
+.rating-stars label:hover {
+    color: gold;
+}
+
+.review-left button {
+    margin-top: 20px;
+    width: 100%;
+    padding: 12px;
+    background-color: #244833;
+    color: #fff;
+    border: none;
+    border-radius: 6px;
+    font-size: 16px;
+}
+
+.review-right {
+    flex: 1;
+    text-align: center;
+}
+
+.review-right img {
+    max-width: 100%;
+    height: auto;
+    margin-bottom: 20px;
+}
