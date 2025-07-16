@@ -4,47 +4,53 @@
 <%
     List<Map<String, Object>> potentialList = (List<Map<String, Object>>) request.getAttribute("potentialList");
 %>
-<!DOCTYPE html>
-<html>
-<head>
-    <title>Potential Customers</title>
-    <link rel="stylesheet" href="../css/admin.css">
-    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
-</head>
-<body>
 <div class="container mt-4">
-    <h2>Potential Customers</h2>
-    <table class="table table-bordered mt-3">
-        <thead>
-        <tr>
-            <th>#</th>
-            <th>Name</th>
-            <th>Email</th>
-            <th>Phone</th>
-            <th>Total Orders</th>
-            <th>Total Spent</th>
-            <th>Reviews</th>
-        </tr>
-        </thead>
-        <tbody>
-        <% if (potentialList != null) {
-            int idx = 1;
-            for (Map<String, Object> info : potentialList) {
-                UserDTO user = (UserDTO) info.get("user");
-        %>
+    <h2 style="color:#234C45;font-weight:600;">Potential Customers</h2>
+    <% if (potentialList != null && !potentialList.isEmpty()) { %>
+    <p class="text-muted">Total potential customers: <%= potentialList.size() %></p>
+    <% } %>
+    
+    <div class="table-responsive">
+        <table class="table table-bordered table-hover align-middle bg-white mt-3">
+            <thead class="table-light">
             <tr>
-                <td><%= idx++ %></td>
-                <td><%= user.getFullName() %></td>
-                <td><%= user.getEmail() %></td>
-                <td><%= user.getPhone() %></td>
-                <td><%= info.get("orderCount") %></td>
-                <td><%= info.get("totalSpent") %></td>
-                <td><%= info.get("reviewCount") %></td>
+                <th>#</th>
+                <th>Name</th>
+                <th>Email</th>
+                <th>Phone</th>
+                <th>Total Orders</th>
+                <th>Total Spent</th>
+                <th>Reviews</th>
             </tr>
-        <%   }
-           } %>
-        </tbody>
-    </table>
+            </thead>
+            <tbody>
+            <% 
+                if (potentialList != null && !potentialList.isEmpty()) {
+                    int idx = 1;
+                    for (Map<String, Object> info : potentialList) {
+                        UserDTO user = (UserDTO) info.get("user");
+                        double totalSpent = info.get("totalSpent") != null ? (double) info.get("totalSpent") : 0;
+                        int orderCount = info.get("orderCount") != null ? (int) info.get("orderCount") : 0;
+                        int reviewCount = info.get("reviewCount") != null ? (int) info.get("reviewCount") : 0;
+            %>
+                <tr style="<%= idx == 1 ? "background:#e6ffed;" : "" %>">
+                    <td><%= idx++ %></td>
+                    <td><%= user.getFullName() %></td>
+                    <td><%= user.getEmail() %></td>
+                    <td><%= user.getPhone() %></td>
+                    <td><%= orderCount %></td>
+                    <td>$<%= String.format("%,.2f", totalSpent) %></td>
+                    <td><%= reviewCount %></td>
+                </tr>
+            <% 
+                    }
+                } else { 
+            %>
+                <tr>
+                    <td colspan="7" class="text-center text-muted">No potential customers found.</td>
+                </tr>
+            <% } %>
+            </tbody>
+        </table>
+    </div>
 </div>
-</body>
-</html> 

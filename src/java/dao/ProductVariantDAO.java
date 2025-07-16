@@ -1,7 +1,3 @@
-/*
- * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
- * Click nbfs://nbhost/SystemFileSystem/Templates/Classes/Class.java to edit this template
- */
 package dao;
 
 import java.sql.Connection;
@@ -15,34 +11,22 @@ import java.util.List;
 import java.util.HashMap;
 import java.util.Map;
 
-/**
- *
- * @author Admin
- */
 public class ProductVariantDAO {
 
     public void insertVariant(ProductVariantDTO variant) throws SQLException, ClassNotFoundException {
         System.out.println("[DEBUG] Insert variant: " + variant);
-        String sql = "INSERT INTO ProductVariant (AttributeID, ProductID, ColorID, SizeID, Price, Quantity) VALUES (?, ?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO ProductVariant (ProductID, ColorID, SizeID, Price, Quantity) VALUES (?, ?, ?, ?, ?)";
         try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
-            int nextID = getNextAttributeID();
-            ps.setInt(1, nextID);
-            ps.setInt(2, variant.getProductID());
-            ps.setInt(3, variant.getColorID());
-            ps.setInt(4, variant.getSizeID());
-            ps.setDouble(5, variant.getPrice());
-            ps.setInt(6, variant.getQuantity());
+            ps.setInt(1, variant.getProductID());
+            ps.setInt(2, variant.getColorID());
+            ps.setInt(3, variant.getSizeID());
+            ps.setDouble(4, variant.getPrice());
+            ps.setInt(5, variant.getQuantity());
             ps.executeUpdate();
-        } catch (Exception e) {
-            System.out.println("[ERROR] Insert variant: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
         }
     }
 
     public int getNextAttributeID() throws SQLException, ClassNotFoundException {
-        // Láº¥y AttributeID má»›i báº±ng cÃ¡ch láº¥y MAX hiá»‡n táº¡i + 1
-        // Náº¿u báº£ng chÆ°a cÃ³ báº£n ghi nÃ o, dÃ¹ng 1 lÃ m ID Ä‘áº§u tiÃªn
         String sql = "SELECT ISNULL(MAX(AttributeID), 0) + 1 FROM ProductVariant";
         try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql);  ResultSet rs = ps.executeQuery()) {
             if (rs.next()) {
@@ -94,7 +78,6 @@ public class ProductVariantDAO {
         return colors;
     }
 
-    // ThÃªm phÆ°Æ¡ng thá»©c láº¥y táº¥t cáº£ variant, nhÃ³m theo ProductID
     public Map<Integer, List<ProductVariantDTO>> getAllVariantsGroupedByProduct() throws SQLException, ClassNotFoundException {
         Map<Integer, List<ProductVariantDTO>> map = new HashMap<>();
         String sql = "SELECT pv.AttributeID, pv.ProductID, pv.ColorID, pv.SizeID, pv.Price, pv.Quantity, c.ColorName, s.SizeName "
@@ -156,77 +139,69 @@ public class ProductVariantDAO {
 
     public void updateVariant(ProductVariantDTO variant) throws SQLException, ClassNotFoundException {
         System.out.println("[DEBUG] Update variant: " + variant);
-        String sql = "UPDATE ProductVariant SET ColorID = ?, SizeID = ?, Price = ?, Quantity = ? WHERE AttributeID = ? AND ProductID = ?";
+        String sql;
+        if (variant.getSizeID() > 0 && variant.getColorID() > 0) {
+            sql = "UPDATE ProductVariant SET ColorID = ?, SizeID = ?, Price = ?, Quantity = ? WHERE AttributeID = ?";
+        } else {
+            sql = "UPDATE ProductVariant SET Price = ?, Quantity = ? WHERE AttributeID = ?";
+        }
+
         try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, variant.getColorID());
-            ps.setInt(2, variant.getSizeID());
-            ps.setDouble(3, variant.getPrice());
-            ps.setInt(4, variant.getQuantity());
-            ps.setInt(5, variant.getAttributeID());
-            ps.setInt(6, variant.getProductID());
+            if (variant.getSizeID() > 0 && variant.getColorID() > 0) {
+                ps.setInt(1, variant.getColorID());
+                ps.setInt(2, variant.getSizeID());
+                ps.setDouble(3, variant.getPrice());
+                ps.setInt(4, variant.getQuantity());
+                ps.setInt(5, variant.getAttributeID());
+            } else {
+                ps.setDouble(1, variant.getPrice());
+                ps.setInt(2, variant.getQuantity());
+                ps.setInt(3, variant.getAttributeID());
+            }
             int affected = ps.executeUpdate();
             if (affected == 0) {
                 insertVariant(variant);
             }
-        } catch (Exception e) {
-            System.out.println("[ERROR] Update variant: " + e.getMessage());
-            e.printStackTrace();
-            throw e;
         }
     }
-public int getAvailableQuantity(int productId, String sizeName, String colorName) throws SQLException, ClassNotFoundException {
-    int quantity = 0;
-    String sql = "SELECT pv.Quantity " +
-                 "FROM ProductVariant pv " +
-                 "JOIN Size s ON pv.SizeID = s.SizeID " +
-                 "JOIN Color c ON pv.ColorID = c.ColorID " +
-                 "WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
-    try (Connection conn = DBUtils.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, productId);
-        ps.setString(2, sizeName);
-        ps.setString(3, colorName);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                quantity = rs.getInt("Quantity");
-            }
-        }
-    }
-    return quantity;
-}
-public double getPriceByVariant(int productId, String sizeName, String colorName) throws SQLException, ClassNotFoundException {
-    double price = 0;
-    String sql = "SELECT pv.Price " +
-                 "FROM ProductVariant pv " +
-                 "JOIN Size s ON pv.SizeID = s.SizeID " +
-                 "JOIN Color c ON pv.ColorID = c.ColorID " +
-                 "WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
-    try (Connection conn = DBUtils.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql)) {
-        ps.setInt(1, productId);
-        ps.setString(2, sizeName);
-        ps.setString(3, colorName);
-        try (ResultSet rs = ps.executeQuery()) {
-            if (rs.next()) {
-                price = rs.getDouble("Price");
-            }
-        }
-    }
-    return price;
-}
 
-    public int getAttributeIDByName(int productId, String size, String color) throws SQLException, ClassNotFoundException {
-        String sql = "SELECT AttributeID FROM ProductVariant WHERE ProductID = ? AND Size = ? AND Color = ?";
+    public int getAvailableQuantity(int productId, String sizeName, String colorName) throws SQLException, ClassNotFoundException {
+        int quantity = 0;
+        String sql = "SELECT pv.Quantity "
+                + "FROM ProductVariant pv "
+                + "JOIN Size s ON pv.SizeID = s.SizeID "
+                + "JOIN Color c ON pv.ColorID = c.ColorID "
+                + "WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
         try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productId);
-            ps.setString(2, size);
-            ps.setString(3, color);
+            ps.setString(2, sizeName);
+            ps.setString(3, colorName);
             try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
-                    return rs.getInt("VariantID");
+                    quantity = rs.getInt("Quantity");
                 }
             }
         }
-        return -1;
+        return quantity;
+    }
+
+    public double getPriceByVariant(int productId, String sizeName, String colorName) throws SQLException, ClassNotFoundException {
+        double price = 0;
+        String sql = "SELECT pv.Price "
+                + "FROM ProductVariant pv "
+                + "JOIN Size s ON pv.SizeID = s.SizeID "
+                + "JOIN Color c ON pv.ColorID = c.ColorID "
+                + "WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setInt(1, productId);
+            ps.setString(2, sizeName);
+            ps.setString(3, colorName);
+            try ( ResultSet rs = ps.executeQuery()) {
+                if (rs.next()) {
+                    price = rs.getDouble("Price");
+                }
+            }
+        }
+        return price;
     }
 }

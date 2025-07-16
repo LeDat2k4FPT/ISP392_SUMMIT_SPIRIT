@@ -27,14 +27,13 @@ public class VoucherDAO {
     }
 
     public boolean addVoucher(VoucherDTO v) throws SQLException, ClassNotFoundException {
-        String sql = "INSERT INTO Voucher(VoucherID, VoucherCode, DiscountValue, ExpiryDate, Status) VALUES (?, ?, ?, ?, ?)";
+        String sql = "INSERT INTO Voucher(VoucherCode, DiscountValue, ExpiryDate, Status) VALUES ( ?, ?, ?, ?)";
         try (Connection con = DBUtils.getConnection();
              PreparedStatement ps = con.prepareStatement(sql)) {
-            ps.setInt(1, v.getVoucherID());
-            ps.setString(2, v.getVoucherCode());
-            ps.setDouble(3, v.getDiscountValue());
-            ps.setDate(4, v.getExpiryDate());
-            ps.setString(5, v.getStatus());
+            ps.setString(1, v.getVoucherCode());
+            ps.setDouble(2, v.getDiscountValue());
+            ps.setDate(3, v.getExpiryDate());
+            ps.setString(4, v.getStatus());
             int rowsAffected = ps.executeUpdate();
             return rowsAffected > 0;
         }

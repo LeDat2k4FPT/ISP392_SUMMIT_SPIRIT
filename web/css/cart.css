@@ -14,11 +14,10 @@ body {
 }
 .header {
     padding: 10px 40px;
-    background-color: #195181;
+    background-color: #ffffff;
     display: flex;
     align-items: center;
     justify-content: space-between;
-    border-bottom: 1px solid #e0e0e0;
 }
 
 .header img {
@@ -34,7 +33,7 @@ body {
 
 .nav-links a {
     text-decoration: none;
-    color: #ffffff;
+    color: #000;
     font-weight: 500;
 }
 .cart-icon {
@@ -65,7 +64,7 @@ body {
     cursor: pointer;
     font-weight: bold;
     padding: 10px;
-    color: #ffffff;
+    color: #000;
 }
 
 .dropdown-menu {
@@ -106,6 +105,7 @@ body {
     border-radius: 10px;
     box-shadow: 0 0 10px rgba(0,0,0,0.1);
     height: fit-content;
+    margin-top: 105px;
 }
 .cart-item {
     display: flex;
@@ -137,21 +137,46 @@ body {
     align-items: center;
     gap: 8px;
     margin-top: 10px;
+    flex-wrap: wrap; /* Giúp mobile tự xuống dòng nếu thiếu chỗ */
 }
+
 .quantity-box button {
-    width: 30px;
-    height: 30px;
-    font-size: 16px;
+    width: 32px;
+    height: 32px;
+    font-size: 18px;
+    font-weight: bold;
     border: none;
-    border-radius: 6px;
-    background-color: #f0f0f0;
+    background-color: #eee;
     cursor: pointer;
+    border-radius: 4px;
+    transition: background-color 0.2s;
 }
-.quantity-box input {
-    width: 40px;
+
+.quantity-box button:hover {
+    background-color: #ccc;
+}
+
+.quantity-box input[type="number"] {
+    width: 60px;
+    height: 32px;
     text-align: center;
+    font-size: 16px;
     border: 1px solid #ccc;
+    border-radius: 4px;
+    background-color: #fff;
 }
+
+.quantity-box .delete-link {
+    margin-left: auto;
+    color: #000;
+    font-size: 18px;
+    transition: color 0.2s;
+}
+
+.quantity-box .delete-link:hover {
+    color: #b71c1c;
+}
+
 .delete-link {
     font-size: 18px;
     color: #888;
@@ -174,7 +199,7 @@ body {
 .btn-continue {
     width: 100%;
     padding: 15px;
-    background-color: #1e5b3e;
+    background-color: #849e98;
     color: white;
     border: none;
     font-size: 16px;
@@ -183,7 +208,7 @@ body {
     margin-top: 20px;
 }
 .btn-continue:hover {
-    background-color: #28a745;
+    background-color: #234C45;
 }
 .empty-cart {
     text-align: center;

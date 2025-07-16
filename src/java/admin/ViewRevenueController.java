@@ -1,4 +1,4 @@
- /*
+/*
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
@@ -103,9 +103,8 @@ public class ViewRevenueController extends HttpServlet {
             request.setAttribute("deliveredOrders", deliveredOrders);
             request.setAttribute("cancelledOrders", cancelledOrders);
             request.setAttribute("topProducts", topProducts);
-
-            // 5. Forward to JSP page
-            request.getRequestDispatcher("viewRevenue.jsp").forward(request, response);
+            request.setAttribute("page", "viewRevenue.jsp");
+            request.getRequestDispatcher("admin/admin.jsp").forward(request, response);
 
         } catch (Exception e) {
             e.printStackTrace();

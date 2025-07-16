@@ -138,7 +138,9 @@
                 <% if (topSales != null && !topSales.isEmpty()) {
             for (ProductDTO p : topSales) { %>
                 <div class="product">
+                    <a href="productDetail.jsp?id=<%= p.getProductID() %>">
                     <img src="<%= p.getProductImage() %>" alt="Product Image">
+                    </a>
                     <h4><a href="productDetail.jsp?id=<%= p.getProductID() %>"><%= p.getProductName() %></a></h4>
                     <p><%= p.getDescription() %></p>
                     <strong><%= String.format("%,.0f", p.getPrice()) %> VND</strong>
@@ -154,7 +156,9 @@
             <div class="product-list">
                 <% for (ProductDTO p : selectedProducts) { %>
                 <div class="product">
+                    <a href="productDetail.jsp?id=<%= p.getProductID() %>">
                     <img src="<%= p.getProductImage() %>" alt="Product Image">
+                    </a>
                     <h4><a href="productDetail.jsp?id=<%= p.getProductID() %>"><%= p.getProductName() %></a></h4>
                     <p><%= p.getDescription() %></p>
                     <strong><%= String.format("%,.0f", p.getPrice()) %> VND</strong>
@@ -162,26 +166,21 @@
                 <% } %>
             </div>
 
-           <!-- Sales Off -->
-<h2>Sales Off</h2>
-<a href="MainController?action=viewSaleOff">
-    <div class="promotion-program">
-        <img src="image/km_banner_1.png">
-        <img src="image/km_banner_2.png">
-        <img src="image/km_banner_3.png">
-        <img src="image/km_banner_4.png">
-        <img src="image/km_banner_5.png">
-    </div>
-</a>
+            <!-- Sales Off -->
+            <h2>Sales Off</h2>
+            <a href="MainController?action=viewSaleOff">
+                <div class="promotion-program">
+                    <img src="image/km_banner_1.png">
+                </div>
+            </a>
 
         </div>
-    </div>
 
-    <%
-        String message = (String) request.getAttribute("MESSAGE");
-        if (message == null) message = "";
-    %>
-    <%= message %>
+        <%
+            String message = (String) request.getAttribute("MESSAGE");
+            if (message == null) message = "";
+        %>
+        <%= message %>
 
-</body>
+    </body>
 </html>

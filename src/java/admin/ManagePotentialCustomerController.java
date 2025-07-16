@@ -21,26 +21,34 @@ public class ManagePotentialCustomerController extends HttpServlet {
             ReviewDAO reviewDAO = new ReviewDAO();
             List<UserDTO> users = userDAO.getAllUsers();
             List<Map<String, Object>> potentialList = new ArrayList<>();
+
             for (UserDTO user : users) {
                 if (user.getRole().equalsIgnoreCase("User")) {
                     int userID = user.getUserID();
-                    double totalSpent = orderDAO.getTotalSpentByUser(userID);
-                    int orderCount = orderDAO.getOrderCountByUser(userID);
+                    double totalSpent = orderDAO.getTotalSpentByUser(userID); // chỉ tính đơn Delivered
+                    int orderCount = orderDAO.getOrderCountByUser(userID);    // chỉ tính đơn Delivered
                     int reviewCount = reviewDAO.getReviewCountByUser(userID);
-                    Map<String, Object> info = new HashMap<>();
-                    info.put("user", user);
-                    info.put("totalSpent", totalSpent);
-                    info.put("orderCount", orderCount);
-                    info.put("reviewCount", reviewCount);
-                    potentialList.add(info);
+
+                    // ⚠ Chỉ lấy user có >=1 đơn đã giao và tổng tiền đã chi > 0
+                    if (orderCount >= 1 && totalSpent > 0) {
+                        Map<String, Object> info = new HashMap<>();
+                        info.put("user", user);
+                        info.put("totalSpent", totalSpent);
+                        info.put("orderCount", orderCount);
+                        info.put("reviewCount", reviewCount);
+                        potentialList.add(info);
+                    }
                 }
             }
-            // Sắp xếp theo tổng chi tiêu giảm dần
+
+            // Sắp xếp giảm dần theo tổng chi tiêu
             potentialList.sort((a, b) -> Double.compare((double) b.get("totalSpent"), (double) a.get("totalSpent")));
+
             request.setAttribute("potentialList", potentialList);
-            request.getRequestDispatcher("admin/potentialCustomer.jsp").forward(request, response);
+            request.setAttribute("page", "potentialCustomer.jsp");
+            request.getRequestDispatcher("admin/admin.jsp").forward(request, response);
         } catch (SQLException | ClassNotFoundException e) {
             throw new ServletException(e);
         }
     }
-} 
+}
