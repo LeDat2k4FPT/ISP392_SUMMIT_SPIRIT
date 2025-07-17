@@ -2,6 +2,7 @@ package controllers;
 
 import dao.OrderDAO;
 import dao.ReviewDAO;
+import dao.UserDAO;
 import dto.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -10,6 +11,7 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 
 import java.io.IOException;
+import java.util.Objects;
 
 @WebServlet("/SubmitReview")
 public class SubmitReviewController extends HttpServlet {
@@ -18,8 +20,20 @@ public class SubmitReviewController extends HttpServlet {
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
-            // Lấy người dùng từ session
+            // ✅ Lấy thông tin cơ bản từ form
+            String email = request.getParameter("email");
+            String phone = request.getParameter("phone");
+            String address = request.getParameter("address");
+            String orderDate = request.getParameter("orderDate");
+            String status = request.getParameter("status");
+
+            // ✅ Lấy người dùng từ session hoặc từ email
             UserDTO user = (UserDTO) request.getSession().getAttribute("LOGIN_USER");
+            if (user == null && email != null) {
+                UserDAO userDAO = new UserDAO();
+                user = userDAO.findByEmail(email);
+            }
+
             if (user == null) {
                 response.sendRedirect("login.jsp");
                 return;
@@ -27,25 +41,26 @@ public class SubmitReviewController extends HttpServlet {
 
             int userId = user.getUserID();
             int productId = Integer.parseInt(request.getParameter("productId"));
+            int orderId = Integer.parseInt(request.getParameter("orderId"));
             int rating = Integer.parseInt(request.getParameter("rating"));
             String comment = request.getParameter("comment");
 
-            // ✅ Kiểm tra đã từng mua & đơn đã Delivered
+            // ✅ Kiểm tra đã mua hàng và đơn đã Delivered
             OrderDAO orderDAO = new OrderDAO();
             boolean isEligible = orderDAO.hasUserPurchasedProduct(userId, productId);
 
             if (!isEligible) {
-                // ❌ Không đủ điều kiện đánh giá
                 response.sendRedirect("productDetail.jsp?id=" + productId + "&error=unauthorized");
                 return;
             }
 
-            // ✅ Tiếp tục nếu hợp lệ
+            // ✅ Thêm hoặc cập nhật đánh giá
             ReviewDAO reviewDAO = new ReviewDAO();
-            reviewDAO.deleteExistingReview(userId, productId); // Optional
-            reviewDAO.insertReview(userId, productId, rating, comment);
+            reviewDAO.upsertReview(userId, productId, rating, comment);
 
+            // ✅ Redirect trở lại trang productDetail.jsp sau khi submit review thành công
             response.sendRedirect("productDetail.jsp?id=" + productId + "&review=success");
+
         } catch (Exception e) {
             e.printStackTrace();
             response.sendRedirect("error.jsp");

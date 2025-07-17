@@ -24,11 +24,12 @@ public class AddToCartServlet extends HttpServlet {
         try {
             int productID = Integer.parseInt(request.getParameter("productID"));
             int quantity = Integer.parseInt(request.getParameter("quantity"));
-            double price = Double.parseDouble(request.getParameter("price")); // ✅ Dùng giá từ form
+            double price = Double.parseDouble(request.getParameter("price")); // Giá từ form
             String size = request.getParameter("size");
             String color = request.getParameter("color");
-            boolean fromSaleOff = "true".equals(request.getParameter("fromSaleOff")); // ✅ Optional
+            boolean fromSaleOff = "true".equals(request.getParameter("fromSaleOff"));
 
+            // Kiểm tra quantity hợp lệ
             if (quantity <= 0) {
                 response.sendRedirect("productDetail.jsp?id=" + productID + "&error=invalid_quantity");
                 return;
@@ -36,7 +37,6 @@ public class AddToCartServlet extends HttpServlet {
 
             ProductDAO dao = new ProductDAO();
             ProductDTO product = dao.getFullProductByID(productID);
-
             if (product == null) {
                 response.sendRedirect("error.jsp");
                 return;
@@ -44,10 +44,11 @@ public class AddToCartServlet extends HttpServlet {
 
             product.setSize(size);
             product.setColor(color);
-            product.setPrice(price); // ✅ Gán giá đã được xử lý từ form
-            product.setFromSaleOff(fromSaleOff); // ✅ Gán cờ SaleOff vào sản phẩm
+            product.setPrice(price);
+            product.setFromSaleOff(fromSaleOff);
 
-            int stock = dao.getStockByProductID(productID);
+            // Lấy tồn kho biến thể đúng size-color
+            int stock = dao.getStockByVariant(productID, size, color);
 
             HttpSession session = request.getSession();
             UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
@@ -69,15 +70,18 @@ public class AddToCartServlet extends HttpServlet {
                 existingQuantity = cart.getCartItem(productID, size, color).getQuantity();
             }
 
+            // Kiểm tra tồn kho đủ hay không
             if (quantity + existingQuantity > stock) {
                 int available = stock - existingQuantity;
                 response.sendRedirect("productDetail.jsp?id=" + productID + "&error=stock&available=" + available);
                 return;
             }
 
-            cart.addToCart(product, quantity);
+            // Sửa gọi hàm addToCart đúng 4 tham số
+            cart.addToCart(product, quantity, size, color);
             session.setAttribute("CART", cart);
 
+            // Redirect lại trang productDetail, giữ param fromSaleOff nếu có
             response.sendRedirect("productDetail.jsp?id=" + productID + (fromSaleOff ? "&fromSaleOff=true" : ""));
 
         } catch (Exception e) {

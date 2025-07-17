@@ -133,32 +133,31 @@ public class ProductDAO {
     }
 
     public List<ProductDTO> getAllProducts() throws SQLException, ClassNotFoundException {
-    List<ProductDTO> list = new ArrayList<>();
-    String sql = "SELECT p.ProductID, p.ProductName, c.CateName, p.status, "
-               + "MIN(pv.Price) AS Price, SUM(pv.Quantity) AS Stock "
-               + "FROM Product p "
-               + "JOIN Category c ON p.CateID = c.CateID "
-               + "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID "
-               + "GROUP BY p.ProductID, p.ProductName, c.CateName, p.status";
+        List<ProductDTO> list = new ArrayList<>();
+        String sql = "SELECT p.ProductID, p.ProductName, c.CateName, p.status, "
+                + "MIN(pv.Price) AS Price, SUM(pv.Quantity) AS Stock "
+                + "FROM Product p "
+                + "JOIN Category c ON p.CateID = c.CateID "
+                + "LEFT JOIN ProductVariant pv ON p.ProductID = pv.ProductID "
+                + "GROUP BY p.ProductID, p.ProductName, c.CateName, p.status";
 
-    try (Connection conn = DBUtils.getConnection();
-         PreparedStatement ps = conn.prepareStatement(sql);
-         ResultSet rs = ps.executeQuery()) {
+        try (Connection conn = DBUtils.getConnection();
+             PreparedStatement ps = conn.prepareStatement(sql);
+             ResultSet rs = ps.executeQuery()) {
 
-        while (rs.next()) {
-            ProductDTO p = new ProductDTO();
-            p.setProductID(rs.getInt("ProductID"));
-            p.setProductName(rs.getString("ProductName"));
-            p.setCateName(rs.getString("CateName"));
-            p.setStatus(rs.getString("status")); // ⚠ đây là dòng thêm
-            p.setPrice(rs.getDouble("Price"));
-            p.setStock(rs.getInt("Stock"));
-            list.add(p);
+            while (rs.next()) {
+                ProductDTO p = new ProductDTO();
+                p.setProductID(rs.getInt("ProductID"));
+                p.setProductName(rs.getString("ProductName"));
+                p.setCateName(rs.getString("CateName"));
+                p.setStatus(rs.getString("status")); // ⚠ đây là dòng thêm
+                p.setPrice(rs.getDouble("Price"));
+                p.setStock(rs.getInt("Stock"));
+                list.add(p);
+            }
         }
+        return list;
     }
-    return list;
-}
-
 
     public List<ProductDTO> getTopSalesFromCategory(int cateID, int limit)
             throws SQLException, ClassNotFoundException {
@@ -323,5 +322,11 @@ public class ProductDAO {
             }
         }
         return list;
+    }
+
+    // Bổ sung method mới lấy tồn kho theo biến thể size-color
+    public int getStockByVariant(int productID, String size, String color) throws SQLException, ClassNotFoundException {
+        ProductVariantDAO variantDAO = new ProductVariantDAO();
+        return variantDAO.getAvailableQuantity(productID, size, color);
     }
 }

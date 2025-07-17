@@ -131,6 +131,12 @@ double avgRating = 0;
             double discountedPrice = Math.round(originalPrice * 0.8);
         %>
         <div class="layout">
+            <% if ("success".equals(request.getParameter("review"))) { %>
+    <div style="padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; margin-bottom: 20px;">
+        Thank you for your review!
+    </div>
+<% } %>
+
             <div class="breadcrumb">
                 <a class="back-button styled-button" href="javascript:history.back()">← Back</a>
             </div>
@@ -159,9 +165,23 @@ double avgRating = 0;
 
                     <script>
                         const variantStockMap = {
-                        <% for (Map.Entry<String, Integer> entry : variantStockMap.entrySet()) { %>
-                            "<%= entry.getKey() %>": <%= entry.getValue() %>,
-                        <% } %>
+                        <%
+    for (String size : sizeList.isEmpty() ? java.util.Arrays.asList("") : sizeList) {
+        for (String color : colorList.isEmpty() ? java.util.Arrays.asList("") : colorList) {
+            int stock = new ProductVariantDAO().getAvailableQuantity(productID, size, color);
+            int inCart = (cart != null) ? cart.getQuantityByVariant(productID, size, color) : 0;
+            int available = stock - inCart;
+            if (available < 0) available = 0;
+            String key = (size.isEmpty() && color.isEmpty()) ? "default" :
+                         (!size.isEmpty() && !color.isEmpty()) ? size + "_" + color :
+                         size.isEmpty() ? color : size;
+%>
+    "<%= key %>": <%= available %>,
+<%
+        }
+    }
+%>
+
                         };
                     </script>
 
@@ -234,32 +254,97 @@ double avgRating = 0;
             <div class="thin-divider"></div>
             <div class="section-box">
     <h3>
-        Customer Reviews
-        <% if (totalReviews > 0) { %>
+    Customer Reviews
+    <% if (totalReviews > 0) { %>
         <span style="font-size: 16px; font-weight: normal;">
-            ⭐ <%= String.format("%.1f", avgRating) %> / 5 (<%= totalReviews %> reviews)
+            <% 
+                int roundedRating = (int) Math.round(avgRating);
+                for (int i = 1; i <= 5; i++) {
+                    if (i <= roundedRating) {
+            %>
+                <i class="fa-solid fa-star" style="color: gold;"></i>
+            <% 
+                    } else { 
+            %>
+                <i class="fa-regular fa-star" style="color: gold;"></i>
+            <% 
+                    }
+                }
+            %>
+            (<%= totalReviews %> reviews)
         </span>
-        <% } %>
-    </h3>
+    <% } %>
+</h3>
+
 
     <% if (canReview) { %>
-    <form action="SubmitReview" method="post" style="margin-bottom: 20px;">
-        <input type="hidden" name="productId" value="<%= productID %>" />
-        <label><strong>Rating:</strong></label>
-        <select name="rating">
-            <% for (int i = 1; i <= 5; i++) { %>
-                <option value="<%= i %>"><%= i %> ⭐</option>
-            <% } %>
-        </select><br/><br/>
-        <label><strong>Comment:</strong></label><br/>
-        <textarea name="comment" rows="4" cols="60" placeholder="Write your experience here..." required></textarea><br/><br/>
-        <input type="submit" value="Submit Review" style="padding: 8px 16px; background-color: #28a745; color: white; border: none;">
-    </form>
-    <% } else if (loginUser != null) { %>
-        <p style="color: gray;"><i>Only customers who have purchased this product can write a review.</i></p>
-    <% } else { %>
-        <p><a href="login.jsp">Login</a> to write a review.</p>
-    <% } %>
+<form action="SubmitReview" method="post" style="margin-bottom: 20px;">
+    <input type="hidden" name="productId" value="<%= productID %>" />
+    <input type="hidden" name="fromPage" value="productDetail">
+    <input type="hidden" name="email" value="<%= loginUser.getEmail() %>">
+    <input type="hidden" name="phone" value="<%= loginUser.getPhone() %>">
+    <input type="hidden" name="address" value="<%= loginUser.getAddress() %>">
+    <input type="hidden" name="orderId" value="0">
+    <input type="hidden" name="orderDate" value="">
+    <input type="hidden" name="status" value="">
+
+    <label><strong>Rating:</strong></label><br>
+    <div class="star-rating" style="font-size: 24px;">
+        <% for (int i = 5; i >= 1; i--) { %>
+            <input type="radio" id="star<%= i %>" name="rating" value="<%= i %>">
+            <label for="star<%= i %>">&#9733;</label>
+        <% } %>
+    </div>
+
+    <style>
+        .star-rating {
+            direction: rtl;
+            unicode-bidi: bidi-override;
+            display: inline-block;
+        }
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+        .star-rating label {
+            color: #ccc;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .star-rating input[type="radio"]:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: gold;
+        }
+    </style>
+
+    <br/><br/>
+    <label><strong>Comment:</strong></label><br/>
+    <textarea name="comment" rows="4" cols="60" placeholder="Write your experience here..." required></textarea><br/><br/>
+
+    <input type="submit" value="Submit Review" style="padding: 8px 16px; background-color: #28a745; color: white; border: none;">
+</form>
+<% } else if (loginUser != null) { %>
+    <p style="color: gray;"><i>Only customers who have purchased this product can write a review.</i></p>
+<% } else { %>
+    <p><a href="login.jsp">Login</a> to write a review.</p>
+<% } %>
+
+</div>
+
+<script>
+    document.querySelectorAll('.rating input').forEach(input => {
+        input.addEventListener('change', function () {
+            const rating = parseInt(this.value);
+            document.querySelectorAll('.rating label i').forEach((star, index) => {
+                star.className = index >= 5 - rating ? 'fa-solid fa-star' : 'fa-regular fa-star';
+            });
+        });
+    });
+</script>
+<br/><br/>
+
+    
+
 
     <% if (reviews != null && !reviews.isEmpty()) {
         for (ReviewDTO review : reviews) { %>
@@ -311,7 +396,15 @@ double avgRating = 0;
             function increaseQuantity(dummy) {
                 const input = document.getElementById("quantity");
                 const display = document.getElementById("quantity-display");
-                const maxAvailable = window.maxAvailable || 0;
+                const size = document.getElementById("size").value;
+const color = document.getElementById("color").value;
+let key = "default";
+if (size && color) key = size + "_" + color;
+else if (size) key = size;
+else if (color) key = color;
+
+const maxAvailable = variantStockMap[key] || 0;
+
                 let val = parseInt(input.value);
                 if (val < maxAvailable) {
                     input.value = val + 1;
@@ -387,12 +480,19 @@ double avgRating = 0;
 // ✅ THÊM Ở ĐÂY:
             function updateStockInfo() {
                 const size = document.getElementById("size").value;
-                const color = document.getElementById("color").value;
-                if (!size || !color)
-                    return;
+const color = document.getElementById("color").value;
 
-                const key = size + "_" + color;
-                const available = variantStockMap[key] || 0;
+let key = "default";
+if (size && color) {
+    key = size + "_" + color;
+} else if (size) {
+    key = size;
+} else if (color) {
+    key = color;
+}
+
+const available = variantStockMap[key] || 0;
+
 
                 const quantity = document.getElementById("quantity");
                 const display = document.getElementById("quantity-display");
@@ -478,8 +578,28 @@ double avgRating = 0;
                         .catch(err => console.error("Lỗi khi lấy giá: ", err));
             }
         </script>
+ <script>
+            window.onload = function() {
+                const sizeInput = document.getElementById("size");
+                const colorInput = document.getElementById("color");
 
+                // Nếu chưa có size đã chọn, chọn size đầu tiên nếu có
+                if (sizeInput && sizeInput.value === "" && <%= !sizeList.isEmpty() %>) {
+                    sizeInput.value = "<%= sizeList.isEmpty() ? "" : sizeList.get(0) %>";
+                    const firstSizeBtn = document.querySelector("#size-options .option-btn");
+                    if (firstSizeBtn) firstSizeBtn.classList.add("active");
+                }
 
+                // Nếu chưa có color đã chọn, chọn color đầu tiên nếu có
+                if (colorInput && colorInput.value === "" && <%= !colorList.isEmpty() %>) {
+                    colorInput.value = "<%= colorList.isEmpty() ? "" : colorList.get(0) %>";
+                    const firstColorBtn = document.querySelector("#color-options .option-btn");
+                    if (firstColorBtn) firstColorBtn.classList.add("active");
+                }
+
+                updateStockInfo();
+                fetchPriceByVariant();
+            }
+        </script>
     </body>
-
 </html>

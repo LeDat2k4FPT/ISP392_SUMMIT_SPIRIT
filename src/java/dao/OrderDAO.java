@@ -157,7 +157,7 @@ public class OrderDAO {
         return check;
     }
 
-public List<OrderDetailDTO> getOrderDetails(int orderID) throws SQLException, ClassNotFoundException {
+    public List<OrderDetailDTO> getOrderDetails(int orderID) throws SQLException, ClassNotFoundException {
     List<OrderDetailDTO> list = new ArrayList<>();
     String sql = "SELECT od.Quantity, od.UnitPrice, "
                + "pv.ProductID, p.ProductName, s.SizeName, c.ColorName "

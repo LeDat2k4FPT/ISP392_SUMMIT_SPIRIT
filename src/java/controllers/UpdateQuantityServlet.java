@@ -2,7 +2,6 @@ package controllers;
 
 import dao.ProductDAO;
 import dto.CartDTO;
-import dto.CartItemDTO;
 import dto.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
@@ -55,9 +54,9 @@ public class UpdateQuantityServlet extends HttpServlet {
                 return;
             }
 
-            // ✅ Kiểm tra tồn kho
+            // ✅ Kiểm tra tồn kho biến thể đúng size-color
             ProductDAO dao = new ProductDAO();
-            int stock = dao.getStockByProductID(productID);
+            int stock = dao.getStockByVariant(productID, size, color);
             if (newQuantity > stock) {
                 response.sendError(HttpServletResponse.SC_CONFLICT, "Quantity exceeds stock");
                 return;
