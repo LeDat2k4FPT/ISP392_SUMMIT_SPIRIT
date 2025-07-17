@@ -131,6 +131,12 @@ double avgRating = 0;
             double discountedPrice = Math.round(originalPrice * 0.8);
         %>
         <div class="layout">
+            <% if ("success".equals(request.getParameter("review"))) { %>
+    <div style="padding: 10px; background-color: #d4edda; color: #155724; border: 1px solid #c3e6cb; margin-bottom: 20px;">
+        Thank you for your review!
+    </div>
+<% } %>
+
             <div class="breadcrumb">
                 <a class="back-button styled-button" href="javascript:history.back()">← Back</a>
             </div>
@@ -248,32 +254,97 @@ double avgRating = 0;
             <div class="thin-divider"></div>
             <div class="section-box">
     <h3>
-        Customer Reviews
-        <% if (totalReviews > 0) { %>
+    Customer Reviews
+    <% if (totalReviews > 0) { %>
         <span style="font-size: 16px; font-weight: normal;">
-            ⭐ <%= String.format("%.1f", avgRating) %> / 5 (<%= totalReviews %> reviews)
+            <% 
+                int roundedRating = (int) Math.round(avgRating);
+                for (int i = 1; i <= 5; i++) {
+                    if (i <= roundedRating) {
+            %>
+                <i class="fa-solid fa-star" style="color: gold;"></i>
+            <% 
+                    } else { 
+            %>
+                <i class="fa-regular fa-star" style="color: gold;"></i>
+            <% 
+                    }
+                }
+            %>
+            (<%= totalReviews %> reviews)
         </span>
-        <% } %>
-    </h3>
+    <% } %>
+</h3>
+
 
     <% if (canReview) { %>
-    <form action="SubmitReview" method="post" style="margin-bottom: 20px;">
-        <input type="hidden" name="productId" value="<%= productID %>" />
-        <label><strong>Rating:</strong></label>
-        <select name="rating">
-            <% for (int i = 1; i <= 5; i++) { %>
-                <option value="<%= i %>"><%= i %> ⭐</option>
-            <% } %>
-        </select><br/><br/>
-        <label><strong>Comment:</strong></label><br/>
-        <textarea name="comment" rows="4" cols="60" placeholder="Write your experience here..." required></textarea><br/><br/>
-        <input type="submit" value="Submit Review" style="padding: 8px 16px; background-color: #28a745; color: white; border: none;">
-    </form>
-    <% } else if (loginUser != null) { %>
-        <p style="color: gray;"><i>Only customers who have purchased this product can write a review.</i></p>
-    <% } else { %>
-        <p><a href="login.jsp">Login</a> to write a review.</p>
-    <% } %>
+<form action="SubmitReview" method="post" style="margin-bottom: 20px;">
+    <input type="hidden" name="productId" value="<%= productID %>" />
+    <input type="hidden" name="fromPage" value="productDetail">
+    <input type="hidden" name="email" value="<%= loginUser.getEmail() %>">
+    <input type="hidden" name="phone" value="<%= loginUser.getPhone() %>">
+    <input type="hidden" name="address" value="<%= loginUser.getAddress() %>">
+    <input type="hidden" name="orderId" value="0">
+    <input type="hidden" name="orderDate" value="">
+    <input type="hidden" name="status" value="">
+
+    <label><strong>Rating:</strong></label><br>
+    <div class="star-rating" style="font-size: 24px;">
+        <% for (int i = 5; i >= 1; i--) { %>
+            <input type="radio" id="star<%= i %>" name="rating" value="<%= i %>">
+            <label for="star<%= i %>">&#9733;</label>
+        <% } %>
+    </div>
+
+    <style>
+        .star-rating {
+            direction: rtl;
+            unicode-bidi: bidi-override;
+            display: inline-block;
+        }
+        .star-rating input[type="radio"] {
+            display: none;
+        }
+        .star-rating label {
+            color: #ccc;
+            cursor: pointer;
+            display: inline-block;
+        }
+        .star-rating input[type="radio"]:checked ~ label,
+        .star-rating label:hover,
+        .star-rating label:hover ~ label {
+            color: gold;
+        }
+    </style>
+
+    <br/><br/>
+    <label><strong>Comment:</strong></label><br/>
+    <textarea name="comment" rows="4" cols="60" placeholder="Write your experience here..." required></textarea><br/><br/>
+
+    <input type="submit" value="Submit Review" style="padding: 8px 16px; background-color: #28a745; color: white; border: none;">
+</form>
+<% } else if (loginUser != null) { %>
+    <p style="color: gray;"><i>Only customers who have purchased this product can write a review.</i></p>
+<% } else { %>
+    <p><a href="login.jsp">Login</a> to write a review.</p>
+<% } %>
+
+</div>
+
+<script>
+    document.querySelectorAll('.rating input').forEach(input => {
+        input.addEventListener('change', function () {
+            const rating = parseInt(this.value);
+            document.querySelectorAll('.rating label i').forEach((star, index) => {
+                star.className = index >= 5 - rating ? 'fa-solid fa-star' : 'fa-regular fa-star';
+            });
+        });
+    });
+</script>
+<br/><br/>
+
+    
+
 
     <% if (reviews != null && !reviews.isEmpty()) {
         for (ReviewDTO review : reviews) { %>

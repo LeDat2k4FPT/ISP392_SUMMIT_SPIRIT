@@ -158,32 +158,34 @@ public class OrderDAO {
     }
 
     public List<OrderDetailDTO> getOrderDetails(int orderID) throws SQLException, ClassNotFoundException {
-        List<OrderDetailDTO> list = new ArrayList<>();
-        String sql = "SELECT od.Quantity, od.UnitPrice, "
-                + "pv.ProductID, p.ProductName, s.SizeName, c.ColorName "
-                + "FROM OrderDetail od "
-                + "JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID "
-                + "JOIN Product p ON pv.ProductID = p.ProductID "
-                + "JOIN Size s ON pv.SizeID = s.SizeID "
-                + "JOIN Color c ON pv.ColorID = c.ColorID "
-                + "WHERE od.OrderID = ?";
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, orderID);
-            try ( ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    OrderDetailDTO od = new OrderDetailDTO();
-                    od.setProductID(rs.getInt("ProductID"));
-                    od.setProductName(rs.getString("ProductName"));
-                    od.setSizeName(rs.getString("SizeName"));
-                    od.setColorName(rs.getString("ColorName"));
-                    od.setQuantity(rs.getInt("Quantity"));
-                    od.setUnitPrice(rs.getDouble("UnitPrice"));
-                    list.add(od);
-                }
+    List<OrderDetailDTO> list = new ArrayList<>();
+    String sql = "SELECT od.Quantity, od.UnitPrice, "
+               + "pv.ProductID, p.ProductName, s.SizeName, c.ColorName "
+               + "FROM OrderDetail od "
+               + "JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID "
+               + "JOIN Product p ON pv.ProductID = p.ProductID "
+               + "LEFT JOIN Size s ON pv.SizeID = s.SizeID "
+               + "LEFT JOIN Color c ON pv.ColorID = c.ColorID "
+               + "WHERE od.OrderID = ?";
+    
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setInt(1, orderID);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                OrderDetailDTO od = new OrderDetailDTO();
+                od.setProductID(rs.getInt("ProductID"));
+                od.setProductName(rs.getString("ProductName"));
+                od.setSizeName(rs.getString("SizeName"));   // sẽ là null nếu không có
+                od.setColorName(rs.getString("ColorName")); // sẽ là null nếu không có
+                od.setQuantity(rs.getInt("Quantity"));
+                od.setUnitPrice(rs.getDouble("UnitPrice"));
+                list.add(od);
             }
         }
-        return list;
     }
+    return list;
+}
 
     public int insertOrder(OrderDTO order) throws SQLException, ClassNotFoundException {
         int orderId = -1;

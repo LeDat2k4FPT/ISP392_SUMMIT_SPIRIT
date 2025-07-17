@@ -31,30 +31,29 @@ body {
     margin-bottom: 5px;
 }
 
-.review-left input, .review-left textarea {
+.review-left input,
+.review-left textarea {
     width: 100%;
     padding: 10px;
     border: 1px solid #ccc;
     border-radius: 6px;
 }
 
+/* Updated for FA-star based rating */
 .rating-stars {
     display: flex;
-    gap: 10px;
+    gap: 8px;
+    margin: 10px 0;
 }
 
-.rating-stars input[type="radio"] {
-    display: none;
-}
-
-.rating-stars label {
-    cursor: pointer;
-    font-size: 20px;
+.rating-stars i {
+    font-size: 24px;
     color: gray;
+    cursor: pointer;
+    transition: color 0.2s ease;
 }
 
-.rating-stars input:checked + label,
-.rating-stars label:hover {
+.rating-stars i.fa-solid {
     color: gold;
 }
 
@@ -67,6 +66,11 @@ body {
     border: none;
     border-radius: 6px;
     font-size: 16px;
+    cursor: pointer;
+}
+
+.review-left button:hover {
+    background-color: #1c3c2a;
 }
 
 .review-right {
@@ -78,4 +82,17 @@ body {
     max-width: 100%;
     height: auto;
     margin-bottom: 20px;
+}
+
+/* Style for individual reviews */
+.review-right .review-box {
+    text-align: left;
+    padding: 10px;
+    border-bottom: 1px solid #ccc;
+    margin-bottom: 15px;
+}
+
+.review-right .review-box i {
+    color: gold;
+    margin-right: 2px;
 }

@@ -79,10 +79,36 @@
                 <div class="product-box">
                     <p><strong>Product ID:</strong> <%= od.getProductID() %></p>
                     <p><strong>Name:</strong> <%= od.getProductName() %></p>
-                    <p><strong>Size:</strong> <%= od.getSizeName() %></p>
-                    <p><strong>Color:</strong> <%= od.getColorName() %></p>
+                    <p><strong>Size:</strong> <%= od.getSizeName() != null ? od.getSizeName() : "N/A" %></p>
+                    <p><strong>Color:</strong> <%= od.getColorName() != null ? od.getColorName() : "N/A" %></p>
                     <p><strong>Quantity:</strong> <%= od.getQuantity() %></p>
                     <p><strong>Unit Price:</strong> <%= nf.format(od.getUnitPrice()) %> ₫</p>
+
+                    <%-- ✅ Thêm nút Review nếu đơn hàng đã giao --%>
+<% if ("Delivered".equalsIgnoreCase(order.getStatus())) { 
+       String fullAddress = userInfo != null ? userInfo.getAddress() + ", " + userInfo.getDistrict() + ", " + userInfo.getCity() + ", " + userInfo.getCountry() : "";
+%>
+<form action="rating.jsp" method="get">
+    <input type="hidden" name="orderID" value="<%= order.getOrderID() %>">
+    <input type="hidden" name="productID" value="<%= od.getProductID() %>">
+    <input type="hidden" name="productName" value="<%= od.getProductName() %>">
+    <input type="hidden" name="size" value="<%= od.getSizeName() %>">
+    <input type="hidden" name="color" value="<%= od.getColorName() %>">
+    <input type="hidden" name="quantity" value="<%= od.getQuantity() %>">
+    <input type="hidden" name="unitPrice" value="<%= nf.format(od.getUnitPrice()) %>">
+
+    <%-- ✅ Thêm thông tin người dùng và đơn hàng --%>
+    <input type="hidden" name="fullName" value="<%= userInfo != null ? userInfo.getFullName() : "" %>">
+    <input type="hidden" name="email" value="<%= userInfo != null ? userInfo.getEmail() : "" %>">
+    <input type="hidden" name="phone" value="<%= userInfo != null ? userInfo.getPhone() : "" %>">
+    <input type="hidden" name="address" value="<%= fullAddress %>">
+    <input type="hidden" name="orderDate" value="<%= order.getOrderDate() %>">
+    <input type="hidden" name="status" value="<%= order.getStatus() %>">
+
+    <button type="submit" class="btn btn-review">Review</button>
+</form>
+<% } %>
+
                 </div>
             <% } %>
         </div>
