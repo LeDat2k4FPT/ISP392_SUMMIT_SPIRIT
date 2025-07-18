@@ -49,7 +49,7 @@ public class AddProductController extends HttpServlet {
                     ", Price=" + price_raw + ", Stock=" + quantity_raw);
 
             if (pName == null || pDescription == null || pCateID_raw == null ||
-                    colorName == null || sizeName == null || price_raw == null || quantity_raw == null) {
+                    price_raw == null || quantity_raw == null) {
                 throw new Exception("Missing required fields");
             }
 
@@ -64,11 +64,19 @@ public class AddProductController extends HttpServlet {
             if (productID <= 0) throw new Exception("Failed to insert Product");
             System.out.println("[DEBUG] Inserted ProductID = " + productID);
 
-            // Insert Color & Size
+            // Insert Color & Size (optional)
             ColorDAO colorDAO = new ColorDAO();
             SizeDAO sizeDAO = new SizeDAO();
-            int colorID = colorDAO.getOrInsertColor(colorName.trim());
-            int sizeID = sizeDAO.getOrInsertSize(sizeName.trim());
+
+            Integer colorID = null;
+            Integer sizeID = null;
+
+            if (colorName != null && !colorName.trim().isEmpty()) {
+                colorID = colorDAO.getOrInsertColor(colorName.trim());
+            }
+            if (sizeName != null && !sizeName.trim().isEmpty()) {
+                sizeID = sizeDAO.getOrInsertSize(sizeName.trim());
+            }
             System.out.println("[DEBUG] ColorID=" + colorID + ", SizeID=" + sizeID);
 
             // Insert Variant
@@ -122,6 +130,6 @@ public class AddProductController extends HttpServlet {
 
     @Override
     public String getServletInfo() {
-        return "Add new product with variant, image, color, size";
+        return "Add new product with optional color/size";
     }
 }

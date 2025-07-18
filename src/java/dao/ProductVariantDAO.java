@@ -16,12 +16,28 @@ public class ProductVariantDAO {
     public void insertVariant(ProductVariantDTO variant) throws SQLException, ClassNotFoundException {
         System.out.println("[DEBUG] Insert variant: " + variant);
         String sql = "INSERT INTO ProductVariant (ProductID, ColorID, SizeID, Price, Quantity) VALUES (?, ?, ?, ?, ?)";
+
         try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+
             ps.setInt(1, variant.getProductID());
-            ps.setInt(2, variant.getColorID());
-            ps.setInt(3, variant.getSizeID());
+
+            // colorID
+            if (variant.getColorID() != null) {
+                ps.setInt(2, variant.getColorID());
+            } else {
+                ps.setNull(2, java.sql.Types.INTEGER);
+            }
+
+            // sizeID
+            if (variant.getSizeID() != null) {
+                ps.setInt(3, variant.getSizeID());
+            } else {
+                ps.setNull(3, java.sql.Types.INTEGER);
+            }
+
             ps.setDouble(4, variant.getPrice());
             ps.setInt(5, variant.getQuantity());
+
             ps.executeUpdate();
         }
     }
@@ -178,7 +194,7 @@ public class ProductVariantDAO {
         } else {
             sql = "SELECT pv.Quantity FROM ProductVariant pv JOIN Size s ON pv.SizeID = s.SizeID JOIN Color c ON pv.ColorID = c.ColorID WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
         }
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productId);
             if ((sizeName == null || sizeName.isEmpty()) && (colorName == null || colorName.isEmpty())) {
                 // only productId param
@@ -190,7 +206,7 @@ public class ProductVariantDAO {
                 ps.setString(2, sizeName);
                 ps.setString(3, colorName);
             }
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     quantity = rs.getInt("Quantity");
                 }
@@ -212,7 +228,7 @@ public class ProductVariantDAO {
         } else {
             sql = "SELECT pv.Price FROM ProductVariant pv JOIN Size s ON pv.SizeID = s.SizeID JOIN Color c ON pv.ColorID = c.ColorID WHERE pv.ProductID = ? AND s.SizeName = ? AND c.ColorName = ?";
         }
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, productId);
             if ((sizeName == null || sizeName.isEmpty()) && (colorName == null || colorName.isEmpty())) {
                 // only productId param
@@ -224,7 +240,7 @@ public class ProductVariantDAO {
                 ps.setString(2, sizeName);
                 ps.setString(3, colorName);
             }
-            try (ResultSet rs = ps.executeQuery()) {
+            try ( ResultSet rs = ps.executeQuery()) {
                 if (rs.next()) {
                     price = rs.getDouble("Price");
                 }

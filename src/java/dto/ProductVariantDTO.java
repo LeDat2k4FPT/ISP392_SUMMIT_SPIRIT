@@ -4,8 +4,8 @@ public class ProductVariantDTO {
 
     private int attributeID;  // ID duy nhất cho mỗi biến thể
     private int productID;
-    private int colorID;
-    private int sizeID;
+    private Integer colorID;
+    private Integer sizeID;
     private double price;
     private int quantity;
 
@@ -16,7 +16,7 @@ public class ProductVariantDTO {
     public ProductVariantDTO() {
     }
 
-    public ProductVariantDTO(int productID, int colorID, int sizeID, double price, int quantity) {
+    public ProductVariantDTO(int productID, Integer colorID, Integer sizeID, double price, int quantity) {
         this.productID = productID;
         this.colorID = colorID;
         this.sizeID = sizeID;
@@ -24,7 +24,7 @@ public class ProductVariantDTO {
         this.quantity = quantity;
     }
 
-    public ProductVariantDTO(int attributeID, int productID, int colorID, int sizeID, double price, int quantity) {
+    public ProductVariantDTO(int attributeID, int productID, Integer colorID, Integer sizeID, double price, int quantity) {
         this.attributeID = attributeID;
         this.productID = productID;
         this.colorID = colorID;
@@ -33,7 +33,6 @@ public class ProductVariantDTO {
         this.quantity = quantity;
     }
 
-    // ========== Getters & Setters ==========
     public int getAttributeID() {
         return attributeID;
     }
@@ -50,19 +49,19 @@ public class ProductVariantDTO {
         this.productID = productID;
     }
 
-    public int getColorID() {
+    public Integer getColorID() {
         return colorID;
     }
 
-    public void setColorID(int colorID) {
+    public void setColorID(Integer colorID) {
         this.colorID = colorID;
     }
 
-    public int getSizeID() {
+    public Integer getSizeID() {
         return sizeID;
     }
 
-    public void setSizeID(int sizeID) {
+    public void setSizeID(Integer sizeID) {
         this.sizeID = sizeID;
     }
 
@@ -97,4 +96,5 @@ public class ProductVariantDTO {
     public void setSizeName(String sizeName) {
         this.sizeName = sizeName;
     }
+
 }

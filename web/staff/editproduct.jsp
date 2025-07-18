@@ -60,7 +60,6 @@
     </select>
 
     <label>Image (Upload file hoặc nhập URL)</label>
-    <input type="file" name="image"/>
     <input type="text" name="imageUrl" placeholder="Hoặc nhập URL ảnh..."/>
 
     <label>Variants</label>
