@@ -5,13 +5,34 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
 <%@page import="java.util.*, com.google.gson.Gson"%>
 <%@page import="dto.RevenueLineDTO, dto.ProductSoldDTO"%>
-
 <h1 style="text-align:center;">📈 Revenue Overview</h1>
 <!-- Filter Form -->
 <form action="${pageContext.request.contextPath}/ViewRevenueController" method="get">
+
+    <label>View by:
+        <select name="filter">
+            <option value="day" <%= "day".equals(request.getAttribute("filterType")) ? "selected" : "" %>>Day</option>
+            <option value="month" <%= "month".equals(request.getAttribute("filterType")) ? "selected" : "" %>>Month</option>
+            <option value="year" <%= "year".equals(request.getAttribute("filterType")) ? "selected" : "" %>>Year</option>
+        </select>
+    </label>
+
+    <label>Date:
+        <select name="dateValue">
+            <% 
+                String selectedDay = (String) request.getAttribute("selectedDay");
+                out.print("<option value='all'" + ("all".equals(selectedDay) ? " selected" : "") + ">All</option>");
+                for (int i = 1; i <= 31; i++) {
+                    String val = String.valueOf(i);
+                    String sel = val.equals(selectedDay) ? " selected" : "";
+                    out.print("<option value='" + val + "'" + sel + ">" + val + "</option>");
+                }
+            %>
+        </select>
+    </label>
+
     <label>Month:
         <select name="monthValue">
             <% 
@@ -43,17 +64,31 @@
 
     <label>Category:
         <select name="category">
-            <% 
-                List categoryList = (List) request.getAttribute("categoryList");
-                String selectedCategory = (String) request.getAttribute("selectedCategory");
-                out.print("<option value='all'" + ("all".equals(selectedCategory) ? " selected" : "") + ">All</option>");
-                if (categoryList != null) {
-                    for (Object obj : categoryList) {
-                        dto.CategoryDTO cate = (dto.CategoryDTO) obj;
-                        if ("all".equalsIgnoreCase(cate.getCateName())) continue;
-                        String selected = cate.getCateName().equals(selectedCategory) ? "selected" : "";
-                        out.print("<option value='" + cate.getCateName() + "' " + selected + ">" + cate.getCateName() + "</option>");
-                    }
+<%
+    List categoryList = (List) request.getAttribute("categoryList");
+    String selectedCategory = (String) request.getAttribute("selectedCategory");
+    // Always show 'All' option first
+    out.print("<option value='all'" + ("all".equals(selectedCategory) ? " selected" : "") + ">All</option>");
+    if (categoryList != null) {
+        for (Object obj : categoryList) {
+            dto.CategoryDTO cate = (dto.CategoryDTO) obj;
+            if ("all".equalsIgnoreCase(cate.getCateName())) continue; // skip duplicate 'all'
+            String selected = cate.getCateName().equals(selectedCategory) ? "selected" : "";
+            out.print("<option value='" + cate.getCateName() + "' " + selected + ">" + cate.getCateName() + "</option>");
+        }
+    }
+%>
+        </select>
+    </label>
+
+    <label>Status:
+        <select name="orderStatus">
+            <%
+                String selectedStatus = (String) request.getAttribute("selectedStatus");
+                String[] statusArr = {"All", "Delivered", "Cancelled", "Processing", "Shipped"};
+                for (String s : statusArr) {
+                    String sel = s.equals(selectedStatus) ? " selected" : "";
+                    out.print("<option value='" + s + "'" + sel + ">" + s + "</option>");
                 }
             %>
         </select>
@@ -190,7 +225,7 @@
     String lineMapJson = new com.google.gson.Gson().toJson(lineMap);
     String revenueMapJson = new com.google.gson.Gson().toJson(revenueMap);
 
-    // Bar chart data
+    // Chuẩn bị dữ liệu cho bar chart
     if (topProducts == null) topProducts = new ArrayList();
     List<String> prodNames = new ArrayList<>();
     List<Integer> prodQty = new ArrayList<>();
@@ -219,21 +254,31 @@
     pieMap.put("colors", colors);
     String pieMapJson = new com.google.gson.Gson().toJson(pieMap);
 %>
+    // Mảng màu cố định (có thể mở rộng thêm màu nếu nhiều category)
+    const colorPalette = [
+        '#195181', // xanh đậm
+        '#28a745', // xanh lá
+        '#dc3545', // đỏ
+        '#007bff', // xanh dương
+        '#ffc107', // vàng
+        '#6f42c1', // tím
+        '#fd7e14', // cam
+        '#20c997', // xanh ngọc
+        '#343a40', // xám đậm
+        '#e83e8c'  // hồng
+    ];
+
+    // Line Chart Data
     const lineRaw = <%= lineMapJson %>;
-const revenueRaw = <%= revenueMapJson %>;
-console.log('✅ Dữ liệu lineRaw:', lineRaw);
-
+    const revenueRaw = <%= revenueMapJson %>;
     let showingRevenue = false;
-
     const ctxLine = document.getElementById('lineChart').getContext('2d');
     const labelSet = new Set();
     Object.values(lineRaw).forEach(obj => Object.keys(obj).forEach(key => labelSet.add(key)));
     const lineLabels = Array.from(labelSet).sort();
-
-    const colorPalette = ['#195181', '#28a745', '#dc3545', '#007bff', '#ffc107', '#6f42c1', '#fd7e14', '#20c997', '#343a40', '#e83e8c'];
-
     function getDatasets(dataMap) {
-        return Object.keys(dataMap).map((cat, idx) => ({
+        const cats = Object.keys(dataMap);
+        return cats.map((cat, idx) => ({
             label: cat,
             data: lineLabels.map(l => dataMap[cat][l] || 0),
             borderColor: colorPalette[idx % colorPalette.length],
@@ -241,7 +286,6 @@ console.log('✅ Dữ liệu lineRaw:', lineRaw);
             fill: false
         }));
     }
-
     let lineChart = new Chart(ctxLine, {
         type: 'line',
         data: {
@@ -256,8 +300,7 @@ console.log('✅ Dữ liệu lineRaw:', lineRaw);
             }
         }
     });
-
-    document.getElementById('toggleChartBtn').onclick = function () {
+    document.getElementById('toggleChartBtn').onclick = function() {
         showingRevenue = !showingRevenue;
         lineChart.data.datasets = getDatasets(showingRevenue ? revenueRaw : lineRaw);
         document.getElementById('lineChartTitle').innerText = showingRevenue ? 'Revenue' : 'Sales Quantity';
@@ -265,8 +308,10 @@ console.log('✅ Dữ liệu lineRaw:', lineRaw);
         lineChart.update();
     };
 
-    // Pie Chart
+    // Pie Chart Data
     const pieRaw = <%= pieMapJson %>;
+
+    // Render Pie Chart
     const ctxPie = document.getElementById('pieChart').getContext('2d');
     new Chart(ctxPie, {
         type: 'pie',
@@ -286,7 +331,7 @@ console.log('✅ Dữ liệu lineRaw:', lineRaw);
         }
     });
 
-    // Bar Chart - Top Products
+    // Bar Chart Top Products
     const topProducts = <%= prodNamesJson %>;
     const topQty = <%= prodQtyJson %>;
     const ctxBar = document.getElementById('barChart').getContext('2d');
@@ -312,4 +357,5 @@ console.log('✅ Dữ liệu lineRaw:', lineRaw);
         }
     });
 </script>
+
 
