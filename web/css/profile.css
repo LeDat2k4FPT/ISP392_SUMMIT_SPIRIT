@@ -1,23 +1,87 @@
 /* Reset */
 body {
+    font-family: 'Kumbh Sans', sans-serif;
     margin: 0;
-    font-family: 'Segoe UI', sans-serif;
-    background-color: #f8f9fa;
+    padding: 0;
+    background-color: #f9f9f9;
 }
 
-/* Topbar */
-.topbar {
-    background-color: #fff;
-    border-bottom: 1px solid #ddd;
+.header {
+    padding: 10px 40px;
+    background-color: #ffffff;
+    display: flex;
+    align-items: center;
+    justify-content: space-between;
 }
-.logo img {
+
+.header img {
     height: 60px;
+    cursor: pointer;
 }
-.nav-icons a {
+
+.nav-links {
+    display: flex;
+    align-items: center;
+    gap: 20px;
+}
+
+.nav-links a {
+    text-decoration: none;
+    color: #000;
+    font-weight: 500;
+}
+.cart-icon {
+    position: relative;
+    display: inline-block;
     font-size: 20px;
     color: #000;
-    margin-left: 25px;
+    margin-left: 15px;
+}
+
+.cart-badge {
+    position: absolute;
+    top: -8px;
+    right: -10px;
+    background-color: #e53935;
+    color: white;
+    border-radius: 50%;
+    padding: 2px 6px;
+    font-size: 12px;
+    font-weight: bold;
+}
+
+.user-dropdown {
+    position: relative;
+}
+
+.user-name {
+    cursor: pointer;
+    font-weight: bold;
+    padding: 10px;
+    color: #000;
+}
+
+.dropdown-menu {
+    display: none;
+    position: absolute;
+    top: 100%;
+    right: 0;
+    background-color: white;
+    box-shadow: 0 8px 16px rgba(0,0,0,0.2);
+    border-radius: 4px;
+    z-index: 1000;
+    min-width: 150px;
+}
+
+.dropdown-menu a {
+    display: block;
+    padding: 10px 16px;
     text-decoration: none;
+    color: black;
+}
+
+.dropdown-menu a:hover {
+    background-color: #f1f1f1;
 }
 
 /* Layout */
@@ -132,18 +196,14 @@ body {
 .btn-outline:hover {
     background-color: #eee;
 }
-.btn-secondary {
-    background-color: #234C45;
+
+.btn-primary,.btn-secondary {
+    background-color: #849e98;
     color: white;
     border-radius: 8px;
 }
-.btn-primary {
+.btn-primary:hover ,.btn-secondary:hover {
     background-color: #234C45;
-    color: white;
-    border-radius: 8px;
-}
-.btn-primary:hover {
-    background-color: #5C636A;
 }
 
 .btn,

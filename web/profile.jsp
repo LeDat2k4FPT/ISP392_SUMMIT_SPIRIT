@@ -1,4 +1,4 @@
-<%@page import="dto.UserDTO" %>
+<%@page import="dto.UserDTO, dto.CartDTO" %>
 <%@page import="user.UserError" %>
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
 <!DOCTYPE html>
@@ -21,19 +21,47 @@
             }
             UserError userError = (UserError) request.getAttribute("USER_ERROR");
             if (userError == null) userError = new UserError();
+            CartDTO cart = (CartDTO) session.getAttribute("CART");
+            int cartItemCount = (cart != null) ? cart.getCartItems().size() : 0;
         %>
 
-        <!-- Topbar  -->
-        <div class="topbar d-flex justify-content-between align-items-center px-4 py-3">
-            <div class="logo">
+
+        <!-- Header -->
+        <div class="header">
+            <a href="homepage.jsp">
                 <img src="image/summit_logo.png" alt="Logo">
-            </div>
-            <div class="nav-icons">
+            </a>
+            <div class="nav-links">
                 <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                <a href="cart.jsp"><i class="fas fa-shopping-cart"></i></a>
-                <a href="profile.jsp"><i class="fas fa-user"></i></a>
+                <a href="cart.jsp" class="cart-icon">
+                    <i class="fas fa-shopping-cart"></i>
+                    <% if (cartItemCount > 0) { %>
+                    <span class="cart-badge"><%= cartItemCount %></span>
+                    <% } %>
+                </a>
+                <div class="user-dropdown">
+                    <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
+                    <div id="dropdown" class="dropdown-menu">
+                        <a href="profile.jsp"><%= loginUser.getFullName() %></a>
+                        <a href="MainController?action=Logout">Logout</a>
+                    </div>
+                </div>
             </div>
         </div>
+        <script>
+            function toggleMenu() {
+                const menu = document.getElementById("dropdown");
+                menu.style.display = menu.style.display === "block" ? "none" : "block";
+            }
+            document.addEventListener("click", function (event) {
+                const dropdown = document.getElementById("dropdown");
+                const userBtn = document.querySelector(".user-name");
+                if (!dropdown.contains(event.target) && !userBtn.contains(event.target)) {
+                    dropdown.style.display = "none";
+                }
+            });
+        </script>
+
 
         <!-- Main content -->
         <div class="wrapper d-flex">
