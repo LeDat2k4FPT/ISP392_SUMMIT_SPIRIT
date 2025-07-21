@@ -114,12 +114,12 @@
            <i class="bi bi-star"></i> Potential Customers
         </a>
     </li>
-    <li class="nav-item">
+<!--    <li class="nav-item">
         <a class="nav-link <%= "updateHistory.jsp".equals(currentPage) ? "active" : "" %>"
            href="${pageContext.request.contextPath}/ManageUpdateHistoryController">
            <i class="bi bi-clock-history"></i> Update History
         </a>
-    </li>
+    </li>-->
             </ul>
         </nav>
 

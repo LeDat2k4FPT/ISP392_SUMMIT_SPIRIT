@@ -48,6 +48,7 @@
                     <th>UserID</th>
                     <th>Full Name</th>
                     <th>Email</th>
+                    <th>Phone</th>
                     <th>Address</th>
                     <th>Role</th>
                     <th>Action</th>
@@ -60,6 +61,7 @@
                     <td><%= u.getUserID() %></td>
                     <td><%= u.getFullName() %></td>
                     <td><%= u.getEmail() %></td>
+                    <td><%= u.getPhone() %></td>
                     <td><%= u.getAddress() %></td>
                     <td><%= u.getRole() %></td>
                     <td>

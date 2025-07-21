@@ -26,12 +26,7 @@
         <div class="col-md-3">
             <input class="form-control" name="expiryDate" type="date" required>
         </div>
-        <div class="col-md-2">
-            <select class="form-select" name="status">
-                <option value="Active">Active</option>
-                <option value="Inactive">Inactive</option>
-            </select>
-        </div>
+       <input type="hidden" name="status" value="Active">
         <div class="col-md-1">
             <button class="btn btn-success" style="background:#234C45;" type="submit">Add</button>
         </div>

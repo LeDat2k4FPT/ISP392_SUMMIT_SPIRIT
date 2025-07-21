@@ -279,35 +279,44 @@ public class UserDAO {
     }
 
     public List<UserDTO> searchUsers(String keyword, String role) {
-        List<UserDTO> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder("SELECT * FROM Account WHERE FullName LIKE ? AND Role <> 'admin'");
-        if (role != null && !role.isEmpty() && !"all".equalsIgnoreCase(role)) {
-            sql.append(" AND Role = ?");
-        }
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            String k = "%" + keyword + "%";
-            ps.setString(1, k);
-            if (role != null && !role.isEmpty() && !"all".equalsIgnoreCase(role)) {
-                ps.setString(2, role);
-            }
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                UserDTO user = new UserDTO(
-                        rs.getInt("UserID"),
-                        rs.getString("FullName"),
-                        rs.getString("Address"),
-                        rs.getString("Password"),
-                        rs.getString("Phone"),
-                        rs.getString("Email"),
-                        rs.getString("Role")
-                );
-                list.add(user);
-            }
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-        return list;
+    List<UserDTO> list = new ArrayList<>();
+    StringBuilder sql = new StringBuilder(
+        "SELECT * FROM Account WHERE (FullName LIKE ? OR Email LIKE ? OR Phone LIKE ?) AND Role <> 'admin'"
+    );
+    if (role != null && !role.isEmpty() && !"all".equalsIgnoreCase(role)) {
+        sql.append(" AND Role = ?");
     }
+
+    try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        String k = "%" + keyword + "%";
+        ps.setString(1, k);
+        ps.setString(2, k);
+        ps.setString(3, k);
+
+        if (role != null && !role.isEmpty() && !"all".equalsIgnoreCase(role)) {
+            ps.setString(4, role);
+        }
+
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            UserDTO user = new UserDTO(
+                rs.getInt("UserID"),
+                rs.getString("FullName"),
+                rs.getString("Address"),
+                rs.getString("Password"),
+                rs.getString("Phone"),
+                rs.getString("Email"),
+                rs.getString("Role")
+            );
+            list.add(user);
+        }
+    } catch (Exception e) {
+        e.printStackTrace();
+    }
+
+    return list;
+}
+
 
     public List<UserDTO> getAllUsers(String role) {
         List<UserDTO> list = new ArrayList<>();
