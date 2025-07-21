@@ -304,7 +304,7 @@
                             <td><%= o.getOrderDate() %></td>
                             <td class="<%= statusClass %>"><%= o.getStatus() %></td>
                             <td><%= String.format("%,.0f", o.getTotalAmount()) %></td>
-                            <td><a href="OrderDetailController?orderID=<%= o.getOrderID() %>">View</a></td>
+                            <td><a href="OrderDetailControllerUser?orderID=<%= o.getOrderID() %>">View</a></td>
                             <td>
                                 <% if (!"Cancelled".equalsIgnoreCase(status)
                                        && !"Delivered".equalsIgnoreCase(status)
