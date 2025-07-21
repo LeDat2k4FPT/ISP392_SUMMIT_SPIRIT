@@ -10,6 +10,7 @@
 <%
     List<UserDTO> users = (List<UserDTO>) request.getAttribute("users");
     String keyword = request.getAttribute("keyword") != null ? (String) request.getAttribute("keyword") : "";
+    String role = request.getAttribute("role") != null ? (String) request.getAttribute("role") : "all";
 %>
 
 <div class="container-fluid px-0">
@@ -18,8 +19,18 @@
         <div class="col-md-4">
             <input type="text" class="form-control" name="keyword" value="<%= keyword %>" placeholder="Search by name, email, address, or role...">
         </div>
+        <div class="col-md-3">
+            <select class="form-select" name="role">
+                <option value="all" <%= "all".equals(role) ? "selected" : "" %>>All Roles</option>
+                <option value="User" <%= "User".equals(role) ? "selected" : "" %>>User</option>
+                <option value="Staff" <%= "Staff".equals(role) ? "selected" : "" %>>Staff</option>
+            </select>
+        </div>
         <div class="col-auto">
             <button type="submit" class="btn btn-success" style="background:#234C45;">Search</button>
+        </div>
+        <div class="col-auto">
+            <a href="${pageContext.request.contextPath}/ManageUserAccountController" class="btn btn-secondary">Cancel</a>
         </div>
         <div class="col-auto">
             <a href="${pageContext.request.contextPath}/AdminCreateUserController" 
