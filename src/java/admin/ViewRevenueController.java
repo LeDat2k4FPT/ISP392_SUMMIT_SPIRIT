@@ -52,8 +52,7 @@ public class ViewRevenueController extends HttpServlet {
 
             // Lấy dữ liệu biểu đồ và bảng
             List<RevenueDTO> revenueList = revenueDAO.getRevenueByMonthYearCategory(month, year, selectedCategory);
-            List<RevenueDTO> topProducts = revenueDAO.getTopSellingProductsByCategory(
-                    selectedCategory != null ? selectedCategory : "Clothing");
+            List<RevenueDTO> topProducts = revenueDAO.getTopSellingProductsByCategory(month, year, selectedCategory);
             List<RevenueDTO> colorStats = revenueDAO.getProductColorStatsByCategory(
                     selectedCategory != null ? selectedCategory : "Clothing");
 

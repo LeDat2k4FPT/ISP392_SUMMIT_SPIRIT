@@ -25,6 +25,8 @@
     String revenueJson = gson.toJson(revenueList);
     String topProductsJson = gson.toJson(topProducts);
     String colorStatsJson = gson.toJson(colorStats);
+
+    boolean isAllCategory = "all".equals(selectedCategory);
 %>
 
 <h2 class="text-center mb-4">📈 Revenue Analytics</h2>
@@ -53,10 +55,17 @@
         <label>Category:</label>
         <select name="category" class="form-select">
             <option value="all" <%= "all".equals(selectedCategory) ? "selected" : "" %>>All</option>
-            <option value="Clothing" <%= "Clothing".equals(selectedCategory) ? "selected" : "" %>>Clothing</option>
-            <option value="Camping" <%= "Camping".equals(selectedCategory) ? "selected" : "" %>>Camping</option>
-            <option value="Accessories" <%= "Accessories".equals(selectedCategory) ? "selected" : "" %>>Accessories</option>
+            <% 
+                List<dto.CategoryDTO> categoryList = (List<dto.CategoryDTO>) request.getAttribute("categoryList");
+                if (categoryList != null) {
+                    for (dto.CategoryDTO cate : categoryList) {
+            %>
+            <option value="<%= cate.getCateName() %>" <%= cate.getCateName().equals(selectedCategory) ? "selected" : "" %>><%= cate.getCateName() %></option>
+            <%      }
+                }
+            %>
         </select>
+
     </div>
     <div class="col-md-3 d-flex align-items-end">
         <button class="btn btn-dark w-100">Filter</button>
@@ -65,13 +74,21 @@
 
 <!-- Chart Section -->
 <div class="row">
-    <div class="col-md-6 mb-4">
-        <h5 class="text-center">Line Chart: Revenue Over Time</h5>
-        <canvas id="lineChart"></canvas>
+    <div class="col-md-6 mb-4 d-flex align-items-stretch">
+        <div class="w-100" style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #eee; padding: 20px; height: 400px; display: flex; flex-direction: column; justify-content: center;">
+            <h5 class="text-center">Line Chart: Revenue Over Time</h5>
+            <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+                <canvas id="lineChart" style="max-width:100%; max-height:320px;"></canvas>
+            </div>
+        </div>
     </div>
-    <div class="col-md-6 mb-4">
-        <h5 class="text-center">Pie Chart: Sold by Color</h5>
-        <canvas id="pieChart"></canvas>
+    <div class="col-md-6 mb-4 d-flex align-items-stretch">
+        <div class="w-100" style="background: #fff; border-radius: 10px; box-shadow: 0 2px 8px #eee; padding: 20px; height: 400px; display: flex; flex-direction: column; justify-content: center;">
+            <h5 class="text-center">Pie Chart: Sold by Color</h5>
+            <div style="flex:1; display:flex; align-items:center; justify-content:center;">
+                <canvas id="pieChart" style="max-width:100%; max-height:320px;"></canvas>
+            </div>
+        </div>
     </div>
     <div class="col-md-12 mb-4">
         <h5 class="text-center">Bar Chart: Top Selling Products</h5>
@@ -83,25 +100,63 @@
 <table class="table table-bordered table-hover">
     <thead class="table-dark">
         <tr>
-            <th>Category</th>
-            <th>Month</th>
-            <th>Year</th>
-            <th>Total Quantity</th>
-            <th>Total Revenue (VND)</th>
+            <% if (isAllCategory) { %>
+                <th>Product Name</th>
+                <th>Total Quantity Sold</th>
+                <th>Total Revenue (VND)</th>
+            <% } %>
         </tr>
     </thead>
     <tbody>
-        <c:forEach var="r" items="${revenueList}">
-            <tr>
-                <td>${r.categoryName}</td>
-                <td>${r.month}</td>
-                <td>${r.year}</td>
-                <td>${r.totalQuantity}</td>
-                <td><fmt:formatNumber value="${r.totalRevenue}" type="number" groupingUsed="true"/></td>
-            </tr>
-        </c:forEach>
+        <% if (isAllCategory) {
+            if (topProducts != null && !topProducts.isEmpty()) {
+                for (dto.RevenueDTO p : topProducts) { %>
+                    <tr>
+                        <td><%= p.getProductName() %></td>
+                        <td><%= p.getTotalQuantity() %></td>
+                        <td><%= String.format("%,.0f", p.getTotalRevenue()) %></td>
+                    </tr>
+        <%      }
+            } else { %>
+                <tr><td colspan="3">No data available.</td></tr>
+        <%  }
+        } else { %>
+            <c:forEach var="r" items="${revenueList}">
+                <tr>
+                    <td>${r.categoryName}</td>
+                    <td>${r.totalQuantity}</td>
+                    <td><fmt:formatNumber value="${r.totalRevenue}" type="number" groupingUsed="true"/></td>
+                </tr>
+            </c:forEach>
+        <% } %>
     </tbody>
 </table>
+
+<% if (!isAllCategory) { %>
+    <h5 class="mt-4">Top 5 Best-Selling Products in Category: <%= selectedCategory %></h5>
+    <table class="table table-bordered table-hover">
+        <thead class="table-dark">
+            <tr>
+                <th>Product Name</th>
+                <th>Total Quantity Sold</th>
+                <th>Total Revenue (VND)</th>
+            </tr>
+        </thead>
+        <tbody>
+            <% if (topProducts != null && !topProducts.isEmpty()) {
+                for (dto.RevenueDTO p : topProducts) { %>
+                    <tr>
+                        <td><%= p.getProductName() %></td>
+                        <td><%= p.getTotalQuantity() %></td>
+                        <td><%= String.format("%,.0f", p.getTotalRevenue()) %></td>
+                    </tr>
+            <%  }
+            } else { %>
+                <tr><td colspan="3">No data available.</td></tr>
+            <% } %>
+        </tbody>
+    </table>
+<% } %>
 
 <!-- Chart.js CDN -->
 <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
@@ -132,7 +187,7 @@
     });
 
     // PIE CHART: Quantity by Color
-    const pieLabels = colorStats.map(item => `${item.productName} (${item.colorName})`);
+    const pieLabels = colorStats.map(item => item.productName + (item.colorName ? ` (${item.colorName})` : ''));
     const pieValues = colorStats.map(item => item.totalQuantity);
 
     new Chart(document.getElementById('pieChart'), {

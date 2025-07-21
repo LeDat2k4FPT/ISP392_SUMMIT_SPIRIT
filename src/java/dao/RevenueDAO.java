@@ -69,31 +69,43 @@ public class RevenueDAO {
     }
 
     // 2. Lấy top sản phẩm bán chạy nhất theo danh mục (Bar Chart)
-    public List<RevenueDTO> getTopSellingProductsByCategory(String category)
+    public List<RevenueDTO> getTopSellingProductsByCategory(int month, int year, String category)
             throws SQLException, ClassNotFoundException {
         List<RevenueDTO> list = new ArrayList<>();
-        String sql = "SELECT TOP 5 p.ProductName, SUM(od.Quantity) AS TotalQuantity " +
-                "FROM Orders o " +
-                "JOIN OrderDetail od ON o.OrderID = od.OrderID " +
-                "JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID " +
-                "JOIN Product p ON pv.ProductID = p.ProductID " +
-                "JOIN Category c ON p.CateID = c.CateID " +
-                "WHERE o.Status = 'Delivered' " +
-                "AND c.CateName = ? " +
-                "GROUP BY p.ProductName " +
-                "ORDER BY TotalQuantity DESC";
+        StringBuilder sql = new StringBuilder();
+        sql.append("SELECT TOP 5 p.ProductName, SUM(od.Quantity) AS TotalQuantity, SUM(od.Quantity * od.UnitPrice) AS TotalRevenue ");
+        sql.append("FROM Orders o ");
+        sql.append("JOIN OrderDetail od ON o.OrderID = od.OrderID ");
+        sql.append("JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID ");
+        sql.append("JOIN Product p ON pv.ProductID = p.ProductID ");
+        sql.append("JOIN Category c ON p.CateID = c.CateID ");
+        sql.append("WHERE o.Status = 'Delivered' ");
+        if (month > 0) {
+            sql.append("AND MONTH(o.OrderDate) = ? ");
+        }
+        if (year > 0) {
+            sql.append("AND YEAR(o.OrderDate) = ? ");
+        }
+        if (category != null && !category.isEmpty()) {
+            sql.append("AND c.CateName = ? ");
+        }
+        sql.append("GROUP BY p.ProductName ");
+        sql.append("ORDER BY TotalQuantity DESC");
 
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, category);
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1;
+            if (month > 0) ps.setInt(idx++, month);
+            if (year > 0) ps.setInt(idx++, year);
+            if (category != null && !category.isEmpty()) ps.setString(idx++, category);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
                 RevenueDTO dto = new RevenueDTO();
                 dto.setProductName(rs.getString("ProductName"));
                 dto.setTotalQuantity(rs.getInt("TotalQuantity"));
+                dto.setTotalRevenue(rs.getDouble("TotalRevenue"));
                 list.add(dto);
             }
         }
-
         return list;
     }
 
