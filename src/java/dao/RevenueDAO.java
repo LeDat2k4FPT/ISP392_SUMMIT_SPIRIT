@@ -5,10 +5,11 @@
 package dao;
 
 import dto.ProductSoldDTO;
-import dto.RevenueLineDTO;
+import dto.RevenueDTO;
 import java.sql.Connection;
 import java.sql.PreparedStatement;
 import java.sql.ResultSet;
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.List;
 import utils.DBUtils;
@@ -18,300 +19,124 @@ import utils.DBUtils;
  * @author Hanne
  */
 public class RevenueDAO {
+// 1. Doanh thu theo tháng, năm, danh mục (Line Chart + Table)
+    public List<RevenueDTO> getRevenueByMonthYearCategory(int month, int year, String category)
+            throws SQLException, ClassNotFoundException {
+        List<RevenueDTO> list = new ArrayList<>();
 
-    /**
-     * Retrieves line chart data based on the selected filter (day, month, year)
-     * and optional selected values.
-     */
-    public List<RevenueLineDTO> getLineChartData(String filterType, String selectedDay, String selectedMonth, String selectedYear, String selectedCategory, String orderStatus) {
-        List<RevenueLineDTO> list = new ArrayList<>();
-        String groupBy;
-        String selectField;
+        String sql = "SELECT c.CateName, MONTH(o.OrderDate) AS Month, YEAR(o.OrderDate) AS Year, " +
+                "SUM(od.Quantity * od.UnitPrice) AS TotalRevenue, SUM(od.Quantity) AS TotalQuantity " +
+                "FROM Orders o " +
+                "JOIN OrderDetail od ON o.OrderID = od.OrderID " +
+                "JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID " +
+                "JOIN Product p ON pv.ProductID = p.ProductID " +
+                "JOIN Category c ON p.CateID = c.CateID " +
+                "WHERE o.Status = 'Delivered' ";
 
-        switch (filterType.toLowerCase()) {
-            case "day":
-                groupBy = "CAST(o.OrderDate AS DATE)";
-                selectField = "CAST(o.OrderDate AS DATE) AS DatePart";
-                break;
-            case "month":
-                groupBy = "YEAR(o.OrderDate), MONTH(o.OrderDate)";
-                selectField = "FORMAT(o.OrderDate, 'yyyy-MM') AS DatePart";
-                break;
-            case "year":
-                groupBy = "YEAR(o.OrderDate)";
-                selectField = "YEAR(o.OrderDate) AS DatePart";
-                break;
-            default:
-                throw new IllegalArgumentException("Invalid filter type: " + filterType);
+        if (month > 0) {
+            sql += "AND MONTH(o.OrderDate) = ? ";
+        }
+        if (year > 0) {
+            sql += "AND YEAR(o.OrderDate) = ? ";
+        }
+        if (category != null && !category.isEmpty()) {
+            sql += "AND c.CateName = ? ";
         }
 
+        sql += "GROUP BY c.CateName, MONTH(o.OrderDate), YEAR(o.OrderDate) " +
+               "ORDER BY Year ASC, Month ASC";
+
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            int index = 1;
+            if (month > 0) ps.setInt(index++, month);
+            if (year > 0) ps.setInt(index++, year);
+            if (category != null && !category.isEmpty()) ps.setString(index++, category);
+
+            try (ResultSet rs = ps.executeQuery()) {
+                while (rs.next()) {
+                    RevenueDTO dto = new RevenueDTO();
+                    dto.setCategoryName(rs.getString("CateName"));
+                    dto.setMonth(rs.getInt("Month"));
+                    dto.setYear(rs.getInt("Year"));
+                    dto.setTotalRevenue(rs.getDouble("TotalRevenue"));
+                    dto.setTotalQuantity(rs.getInt("TotalQuantity"));
+                    list.add(dto);
+                }
+            }
+        }
+
+        return list;
+    }
+
+    // 2. Lấy top sản phẩm bán chạy nhất theo danh mục (Bar Chart)
+    public List<RevenueDTO> getTopSellingProductsByCategory(int month, int year, String category)
+            throws SQLException, ClassNotFoundException {
+        List<RevenueDTO> list = new ArrayList<>();
         StringBuilder sql = new StringBuilder();
-        sql.append("SELECT c.CateName, ").append(selectField).append(", SUM(od.Quantity) AS TotalQuantity, SUM(od.Quantity * od.UnitPrice) AS TotalRevenue ")
-           .append("FROM Orders o ")
-           .append("JOIN OrderDetail od ON o.OrderID = od.OrderID ")
-           .append("JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID ")
-           .append("JOIN Product p ON pv.ProductID = p.ProductID ")
-           .append("JOIN Category c ON p.CateID = c.CateID ")
-           .append("WHERE 1=1 ");
-
-        if (orderStatus != null && !"All".equalsIgnoreCase(orderStatus)) {
-            sql.append("AND o.Status = ? ");
+        sql.append("SELECT TOP 5 p.ProductName, SUM(od.Quantity) AS TotalQuantity, SUM(od.Quantity * od.UnitPrice) AS TotalRevenue ");
+        sql.append("FROM Orders o ");
+        sql.append("JOIN OrderDetail od ON o.OrderID = od.OrderID ");
+        sql.append("JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID ");
+        sql.append("JOIN Product p ON pv.ProductID = p.ProductID ");
+        sql.append("JOIN Category c ON p.CateID = c.CateID ");
+        sql.append("WHERE o.Status = 'Delivered' ");
+        if (month > 0) {
+            sql.append("AND MONTH(o.OrderDate) = ? ");
         }
-
-        // Add filter condition
-        if (selectedCategory != null && !"All".equalsIgnoreCase(selectedCategory)) {
-            sql.append("AND c.CateName = ? ");
-        }
-        if ("day".equals(filterType) && selectedDay != null && !"all".equalsIgnoreCase(selectedDay)) {
-            sql.append("AND CAST(o.OrderDate AS DATE) = ? ");
-        } else if ("month".equals(filterType) && selectedMonth != null && !"all".equalsIgnoreCase(selectedMonth)) {
-            sql.append("AND FORMAT(o.OrderDate, 'yyyy-MM') = ? ");
-        } else if ("year".equals(filterType) && selectedYear != null && !"all".equalsIgnoreCase(selectedYear)) {
+        if (year > 0) {
             sql.append("AND YEAR(o.OrderDate) = ? ");
         }
+        if (category != null && !category.isEmpty()) {
+            sql.append("AND c.CateName = ? ");
+        }
+        sql.append("GROUP BY p.ProductName ");
+        sql.append("ORDER BY TotalQuantity DESC");
 
-        sql.append("GROUP BY c.CateName, ").append(groupBy).append(" ")
-           .append("ORDER BY c.CateName, DatePart");
-
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-
-            int paramIndex = 1;
-            if (orderStatus != null && !"All".equalsIgnoreCase(orderStatus)) {
-                ps.setString(paramIndex++, orderStatus);
-            }
-            if (selectedCategory != null && !"All".equalsIgnoreCase(selectedCategory)) {
-                ps.setString(paramIndex++, selectedCategory);
-            }
-            if ("day".equals(filterType) && selectedDay != null && !"all".equalsIgnoreCase(selectedDay)) {
-                ps.setString(paramIndex++, selectedDay); // Format: yyyy-MM-dd
-            } else if ("month".equals(filterType) && selectedMonth != null && !"all".equalsIgnoreCase(selectedMonth)) {
-                ps.setString(paramIndex++, selectedMonth); // Format: yyyy-MM
-            } else if ("year".equals(filterType) && selectedYear != null && !"all".equalsIgnoreCase(selectedYear)) {
-                ps.setInt(paramIndex++, Integer.parseInt(selectedYear));
-            }
-
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            int idx = 1;
+            if (month > 0) ps.setInt(idx++, month);
+            if (year > 0) ps.setInt(idx++, year);
+            if (category != null && !category.isEmpty()) ps.setString(idx++, category);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                RevenueLineDTO dto = new RevenueLineDTO();
-                dto.setCategory(rs.getString("CateName"));
-                dto.setTimeLabel(rs.getString("DatePart"));
+                RevenueDTO dto = new RevenueDTO();
+                dto.setProductName(rs.getString("ProductName"));
                 dto.setTotalQuantity(rs.getInt("TotalQuantity"));
                 dto.setTotalRevenue(rs.getDouble("TotalRevenue"));
                 list.add(dto);
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
-
         return list;
     }
 
-    /**
-     * Retrieves pie chart data: quantity sold by product and color in a given category.
-     */
-    public List<ProductSoldDTO> getPieChartData(String categoryName, String filterType, String selectedDay, String selectedMonth, String selectedYear, String orderStatus) {
-        List<ProductSoldDTO> list = new ArrayList<>();
+    // 3. Lấy dữ liệu pie chart: số lượng sản phẩm bán ra theo màu trong một danh mục
+    public List<RevenueDTO> getProductColorStatsByCategory(String category)
+            throws SQLException, ClassNotFoundException {
+        List<RevenueDTO> list = new ArrayList<>();
+        String sql = "SELECT p.ProductName, c2.ColorName, SUM(od.Quantity) AS TotalQuantity " +
+                "FROM Orders o " +
+                "JOIN OrderDetail od ON o.OrderID = od.OrderID " +
+                "JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID " +
+                "JOIN Product p ON pv.ProductID = p.ProductID " +
+                "JOIN Category c ON p.CateID = c.CateID " +
+                "LEFT JOIN Color c2 ON pv.ColorID = c2.ColorID " +
+                "WHERE o.Status = 'Delivered' " +
+                "AND c.CateName = ? " +
+                "GROUP BY p.ProductName, c2.ColorName " +
+                "ORDER BY p.ProductName";
 
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT p.ProductName, cl.ColorName, SUM(od.Quantity) AS TotalSold ")
-           .append("FROM Orders o ")
-           .append("JOIN OrderDetail od ON o.OrderID = od.OrderID ")
-           .append("JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID ")
-           .append("JOIN Product p ON pv.ProductID = p.ProductID ")
-           .append("JOIN Category c ON p.CateID = c.CateID ")
-           .append("JOIN Color cl ON pv.ColorID = cl.ColorID ")
-           .append("WHERE 1=1 ");
-
-        if (orderStatus != null && !"All".equalsIgnoreCase(orderStatus)) {
-            sql.append("AND o.Status = ? ");
-        }
-
-        if (categoryName != null && !"All".equalsIgnoreCase(categoryName)) {
-            sql.append("AND c.CateName = ? ");
-        }
-        if ("day".equals(filterType) && selectedDay != null && !"all".equalsIgnoreCase(selectedDay)) {
-            sql.append("AND CAST(o.OrderDate AS DATE) = ? ");
-        } else if ("month".equals(filterType) && selectedMonth != null && !"all".equalsIgnoreCase(selectedMonth)) {
-            sql.append("AND FORMAT(o.OrderDate, 'yyyy-MM') = ? ");
-        } else if ("year".equals(filterType) && selectedYear != null && !"all".equalsIgnoreCase(selectedYear)) {
-            sql.append("AND YEAR(o.OrderDate) = ? ");
-        }
-
-        sql.append("GROUP BY p.ProductName, cl.ColorName ")
-           .append("ORDER BY TotalSold DESC");
-
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-
-            int paramIndex = 1;
-            if (orderStatus != null && !"All".equalsIgnoreCase(orderStatus)) {
-                ps.setString(paramIndex++, orderStatus);
-            }
-            if (categoryName != null && !"All".equalsIgnoreCase(categoryName)) {
-                ps.setString(paramIndex++, categoryName);
-            }
-            if ("day".equals(filterType) && selectedDay != null && !"all".equalsIgnoreCase(selectedDay)) {
-                ps.setString(paramIndex++, selectedDay);
-            } else if ("month".equals(filterType) && selectedMonth != null && !"all".equalsIgnoreCase(selectedMonth)) {
-                ps.setString(paramIndex++, selectedMonth);
-            } else if ("year".equals(filterType) && selectedYear != null && !"all".equalsIgnoreCase(selectedYear)) {
-                ps.setInt(paramIndex++, Integer.parseInt(selectedYear));
-            }
-
+        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, category);
             ResultSet rs = ps.executeQuery();
             while (rs.next()) {
-                ProductSoldDTO dto = new ProductSoldDTO();
+                RevenueDTO dto = new RevenueDTO();
                 dto.setProductName(rs.getString("ProductName"));
-                dto.setColor(rs.getString("ColorName"));
-                dto.setQuantitySold(rs.getInt("TotalSold"));
+                dto.setColorName(rs.getString("ColorName"));
+                dto.setTotalQuantity(rs.getInt("TotalQuantity"));
                 list.add(dto);
             }
-
-        } catch (Exception e) {
-            e.printStackTrace();
         }
 
-        return list;
-    }
-
-    public int countOrders(String selectedDay, String selectedMonth, String selectedYear, String selectedCategory, String orderStatus) {
-        int count = 0;
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT COUNT(DISTINCT o.OrderID) FROM Orders o ")
-           .append("JOIN OrderDetail od ON o.OrderID = od.OrderID ")
-           .append("JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID ")
-           .append("JOIN Product p ON pv.ProductID = p.ProductID ")
-           .append("JOIN Category c ON p.CateID = c.CateID WHERE 1=1 ");
-        if (orderStatus != null && !"All".equalsIgnoreCase(orderStatus)) {
-            sql.append("AND o.Status = ? ");
-        }
-        if (selectedCategory != null && !"All".equalsIgnoreCase(selectedCategory)) {
-            sql.append("AND c.CateName = ? ");
-        }
-        if (selectedDay != null && !"all".equalsIgnoreCase(selectedDay)) {
-            sql.append("AND CAST(o.OrderDate AS DATE) = ? ");
-        } else if (selectedMonth != null && !"all".equalsIgnoreCase(selectedMonth)) {
-            sql.append("AND FORMAT(o.OrderDate, 'yyyy-MM') = ? ");
-        } else if (selectedYear != null && !"all".equalsIgnoreCase(selectedYear)) {
-            sql.append("AND YEAR(o.OrderDate) = ? ");
-        }
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            int paramIndex = 1;
-            if (orderStatus != null && !"All".equalsIgnoreCase(orderStatus)) {
-                ps.setString(paramIndex++, orderStatus);
-            }
-            if (selectedCategory != null && !"All".equalsIgnoreCase(selectedCategory)) {
-                ps.setString(paramIndex++, selectedCategory);
-            }
-            if (selectedDay != null && !"all".equalsIgnoreCase(selectedDay)) {
-                ps.setString(paramIndex++, selectedDay);
-            } else if (selectedMonth != null && !"all".equalsIgnoreCase(selectedMonth)) {
-                ps.setString(paramIndex++, selectedMonth);
-            } else if (selectedYear != null && !"all".equalsIgnoreCase(selectedYear)) {
-                ps.setInt(paramIndex++, Integer.parseInt(selectedYear));
-            }
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                count = rs.getInt(1);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return count;
-    }
-
-    public int countProductsSold(String selectedDay, String selectedMonth, String selectedYear, String selectedCategory, String orderStatus) {
-        int count = 0;
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT SUM(od.Quantity) FROM Orders o ")
-           .append("JOIN OrderDetail od ON o.OrderID = od.OrderID ")
-           .append("JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID ")
-           .append("JOIN Product p ON pv.ProductID = p.ProductID ")
-           .append("JOIN Category c ON p.CateID = c.CateID WHERE 1=1 ");
-        if (orderStatus != null && !"All".equalsIgnoreCase(orderStatus)) {
-            sql.append("AND o.Status = ? ");
-        }
-        if (selectedCategory != null && !"All".equalsIgnoreCase(selectedCategory)) {
-            sql.append("AND c.CateName = ? ");
-        }
-        if (selectedDay != null && !"all".equalsIgnoreCase(selectedDay)) {
-            sql.append("AND CAST(o.OrderDate AS DATE) = ? ");
-        } else if (selectedMonth != null && !"all".equalsIgnoreCase(selectedMonth)) {
-            sql.append("AND FORMAT(o.OrderDate, 'yyyy-MM') = ? ");
-        } else if (selectedYear != null && !"all".equalsIgnoreCase(selectedYear)) {
-            sql.append("AND YEAR(o.OrderDate) = ? ");
-        }
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            int paramIndex = 1;
-            if (orderStatus != null && !"All".equalsIgnoreCase(orderStatus)) {
-                ps.setString(paramIndex++, orderStatus);
-            }
-            if (selectedCategory != null && !"All".equalsIgnoreCase(selectedCategory)) {
-                ps.setString(paramIndex++, selectedCategory);
-            }
-            if (selectedDay != null && !"all".equalsIgnoreCase(selectedDay)) {
-                ps.setString(paramIndex++, selectedDay);
-            } else if (selectedMonth != null && !"all".equalsIgnoreCase(selectedMonth)) {
-                ps.setString(paramIndex++, selectedMonth);
-            } else if (selectedYear != null && !"all".equalsIgnoreCase(selectedYear)) {
-                ps.setInt(paramIndex++, Integer.parseInt(selectedYear));
-            }
-            ResultSet rs = ps.executeQuery();
-            if (rs.next()) {
-                count = rs.getInt(1);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
-        return count;
-    }
-
-    public List<ProductSoldDTO> getTopSellingProducts(String selectedDay, String selectedMonth, String selectedYear, String selectedCategory, String orderStatus, int limit) {
-        List<ProductSoldDTO> list = new ArrayList<>();
-        StringBuilder sql = new StringBuilder();
-        sql.append("SELECT TOP " + limit + " p.ProductName, SUM(od.Quantity) AS TotalSold, SUM(od.Quantity * od.UnitPrice) AS TotalRevenue ")
-           .append("FROM Orders o ")
-           .append("JOIN OrderDetail od ON o.OrderID = od.OrderID ")
-           .append("JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID ")
-           .append("JOIN Product p ON pv.ProductID = p.ProductID ")
-           .append("JOIN Category c ON p.CateID = c.CateID WHERE 1=1 ");
-        if (orderStatus != null && !"All".equalsIgnoreCase(orderStatus)) {
-            sql.append("AND o.Status = ? ");
-        }
-        if (selectedCategory != null && !"All".equalsIgnoreCase(selectedCategory)) {
-            sql.append("AND c.CateName = ? ");
-        }
-        if (selectedDay != null && !"all".equalsIgnoreCase(selectedDay)) {
-            sql.append("AND CAST(o.OrderDate AS DATE) = ? ");
-        } else if (selectedMonth != null && !"all".equalsIgnoreCase(selectedMonth)) {
-            sql.append("AND FORMAT(o.OrderDate, 'yyyy-MM') = ? ");
-        } else if (selectedYear != null && !"all".equalsIgnoreCase(selectedYear)) {
-            sql.append("AND YEAR(o.OrderDate) = ? ");
-        }
-        sql.append("GROUP BY p.ProductName ")
-           .append("ORDER BY TotalSold DESC");
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-            int paramIndex = 1;
-            if (orderStatus != null && !"All".equalsIgnoreCase(orderStatus)) {
-                ps.setString(paramIndex++, orderStatus);
-            }
-            if (selectedCategory != null && !"All".equalsIgnoreCase(selectedCategory)) {
-                ps.setString(paramIndex++, selectedCategory);
-            }
-            if (selectedDay != null && !"all".equalsIgnoreCase(selectedDay)) {
-                ps.setString(paramIndex++, selectedDay);
-            } else if (selectedMonth != null && !"all".equalsIgnoreCase(selectedMonth)) {
-                ps.setString(paramIndex++, selectedMonth);
-            } else if (selectedYear != null && !"all".equalsIgnoreCase(selectedYear)) {
-                ps.setInt(paramIndex++, Integer.parseInt(selectedYear));
-            }
-            ResultSet rs = ps.executeQuery();
-            while (rs.next()) {
-                ProductSoldDTO dto = new ProductSoldDTO();
-                dto.setProductName(rs.getString("ProductName"));
-                dto.setQuantitySold(rs.getInt("TotalSold"));
-                dto.setTotalRevenue(rs.getDouble("TotalRevenue"));
-                list.add(dto);
-            }
-        } catch (Exception e) { e.printStackTrace(); }
         return list;
     }
 }
