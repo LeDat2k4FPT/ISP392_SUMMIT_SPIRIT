@@ -8,7 +8,7 @@
 
 <%
      UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
-    if (loginUser == null || !"User".equals(loginUser.getRole())) {
+    if (loginUser == null || !"Staff".equals(loginUser.getRole())) {
         response.sendRedirect("login.jsp");
         return;
     }
@@ -39,51 +39,16 @@
         <title>Order Details</title>
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/orderDetail.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/orderDetailStaff.css">
     </head>
     <body>
-        <!-- Header -->
-        <div class="header">
-            <a href="homepage.jsp">
-                <img src="image/summit_logo.png" alt="Logo">
-            </a>
-            <div class="nav-links">
-                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                <a href="cart.jsp" class="cart-icon">
-                    <i class="fas fa-shopping-cart"></i>
-                    <% if (cartItemCount > 0) { %>
-                    <span class="cart-badge"><%= cartItemCount %></span>
-                    <% } %>
-                </a>
-                <div class="user-dropdown">
-                    <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
-                    <div id="dropdown" class="dropdown-menu">
-                        <a href="profile.jsp"><%= loginUser.getFullName() %></a>
-                        <a href="MainController?action=Logout">Logout</a>
-                    </div>
-                </div>
-            </div>
-        </div>
-        <script>
-            function toggleMenu() {
-                const menu = document.getElementById("dropdown");
-                menu.style.display = menu.style.display === "block" ? "none" : "block";
-            }
-            document.addEventListener("click", function (event) {
-                const dropdown = document.getElementById("dropdown");
-                const userBtn = document.querySelector(".user-name");
-                if (!dropdown.contains(event.target) && !userBtn.contains(event.target)) {
-                    dropdown.style.display = "none";
-                }
-            });
-        </script>
-        <button class="btn" onclick="history.back()">← Back</button>
+        <button class="btn" onclick="loadContent('staff/orderlist.jsp')">← Back</button>
+
         <div class="container">
             <% if (order == null) { %>
             <div class="alert">
                 <h2>🚫 Order Not Found!</h2>
                 <p>No order exists with ID: <%= orderID %></p>
-                <button class="btn" onclick="history.back()">← Back</button>
             </div>
             <% } else { %>
             <div class="order-card">
@@ -157,7 +122,7 @@
                 </div>
                 <% } %>
             </div>
-            
+
             <% } %>
         </div>
     </body>

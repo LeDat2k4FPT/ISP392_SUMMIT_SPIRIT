@@ -6,11 +6,13 @@ package controllers;
 
 import dao.OrderDAO;
 import dto.OrderDetailDTO;
+import dto.UserDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
+import jakarta.servlet.http.HttpSession;
 import java.io.IOException;
 import java.io.PrintWriter;
 import java.util.List;
@@ -61,12 +63,23 @@ public class OrderDetailController extends HttpServlet {
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         try {
+            HttpSession session = request.getSession();
+            UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
+            if (user == null) {
+                // Nếu chưa login thì redirect về login.jsp
+                response.sendRedirect("login.jsp");
+                return;
+            }
             int orderID = Integer.parseInt(request.getParameter("orderID"));
             OrderDAO dao = new OrderDAO();
             List<OrderDetailDTO> details = dao.getOrderDetails(orderID);
 
             request.setAttribute("details", details);
-            request.getRequestDispatcher("staff/orderDetail.jsp").forward(request, response);
+            if (user.getRole().equals("Staff")) {
+                request.getRequestDispatcher("staff/orderDetailStaff.jsp").forward(request, response);
+            } else {
+                request.getRequestDispatcher("orderDetail.jsp").forward(request, response);
+            }
         } catch (Exception e) {
             e.printStackTrace();
         }

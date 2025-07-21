@@ -107,6 +107,15 @@ td form select {
 
 td form button {
     padding: 6px 12px;
+    background-color: #849e98;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+td button{
+    padding: 6px 12px;
     background-color: #234C45;
     color: white;
     border: none;
@@ -114,9 +123,11 @@ td form button {
     cursor: pointer;
     font-size: 14px;
 }
-
+td button:hover{
+    background-color: #28a745;
+}
 td form button:hover {
-    background-color: #195181;
+    background-color: #234C45;
 }
 .back-btn-container {
     margin-top: 30px;
@@ -128,7 +139,7 @@ td form button:hover {
     border-radius: 6px;
     color: black;
     text-decoration: none;
-    
+
 }
 .back-btn-container .btn:hover {
     background-color: #195181;

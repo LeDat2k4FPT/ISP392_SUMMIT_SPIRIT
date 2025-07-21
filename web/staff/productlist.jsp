@@ -19,17 +19,17 @@
     String msg = (String) request.getAttribute("message");
     if (msg != null) {
 %>
-    <div class="success-box"><%= msg %></div>
+<div class="success-box"><%= msg %></div>
 <%
     }
 %>
 
-<div class="search-bar" style="margin-bottom:15px;">
-    <form method="get" action="<%= request.getContextPath() %>/ProductListController">
-        <input type="text" name="keyword" value="<%= keyword %>" placeholder="🔍 Search product name..." style="padding:5px; width:200px;">
-        <button type="submit">Search</button>
-    </form>
-</div>
+
+<form class="search-form" action="<%=request.getContextPath()%>/ProductListController" method="get">
+    <input type="text" name="keyword" value="<%= request.getParameter("keyword") != null ? request.getParameter("keyword") : "" %>"
+           placeholder="🔍 Search product name..."/>
+    <button type="submit">Search</button>
+</form>
 
 <div class="product-section">
     <div class="product-header">
@@ -57,50 +57,50 @@
                 </tr>
             </thead>
             <tbody>
-            <%
-                if (productList != null && !productList.isEmpty()) {
-                    for (ProductDTO p : productList) {
-                        // ✅ Chỉ bỏ qua nếu status rõ ràng là inactive
-                        if (p.getStatus() != null && !"active".equalsIgnoreCase(p.getStatus())) {
-                            continue;
-                        }
+                <%
+                    if (productList != null && !productList.isEmpty()) {
+                        for (ProductDTO p : productList) {
+                            // ✅ Chỉ bỏ qua nếu status rõ ràng là inactive
+                            if (p.getStatus() != null && !"active".equalsIgnoreCase(p.getStatus())) {
+                                continue;
+                            }
 
-                        List<ProductVariantDTO> variants = variantMap != null ? variantMap.get(p.getProductID()) : null;
-                        if (variants != null) {
-                            variants.sort(Comparator.comparing(ProductVariantDTO::getSizeName, Comparator.nullsLast(String::compareTo))
-                                .thenComparing(ProductVariantDTO::getColorName, Comparator.nullsLast(String::compareTo)));
-                        }
-                        int variantCount = (variants != null) ? variants.size() : 0;
-                        boolean firstRow = true;
-                        if (variantCount > 0) {
-                            for (ProductVariantDTO v : variants) {
-            %>
+                            List<ProductVariantDTO> variants = variantMap != null ? variantMap.get(p.getProductID()) : null;
+                            if (variants != null) {
+                                variants.sort(Comparator.comparing(ProductVariantDTO::getSizeName, Comparator.nullsLast(String::compareTo))
+                                    .thenComparing(ProductVariantDTO::getColorName, Comparator.nullsLast(String::compareTo)));
+                            }
+                            int variantCount = (variants != null) ? variants.size() : 0;
+                            boolean firstRow = true;
+                            if (variantCount > 0) {
+                                for (ProductVariantDTO v : variants) {
+                %>
                 <tr>
                     <% if (firstRow) { %>
-                        <td rowspan="<%= variantCount %>"><%= p.getProductID() %></td>
-                        <td rowspan="<%= variantCount %>"><%= p.getProductName() %></td>
-                        <td rowspan="<%= variantCount %>"><%= p.getCateName() %></td>
+                    <td rowspan="<%= variantCount %>"><%= p.getProductID() %></td>
+                    <td rowspan="<%= variantCount %>"><%= p.getProductName() %></td>
+                    <td rowspan="<%= variantCount %>"><%= p.getCateName() %></td>
                     <% } %>
                     <td style="text-align:center;"><%= v.getSizeName() != null ? v.getSizeName() : "" %></td>
                     <td style="text-align:center;"><%= v.getColorName() != null ? v.getColorName() : "" %></td>
                     <td style="text-align:center;"><%= v.getQuantity() != 0 ? v.getQuantity() : "" %></td>
                     <td style="text-align:center;"><%= v.getPrice() != 0 ? String.format("%,.0f", v.getPrice()) : "" %></td>
                     <% if (firstRow) { %>
-                        <td rowspan="<%= variantCount %>"><%= p.getStock() %></td>
-                        <td rowspan="<%= variantCount %>"><%= p.getStatus() != null ? p.getStatus() : "active" %></td>
-                        <td rowspan="<%= variantCount %>" class="actions">
-                            <a href="<%= request.getContextPath()%>/EditProductController?productID=<%= p.getProductID() %>" title="Edit">🖋️</a>
-                            <a href="<%= request.getContextPath()%>/DeleteProductController?productID=<%= p.getProductID() %>"
-                               title="Deactivate"
-                               onclick="return confirm('Are you sure you want to deactivate this product?')">🗑️</a>
-                        </td>
+                    <td rowspan="<%= variantCount %>"><%= p.getStock() %></td>
+                    <td rowspan="<%= variantCount %>"><%= p.getStatus() != null ? p.getStatus() : "active" %></td>
+                    <td rowspan="<%= variantCount %>" class="actions">
+                        <a href="<%= request.getContextPath()%>/EditProductController?productID=<%= p.getProductID() %>" title="Edit">🖋️</a>
+                        <a href="<%= request.getContextPath()%>/DeleteProductController?productID=<%= p.getProductID() %>"
+                           title="Deactivate"
+                           onclick="return confirm('Are you sure you want to deactivate this product?')">🗑️</a>
+                    </td>
                     <% } %>
                 </tr>
-            <%
-                                firstRow = false;
-                            }
-                        } else {
-            %>
+                <%
+                                    firstRow = false;
+                                }
+                            } else {
+                %>
                 <tr>
                     <td><%= p.getProductID() %></td>
                     <td><%= p.getProductName() %></td>
@@ -115,13 +115,13 @@
                            onclick="return confirm('Are you sure you want to deactivate this product?')">🗑️</a>
                     </td>
                 </tr>
-            <%
+                <%
+                            }
                         }
-                    }
-                } else {
-            %>
+                    } else {
+                %>
                 <tr><td colspan="10" class="no-data">No products found.</td></tr>
-            <% } %>
+                <% } %>
             </tbody>
         </table>
     </div>

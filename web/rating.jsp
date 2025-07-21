@@ -6,7 +6,7 @@
 <%@ page import="java.util.List" %>
 <%
     UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
-    if (loginUser == null || !"User".equals(loginUser.getRole())) {
+    if (loginUser == null) {
         response.sendRedirect("login.jsp");
         return;
     }

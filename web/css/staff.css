@@ -171,7 +171,33 @@ body {
     color: #999;
     font-style: italic;
 }
+/* Search form */
+form.search-form {
+    display: flex;
+    justify-content: center;
+    margin-bottom: 25px;
+    gap: 10px;
+}
 
+form.search-form input[type="text"] {
+    padding: 10px 16px;
+    width: 300px;
+    border: 1px solid #ddd;
+    border-radius: 8px;
+}
+
+form.search-form button {
+    padding: 10px 16px;
+    background-color: #234C45;
+    color: white;
+    border: none;
+    border-radius: 8px;
+    cursor: pointer;
+}
+
+form.search-form button:hover {
+    background-color: #195181;
+}
 /* ----------------------add product-------------------- */
 .product-form-wrapper {
     background: #fff;
