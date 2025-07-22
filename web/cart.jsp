@@ -217,7 +217,15 @@
                             <button type="button" onclick="decrease('<%= uniqueKey %>')">−</button>
                             <input type="number" name="quantity_<%= uniqueKey %>" id="qty_<%= uniqueKey %>" value="<%= quantity %>" min="1" max="<%= stock %>" readonly>
                             <button type="button" onclick="increase('<%= uniqueKey %>', <%= stock %>)">+</button>
-                            <a href="RemoveFromCartServlet?productID=<%= p.getProductID() %>&size=<%= p.getSize() %>&color=<%= p.getColor() %>" class="delete-link"><i class="fa fa-trash"></i></a>
+<%
+    String safeSize = (p.getSize() != null && !p.getSize().trim().isEmpty()) ? p.getSize().trim() : "N/A";
+    String safeColor = (p.getColor() != null && !p.getColor().trim().isEmpty()) ? p.getColor().trim() : "N/A";
+%>
+<a href="RemoveFromCartServlet?productID=<%= p.getProductID() %>&size=<%= safeSize %>&color=<%= safeColor %>" class="delete-link">
+    <i class="fa fa-trash"></i>
+</a>
+
+
                         </div>
                     </div>
                     <div class="price">

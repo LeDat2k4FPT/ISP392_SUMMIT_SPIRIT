@@ -22,16 +22,15 @@ public class RemoveFromCartServlet extends HttpServlet {
             String size = request.getParameter("size");
             String color = request.getParameter("color");
 
+            // Làm sạch dữ liệu
+            if (size != null) size = size.trim();
+            if (color != null) color = color.trim();
+
             HttpSession session = request.getSession();
             CartDTO cart = (CartDTO) session.getAttribute("CART");
 
             if (cart != null) {
-                if (size != null && color != null && !size.isEmpty() && !color.isEmpty()) {
-                    cart.removeFromCart(productID, size, color);
-                } else {
-                    cart.removeFromCart(productID); // fallback nếu thiếu dữ liệu
-                }
-
+                cart.removeFromCart(productID, size, color); // luôn dùng key chuẩn
                 session.setAttribute("CART", cart);
             }
 

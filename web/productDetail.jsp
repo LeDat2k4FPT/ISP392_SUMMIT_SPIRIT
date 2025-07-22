@@ -278,7 +278,7 @@ double avgRating = 0;
 
 
     <% if (canReview) { %>
-<form action="SubmitReview" method="post" style="margin-bottom: 20px;">
+<form action="SubmitReview" method="post" style="margin-bottom: 20px;" onsubmit="return validateReviewForm();">
     <input type="hidden" name="productId" value="<%= productID %>" />
     <input type="hidden" name="fromPage" value="productDetail">
     <input type="hidden" name="email" value="<%= loginUser.getEmail() %>">
@@ -601,5 +601,16 @@ const available = variantStockMap[key] || 0;
                 fetchPriceByVariant();
             }
         </script>
+        <script>
+    function validateReviewForm() {
+        const ratingSelected = document.querySelector('input[name="rating"]:checked');
+        if (!ratingSelected) {
+            alert("Please select a rating before submitting your review.");
+            return false;
+        }
+        return true;
+    }
+</script>
+
     </body>
 </html>

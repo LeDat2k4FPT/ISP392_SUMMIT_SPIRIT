@@ -29,13 +29,11 @@ public class CartDTO implements Serializable {
 
     // Sửa buildKey để tạo key hợp lệ cho các trường hợp size/color rỗng
     private String buildKey(int productID, String size, String color) {
-        if ((size == null || size.isEmpty()) && (color == null || color.isEmpty())) {
-            return productID + "_default";
-        }
-        if (size == null || size.isEmpty()) return productID + "_" + color;
-        if (color == null || color.isEmpty()) return productID + "_" + size;
-        return productID + "_" + size + "_" + color;
-    }
+    String sizePart = (size == null || size.trim().isEmpty()) ? "N/A" : size.trim();
+    String colorPart = (color == null || color.trim().isEmpty()) ? "N/A" : color.trim();
+    return productID + "_" + sizePart + "_" + colorPart;
+}
+
 
     // Sửa addToCart: thêm tham số size và color để phân biệt biến thể rõ ràng
     public void addToCart(ProductDTO product, int quantity, String size, String color) {
