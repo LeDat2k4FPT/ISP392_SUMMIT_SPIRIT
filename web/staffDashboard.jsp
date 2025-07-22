@@ -1,88 +1,76 @@
-<%-- 
-    Document   : staffDashboard
-    Created on : Jun 18, 2025
-    Author     : Admin
---%>
-
-<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<%@page contentType="text/html" pageEncoding="UTF-8"%>
 <%@ page import="dto.UserDTO" %>
 <%
-    UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
-    if (user == null || !"Staff".equals(user.getRole())) {
+    UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+    if (loginUser == null || !"Staff".equals(loginUser.getRole())) {
         response.sendRedirect("login.jsp");
         return;
     }
+
+    String currentPage = (String) request.getAttribute("page");
+    if (currentPage == null) {
+        currentPage = request.getParameter("page") != null ? request.getParameter("page") : "staff/home.jsp";
+    }
+
+    String productIDParam = request.getParameter("productID");
+    if (productIDParam == null) productIDParam = "";
 %>
+
 <!DOCTYPE html>
 <html>
-    <head>
-        <meta charset="UTF-8">
-        <title>Staff Dashboard</title>
-        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
-        <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
-        <link rel="stylesheet" href="css/staff.css">
-        <script>
-            function loadContent(page, msg, type = 'success') {
-                fetch(page)
-                        .then(res => res.text())
-                        .then(html => {
-                            const mainContent = document.getElementById("main-content");
-                            let alertBox = "";
-                            if (msg) {
-                                alertBox = '<div class="alert alert-' + type + '">' + msg + '</div>';
-                            }
-                            mainContent.innerHTML = alertBox + html;
+<head>
+    <meta charset="UTF-8">
+    <title>Staff Panel</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/staff.css">
+</head>
+<body>
 
-                            setTimeout(() => {
-                                const alert = document.querySelector(".alert");
-                                if (alert)
-                                    alert.remove();
-                            }, 3000);
-                        });
-            }
+    <!-- TOP BAR -->
+    <div class="top-bar-custom d-flex justify-content-between align-items-center">
+        <span>Hello, <%= loginUser.getFullName() %></span>
+    </div>
 
-            window.addEventListener("DOMContentLoaded", () => {
-                const urlParams = new URLSearchParams(window.location.search);
-                const page = urlParams.get("page");
-                const msg = urlParams.get("msg");
-                const type = urlParams.get("type") || "success";
-                if (page) {
-                    loadContent(page, msg, type);
-                }
-            });
-        </script>
-    </head>
-    <body>
-        <div class="top-bar">
-            <span>Hello, <%= user.getFullName() %></span>         
-        </div>
-        <div class="layout">
-            <aside class="sidebar">
-                <nav class="menu">
-                    <button onclick="loadContent('staff/home.jsp')">Home</button>
-                    <button onclick="loadContent('ProductListController')">Product</button>
-                    <button onclick="loadContent('staff/orderlist.jsp')">Order</button>
-                </nav>
-                <form action="LogoutController" method="post">
-                    <button class="logout-btn">Logout</button>
+    <!-- MAIN LAYOUT -->
+    <div class="main-layout">
+        <!-- SIDEBAR -->
+        <nav class="sidebar-custom">
+            <ul class="nav flex-column">
+                <li class="nav-item">
+                    <a class="nav-link <%= "staff/home.jsp".equals(currentPage) ? "active" : "" %>" 
+                       href="staffDashboard.jsp?page=staff/home.jsp">
+                        <i class="bi bi-house"></i> Home
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= "staff/orderlist.jsp".equals(currentPage) ? "active" : "" %>" 
+                       href="staffDashboard.jsp?page=staff/orderlist.jsp">
+                        <i class="bi bi-list-check"></i> Orders
+                    </a>
+                </li>
+                <li class="nav-item">
+                    <a class="nav-link <%= "staff/productlist.jsp".equals(currentPage) ? "active" : "" %>" 
+                       href="ProductListController">
+                        <i class="bi bi-list-check"></i> Product
+                    </a> 
+                </li>
+            </ul>
+            <div class="logout-container">
+                <form action="LogoutController" method="post" class="m-0">
+                    <button class="logout-btn btn"><i class="bi bi-power"></i> Logout</button>
                 </form>
-            </aside>
-            <main id="main-content" class="main-content">
-                <%
-     String includePage = request.getParameter("page");
-     if (includePage != null && includePage.contains("?")) {
-         String[] parts = includePage.split("\\?", 2);
-         request.getRequestDispatcher(parts[0] + "?" + parts[1]).include(request, response);
-     } else if (includePage != null) {
-         request.getRequestDispatcher(includePage).include(request, response);
-     } else {
-                %>
-                <h2>Welcome to Staff Dashboard</h2>
-                <p>Select a menu on the left to manage the system.</p>
-                <%
-                    }
-                %>
-            </main>
-        </div>
-    </body>
+            </div>
+        </nav>
+
+        <!-- CONTENT AREA -->
+        <main class="main-content">
+            <jsp:include page="<%= currentPage %>">
+                <jsp:param name="productID" value="<%= productIDParam %>" />
+            </jsp:include>
+        </main>
+    </div>
+
+    <script src="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/js/bootstrap.bundle.min.js"></script>
+</body>
 </html>

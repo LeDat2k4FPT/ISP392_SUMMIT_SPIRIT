@@ -84,7 +84,7 @@
                     <p><strong>Quantity:</strong> <%= od.getQuantity() %></p>
                     <p><strong>Unit Price:</strong> <%= nf.format(od.getUnitPrice()) %> ₫</p>
 
-                    <%-- ✅ Thêm nút Review nếu đơn hàng đã giao --%>
+                    <%--  Thêm nút Review nếu đơn hàng đã giao --%>
 <% if ("Delivered".equalsIgnoreCase(order.getStatus())) { 
        String fullAddress = userInfo != null ? userInfo.getAddress() + ", " + userInfo.getDistrict() + ", " + userInfo.getCity() + ", " + userInfo.getCountry() : "";
 %>

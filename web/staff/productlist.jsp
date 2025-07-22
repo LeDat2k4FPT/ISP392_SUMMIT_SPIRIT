@@ -1,128 +1,152 @@
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
-<%@ page import="java.util.List" %>
-<%@ page import="java.util.Map" %>
-<%@ page import="dto.ProductDTO" %>
-<%@ page import="dto.ProductVariantDTO" %>
-<%@ page import="java.util.Comparator" %>
+<%@ page import="java.util.List, java.util.Map, dto.ProductDTO, dto.ProductVariantDTO, java.util.Comparator" %>
+
 <%
-    String keyword = request.getParameter("keyword");
+    String keyword = (String) session.getAttribute("keyword");
     if (keyword == null) keyword = "";
-%>
-<%
-    List<ProductDTO> productList = (List<ProductDTO>) request.getAttribute("productList");
-    Map<Integer, List<ProductVariantDTO>> variantMap = (Map<Integer, List<ProductVariantDTO>>) request.getAttribute("variantMap");
+
+    List<ProductDTO> productList = (List<ProductDTO>) session.getAttribute("productList");
+    if (productList == null) {
+        response.sendRedirect(request.getContextPath() + "/ProductListController");
+        return;
+    }
+    Map<Integer, List<ProductVariantDTO>> variantMap = (Map<Integer, List<ProductVariantDTO>>) session.getAttribute("variantMap");
+
     if (productList != null) {
-        productList.sort(java.util.Comparator.comparingInt(dto.ProductDTO::getProductID));
+        productList.sort(Comparator.comparingInt(ProductDTO::getProductID));
     }
-%>
-<%
-    String msg = (String) request.getAttribute("message");
-    if (msg != null) {
-%>
-<div class="success-box"><%= msg %></div>
-<%
-    }
+
+    String msg = request.getParameter("msg");
+    String type = request.getParameter("type");
 %>
 
+<head>
+    <meta charset="UTF-8">
+    <title>Product</title>
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link rel="stylesheet" href="<%= request.getContextPath() %>/css/productList.css">
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
-<form class="search-form" action="<%=request.getContextPath()%>/ProductListController" method="get">
-    <input type="text" name="keyword" value="<%= request.getParameter("keyword") != null ? request.getParameter("keyword") : "" %>"
-           placeholder="🔍 Search product name..."/>
-    <button type="submit">Search</button>
-</form>
+</head>
 
+<% if (msg != null && type != null) { %>
+<div class="alert alert-<%= type %>" role="alert" style="margin-top: 10px;">
+    <%= msg %>
+</div>
+<script>
+    setTimeout(() => {
+        const alert = document.querySelector('.alert');
+        if (alert)
+            alert.style.display = 'none';
+    }, 3000);
+</script>
+<% } %>
 <div class="product-section">
-    <div class="product-header">
-        <h2>📦 Product</h2>
-        <button onclick="loadContent('staff/mnproduct.jsp')" class="btn-add"> ➕ Add product</button>
-    </div>
+    <div class="product-box shadow-sm rounded-4 p-4 bg-white">
 
-    <div class="product-table-wrapper">
-        <table class="product-table">
-            <thead>
-                <tr>
-                    <th rowspan="2">ID</th>
-                    <th rowspan="2">Product name</th>
-                    <th rowspan="2">Category</th>
-                    <th colspan="4" style="text-align:center;">Variant</th>
-                    <th rowspan="2">Stock</th>
-                    <th rowspan="2">Status</th>
-                    <th rowspan="2">Actions</th>
-                </tr>
-                <tr>
-                    <th style="text-align:center;">Size</th>
-                    <th style="text-align:center;">Color</th>
-                    <th style="text-align:center;">Quantity</th>
-                    <th style="text-align:center;">Price</th>
-                </tr>
-            </thead>
-            <tbody>
-                <%
-                    if (productList != null && !productList.isEmpty()) {
-                        for (ProductDTO p : productList) {
-                            // ✅ Chỉ bỏ qua nếu status rõ ràng là inactive
-                            if (p.getStatus() != null && !"active".equalsIgnoreCase(p.getStatus())) {
-                                continue;
-                            }
+        <!-- 👇 Đây là phần đã chỉnh đúng -->
+        <div class="product-header">
+            <h2>📦 Product</h2>
+            <a href="staffDashboard.jsp?page=staff/addProduct.jsp" class="btn btn-add-product">
+                <i class="bi bi-plus-circle"></i> Add Product
+            </a>
+        </div>
 
-                            List<ProductVariantDTO> variants = variantMap != null ? variantMap.get(p.getProductID()) : null;
-                            if (variants != null) {
-                                variants.sort(Comparator.comparing(ProductVariantDTO::getSizeName, Comparator.nullsLast(String::compareTo))
-                                    .thenComparing(ProductVariantDTO::getColorName, Comparator.nullsLast(String::compareTo)));
-                            }
-                            int variantCount = (variants != null) ? variants.size() : 0;
-                            boolean firstRow = true;
-                            if (variantCount > 0) {
-                                for (ProductVariantDTO v : variants) {
-                %>
-                <tr>
-                    <% if (firstRow) { %>
-                    <td rowspan="<%= variantCount %>"><%= p.getProductID() %></td>
-                    <td rowspan="<%= variantCount %>"><%= p.getProductName() %></td>
-                    <td rowspan="<%= variantCount %>"><%= p.getCateName() %></td>
-                    <% } %>
-                    <td style="text-align:center;"><%= v.getSizeName() != null ? v.getSizeName() : "" %></td>
-                    <td style="text-align:center;"><%= v.getColorName() != null ? v.getColorName() : "" %></td>
-                    <td style="text-align:center;"><%= v.getQuantity() != 0 ? v.getQuantity() : "" %></td>
-                    <td style="text-align:center;"><%= v.getPrice() != 0 ? String.format("%,.0f", v.getPrice()) : "" %></td>
-                    <% if (firstRow) { %>
-                    <td rowspan="<%= variantCount %>"><%= p.getStock() %></td>
-                    <td rowspan="<%= variantCount %>"><%= p.getStatus() != null ? p.getStatus() : "active" %></td>
-                    <td rowspan="<%= variantCount %>" class="actions">
-                        <a href="<%= request.getContextPath()%>/EditProductController?productID=<%= p.getProductID() %>" title="Edit">🖋️</a>
-                        <a href="<%= request.getContextPath()%>/DeleteProductController?productID=<%= p.getProductID() %>"
-                           title="Deactivate"
-                           onclick="return confirm('Are you sure you want to deactivate this product?')">🗑️</a>
-                    </td>
-                    <% } %>
-                </tr>
-                <%
-                                    firstRow = false;
+        <form class="search-form" action="<%=request.getContextPath()%>/ProductListController" method="get">
+            <input type="text" name="keyword" value="<%= keyword %>" placeholder="Search product name..." />
+            <button type="submit">Search</button>
+        </form>
+
+        <div class="product-table-wrapper">
+            <table class="product-table">
+                <thead>
+                    <tr>
+                        <th rowspan="2">ID</th>
+                        <th rowspan="2">Product name</th>
+                        <th rowspan="2">Category</th>
+                        <th colspan="4" style="text-align:center;">Variant</th>
+                        <th rowspan="2">Stock</th>
+                        <th rowspan="2">Status</th>
+                        <th rowspan="2">Actions</th>
+                    </tr>
+                    <tr>
+                        <th>Size</th>
+                        <th>Color</th>
+                        <th>Quantity</th>
+                        <th>Price</th>
+                    </tr>
+                </thead>
+                <tbody>
+                    <%
+                        if (productList != null && !productList.isEmpty()) {
+                            for (ProductDTO p : productList) {
+                                if (p.getStatus() != null && !"active".equalsIgnoreCase(p.getStatus())) continue;
+                                List<ProductVariantDTO> variants = variantMap != null ? variantMap.get(p.getProductID()) : null;
+                                if (variants != null) {
+                                    variants.sort(Comparator
+                                        .comparing(ProductVariantDTO::getSizeName, Comparator.nullsLast(String::compareTo))
+                                        .thenComparing(ProductVariantDTO::getColorName, Comparator.nullsLast(String::compareTo)));
                                 }
-                            } else {
-                %>
-                <tr>
-                    <td><%= p.getProductID() %></td>
-                    <td><%= p.getProductName() %></td>
-                    <td><%= p.getCateName() %></td>
-                    <td colspan="4" style="text-align:center;">No variants</td>
-                    <td><%= p.getStock() %></td>
-                    <td><%= p.getStatus() != null ? p.getStatus() : "active" %></td>
-                    <td class="actions">
-                        <a href="<%= request.getContextPath()%>/EditProductController?productID=<%= p.getProductID() %>" title="Edit">🖋️</a>
-                        <a href="<%= request.getContextPath()%>/DeleteProductController?productID=<%= p.getProductID() %>"
-                           title="Deactivate"
-                           onclick="return confirm('Are you sure you want to deactivate this product?')">🗑️</a>
-                    </td>
-                </tr>
-                <%
+                                int rowCount = (variants != null) ? variants.size() : 0;
+                                boolean firstRow = true;
+
+                                if (rowCount > 0) {
+                                    for (ProductVariantDTO v : variants) {
+                    %>
+                    <tr>
+                        <% if (firstRow) { %>
+                        <td rowspan="<%= rowCount %>"><%= p.getProductID() %></td>
+                        <td rowspan="<%= rowCount %>"><%= p.getProductName() %></td>
+                        <td rowspan="<%= rowCount %>"><%= p.getCateName() %></td>
+                        <% } %>
+                        <td><%= v.getSizeName() != null ? v.getSizeName() : "" %></td>
+                        <td><%= v.getColorName() != null ? v.getColorName() : "" %></td>
+                        <td><%= v.getQuantity() != 0 ? v.getQuantity() : "" %></td>
+                        <td><%= v.getPrice() != 0 ? String.format("%,.0f", v.getPrice()) : "" %></td>
+                        <% if (firstRow) { %>
+                        <td rowspan="<%= rowCount %>"><%= p.getStock() %></td>
+                        <td rowspan="<%= rowCount %>"><%= p.getStatus() != null ? p.getStatus() : "active" %></td>
+                        <td rowspan="<%= rowCount %>" class="actions">
+                            <a href="<%= request.getContextPath() %>/EditProductController?productID=<%= p.getProductID() %>">🖋️</a>
+                            <a href="<%= request.getContextPath() %>/DeleteProductController?productID=<%= p.getProductID() %>"
+                               onclick="return confirm('Are you sure you want to deactivate this product?')">🗑️</a>
+                        </td>
+                        <% } %>
+                    </tr>
+                    <%
+                                        firstRow = false;
+                                    }
+                                } else {
+                    %>
+                    <tr>
+                        <td><%= p.getProductID() %></td>
+                        <td><%= p.getProductName() %></td>
+                        <td><%= p.getCateName() %></td>
+                        <td colspan="4" style="text-align:center;">No variants</td>
+                        <td><%= p.getStock() %></td>
+                        <td><%= p.getStatus() != null ? p.getStatus() : "active" %></td>
+                        <td class="actions">
+                            <a href="EditProductController?productID=<%= p.getProductID() %>">🖋️</a>
+                            <a href="<%= request.getContextPath() %>/DeleteProductController?productID=<%= p.getProductID() %>"
+                               onclick="return confirm('Are you sure you want to deactivate this product?')">🗑️</a>
+                        </td>
+                    </tr>
+                    <%
+                                }
                             }
-                        }
-                    } else {
-                %>
-                <tr><td colspan="10" class="no-data">No products found.</td></tr>
-                <% } %>
-            </tbody>
-        </table>
+                        } else {
+                    %>
+                    <tr><td colspan="10" class="no-data">No products found.</td></tr>
+                    <% } %>
+                </tbody>
+            </table>
+        </div> <!-- đóng product-box -->
     </div>
 </div>
+
+
+<%
+    session.removeAttribute("productList");
+    session.removeAttribute("variantMap");
+    session.removeAttribute("keyword");
+%>

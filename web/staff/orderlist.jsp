@@ -11,6 +11,17 @@
         return;
     }
 %>
+<%
+    String msg = request.getParameter("msg");
+    String type = request.getParameter("type"); // success, danger, etc.
+    if (msg != null && type != null) {
+%>
+<div class="alert alert-<%= type %>" role="alert" style="margin-top: 10px;">
+    <%= msg %>
+</div>
+<%
+    }
+%>
 <html>
     <head>
         <title>Order List</title>
@@ -23,10 +34,12 @@
             <div class="order-header">
                 <h2>Order List</h2>
             </div>
-            
-            <form class="search-form" action="<%=request.getContextPath()%>/staff/orderlist.jsp" method="get">
-                <input type="text" name="keyword" value="<%= request.getParameter("keyword") != null ? request.getParameter("keyword") : "" %>"
-                       placeholder="Search by customer name, status, or ID"/>
+
+            <form class="search-form" action="<%= request.getContextPath() %>/staffDashboard.jsp" method="get">
+                <input type="hidden" name="page" value="staff/orderlist.jsp" />
+                <input type="text" name="keyword"
+                       value="<%= request.getParameter("keyword") != null ? request.getParameter("keyword") : "" %>"
+                       placeholder="Search by customer name, email, status, or ID" />
                 <button type="submit">Search</button>
             </form>
 
@@ -77,10 +90,7 @@
                                 </form>
                             </td>
                             <td>
-                                <button onclick="loadContent('OrderDetailController?orderID=<%=o.getOrderID()%>')">
-                                    View Detail
-                                </button>
-
+                                <a href="<%= request.getContextPath() %>/OrderDetailController?orderID=<%=o.getOrderID()%>" class="view-btn">View Detail</a>
                             </td>
 
                         </tr>
@@ -95,10 +105,17 @@
                     </tbody>
                 </table>      
             </div>
-            <div class="back-btn-container">
-                <a class="btn" href="<%= request.getContextPath() %>/staffDashboard.jsp?page=staff/orderlist.jsp">Order List</a>
-            </div>
         </div>
-
+        <script>
+            // Tự động ẩn alert sau 3 giây
+            setTimeout(function () {
+                const alertBox = document.querySelector('.alert');
+                if (alertBox) {
+                    alertBox.style.transition = "opacity 0.5s ease-out";
+                    alertBox.style.opacity = "0";
+                    setTimeout(() => alertBox.remove(), 500); // Xoá khỏi DOM sau khi ẩn
+                }
+            }, 3000);
+        </script>
     </body>
 </html>

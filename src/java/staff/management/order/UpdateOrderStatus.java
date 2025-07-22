@@ -99,7 +99,7 @@ public class UpdateOrderStatus extends HttpServlet {
 
             if (updated) {
                 System.out.println("[SERVLET] Update successful.");
-                message = "Update successful";
+                message = "Update successfully!!!";
                 type = "success";
             } else {
                 System.out.println("[SERVLET] Update failed.");

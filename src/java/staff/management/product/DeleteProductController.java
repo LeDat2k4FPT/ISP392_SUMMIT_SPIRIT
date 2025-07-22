@@ -21,12 +21,8 @@ import java.net.URLEncoder;
 @WebServlet(name = "DeleteProductController", urlPatterns = {"/DeleteProductController"})
 public class DeleteProductController extends HttpServlet {
 
-    private static final String ERROR = "error.jsp";
-    private static final String SUCCESS = "staffDashboard.jsp?page=staff/productlist.jsp";
-
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String url = ERROR;
 
         try {
             int productID = Integer.parseInt(request.getParameter("productID"));
@@ -34,59 +30,38 @@ public class DeleteProductController extends HttpServlet {
 
             boolean deleted = dao.deleteProductByID(productID);
 
+            String msg, type;
             if (deleted) {
-                url = SUCCESS;
+                msg = "Delete product successfully !";
+                type = "success";
             } else {
-                request.setAttribute("error", "Failed to delete product.");
+                msg = "Failed to delete product.";
+                type = "danger";
             }
+
+            // Redirect về ProductListController kèm thông báo
+            response.sendRedirect(request.getContextPath() + "/ProductListController?msg="
+                    + URLEncoder.encode(msg, "UTF-8") + "&type=" + type);
+
         } catch (Exception e) {
             log("Error at DeleteProductController: " + e.getMessage());
-            request.setAttribute("error", "Error: " + e.getMessage());
-            request.getRequestDispatcher(ERROR).forward(request, response);
-            return;
-        } finally {
-            String msg = URLEncoder.encode("Delete product successfully !", "UTF-8");
-            response.sendRedirect("staffDashboard.jsp?page=staff/productlist.jsp&msg=" + msg + "&type=sucess");
+
+            // Lỗi nghiêm trọng → redirect kèm lỗi
+            String msg = "Lỗi: " + e.getMessage();
+            response.sendRedirect(request.getContextPath() + "/ProductListController?msg="
+                    + URLEncoder.encode(msg, "UTF-8") + "&type=danger");
         }
     }
 
-    // <editor-fold defaultstate="collapsed" desc="HttpServlet methods. Click on the + sign on the left to edit the code.">
-    /**
-     * Handles the HTTP <code>GET</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
 
-    /**
-     * Handles the HTTP <code>POST</code> method.
-     *
-     * @param request servlet request
-     * @param response servlet response
-     * @throws ServletException if a servlet-specific error occurs
-     * @throws IOException if an I/O error occurs
-     */
     @Override
     protected void doPost(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
         processRequest(request, response);
     }
-
-    /**
-     * Returns a short description of the servlet.
-     *
-     * @return a String containing servlet description
-     */
-    @Override
-    public String getServletInfo() {
-        return "Controller to delete a product by ID";
-    }// </editor-fold>
-
 }

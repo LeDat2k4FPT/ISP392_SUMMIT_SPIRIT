@@ -102,7 +102,8 @@ public class UpdateProductController extends HttpServlet {
             }
 
             if (updated) {
-                response.sendRedirect("ProductListController?success=1");
+                response.sendRedirect("ProductListController?msg=UPDATE Product Success!!!&type=success");
+
             } else {
                 request.setAttribute("error", "Cập nhật sản phẩm thất bại!");
                 request.getRequestDispatcher("staff/editproduct.jsp").forward(request, response);

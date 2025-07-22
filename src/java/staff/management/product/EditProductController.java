@@ -11,31 +11,29 @@ import java.io.IOException;
 
 @WebServlet(name = "EditProductController", urlPatterns = {"/EditProductController"})
 public class EditProductController extends HttpServlet {
-    private static final String ERROR = "error.jsp";
-    private static final String SUCCESS = "staff/editproduct.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        String url = ERROR;
-
         try {
             int productID = Integer.parseInt(request.getParameter("productID"));
             ProductDAO dao = new ProductDAO();
-            
-            // ✅ Sửa tại đây để không lọc Status
+
             ProductDTO product = dao.getProductByID(productID);
 
             if (product != null) {
-                request.setAttribute("PRODUCT", product);
-                url = SUCCESS;
+                request.getSession().setAttribute("PRODUCT", product);
+
+                // Redirect thay vì forward
+                request.setAttribute("page", "staff/editproduct.jsp");
+                request.getSession().setAttribute("PRODUCT", product);
+                request.getRequestDispatcher("staffDashboard.jsp").forward(request, response);
+
             } else {
-                request.setAttribute("error", "Product not found!");
+                response.sendRedirect("staffDashboard.jsp?page=staff/productlist.jsp&msg=Product+not+found&type=danger");
             }
         } catch (Exception e) {
-            log("Error at EditProductController: " + e.getMessage());
-            request.setAttribute("error", "Error: " + e.getMessage());
-        } finally {
-            request.getRequestDispatcher(url).forward(request, response);
+            e.printStackTrace();
+            response.sendRedirect("staffDashboard.jsp?page=staff/productlist.jsp&msg=Error+loading+product&type=danger");
         }
     }
 

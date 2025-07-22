@@ -4,7 +4,6 @@
     Author     : Hanne
 --%>
 
-<div style="padding: 40px; text-align: center;">
-    <h2>Welcome to Staff Dashboard</h2>
-    <p>Select a menu on the left to manage the system.</p>
-</div> 
+<%@ page contentType="text/html;charset=UTF-8" language="java" %>
+<h2>Welcome to Staff Dashboard</h2>
+<p>Select an option from the sidebar.</p>

@@ -106,7 +106,7 @@ public class AddProductController extends HttpServlet {
 
             System.out.println("[DEBUG] END AddProductController SUCCESS");
             response.sendRedirect(request.getContextPath() + "/ProductListController?msg=" 
-                + URLEncoder.encode("Product added successfully", "UTF-8"));
+                + URLEncoder.encode("Product added successfully", "UTF-8")+ "&type=success");
 
         } catch (Exception e) {
             e.printStackTrace();

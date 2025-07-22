@@ -15,7 +15,6 @@ body {
     color: #333;
 }
 
-/* Container card giống product list */
 .order-section {
     background: #ffffff;
     padding: 24px;
@@ -30,7 +29,7 @@ body {
     display: flex;
     justify-content: space-between;
     align-items: center;
-    margin-bottom: 20px;
+    
 }
 
 .order-header h2 {
@@ -129,19 +128,12 @@ td button:hover{
 td form button:hover {
     background-color: #234C45;
 }
-.back-btn-container {
-    margin-top: 30px;
-}
 
-.back-btn-container .btn {
-    font-size: 15px;
-    padding: 10px 20px;
+.alert-danger {
+    background-color: #f8d7da;
+    color: #842029;
+    border: 1px solid #f5c2c7;
+    padding: 10px 15px;
     border-radius: 6px;
-    color: black;
-    text-decoration: none;
-
-}
-.back-btn-container .btn:hover {
-    background-color: #195181;
-    color: #fff;
+    margin-bottom: 20px;
 }

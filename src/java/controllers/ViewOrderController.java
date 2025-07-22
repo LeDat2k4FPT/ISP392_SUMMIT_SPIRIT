@@ -16,14 +16,12 @@ public class ViewOrderController extends HttpServlet {
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
-        
-        
+
         HttpSession session = request.getSession();
         UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
 
-        
         if (loginUser == null) {
-            
+
             response.sendRedirect("login.jsp");
             return;
         }
@@ -32,22 +30,20 @@ public class ViewOrderController extends HttpServlet {
         OrderDAO orderDAO = new OrderDAO();
 
         try {
-            
+
             List<OrderDTO> orderList = orderDAO.getOrdersByUser(userID);
-            
-            
+
             if (orderList != null && !orderList.isEmpty()) {
                 request.setAttribute("ORDER_LIST", orderList);
             } else {
                 request.setAttribute("MESSAGE", "Bạn chưa có đơn hàng nào.");
             }
         } catch (Exception e) {
-            
+
             e.printStackTrace();
             request.setAttribute("ERROR", "Đã xảy ra lỗi khi lấy thông tin đơn hàng. Vui lòng thử lại sau.");
         }
 
-        
         request.getRequestDispatcher("orderHistory.jsp").forward(request, response);
     }
 

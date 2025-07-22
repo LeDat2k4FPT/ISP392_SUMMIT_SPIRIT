@@ -171,6 +171,8 @@ public class ProductDTO {
     public void setAttributeID(int attributeID) {
         this.attributeID = attributeID;
     }
+    
+    
 
     // === COPY CONSTRUCTOR: Tạo đối tượng ProductDTO mới dựa trên 1 ProductDTO khác ===
     public ProductDTO(ProductDTO other) {
