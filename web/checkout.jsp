@@ -209,7 +209,7 @@
                     <% } %>
 
                     <div class="footer-buttons">
-                        <a href="cart.jsp" class="back-btn">← Return To Cart</a>
+                        <a href="javascript:history.back()" class="back-btn">← Back</a>
                         <% if (product != null) {
                             double total = product.getPrice() * quantity;
                             double shipFee = 30000;
