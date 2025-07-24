@@ -71,31 +71,21 @@
 
                             if (orders != null && !orders.isEmpty()) {
                                 for (OrderDTO o : orders) {
+                                    if ("Processing".equals(o.getStatus())) {
                         %>
                         <tr>
                             <td><%= index++ %></td> 
                             <td><%= o.getFullName() %></td>
                             <td><%= o.getOrderDate() %></td>
                             <td><%= String.format("%,.0f", o.getTotalAmount()) %></td>
-                            <td>
-                                <form action="<%=request.getContextPath()%>/UpdateOrderStatus" method="post" style="display:inline;">
-                                    <input type="hidden" name="orderID" value="<%= o.getOrderID() %>"/>
-                                    <select name="status">
-                                        <option value="Processing" <%= "Processing".equals(o.getStatus()) ? "selected":"" %>>Processing</option>
-                                        <option value="Shipped" <%= "Shipped".equals(o.getStatus()) ? "selected":"" %>>Shipped</option>
-                                        <option value="Delivered" <%= "Delivered".equals(o.getStatus()) ? "selected":"" %>>Delivered</option>
-                                        <option value="Cancelled" <%= "Cancelled".equals(o.getStatus()) ? "selected":"" %>>Cancelled</option>
-                                    </select>
-                                    <button type="submit">Update</button>
-                                </form>
-                            </td>
+                            <td><%= o.getStatus() %></td>
                             <td>
                                 <a href="<%= request.getContextPath() %>/OrderDetailController?orderID=<%=o.getOrderID()%>" class="view-btn">View Detail</a>
                             </td>
-
                         </tr>
                         <%
-                                }
+                                    } // end if
+                                } // end for
                             } else {
                         %>
                         <tr><td colspan="6" style="text-align:center; color:#999;">No orders found.</td></tr>
@@ -113,9 +103,10 @@
                 if (alertBox) {
                     alertBox.style.transition = "opacity 0.5s ease-out";
                     alertBox.style.opacity = "0";
-                    setTimeout(() => alertBox.remove(), 500); // Xoá khỏi DOM sau khi ẩn
+                    setTimeout(() => alertBox.remove(), 500);
                 }
             }, 3000);
         </script>
     </body>
 </html>
+    
