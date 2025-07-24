@@ -63,7 +63,7 @@ form.search-form button {
 }
 
 form.search-form button:hover {
-    background-color: #195181;
+    background-color: #28a745;
 }
 
 /* Table */
@@ -136,4 +136,17 @@ td form button:hover {
     padding: 10px 15px;
     border-radius: 6px;
     margin-bottom: 20px;
+}
+.view-btn{
+    text-decoration: none;
+    padding: 6px 12px;
+    background-color: #234C45;
+    color: white;
+    border: none;
+    border-radius: 6px;
+    cursor: pointer;
+    font-size: 14px;
+}
+.view-btn:hover{
+    background-color: #28a745
 }
