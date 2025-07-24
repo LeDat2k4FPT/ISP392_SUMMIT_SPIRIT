@@ -43,6 +43,25 @@ public class OrderDAO {
         }
         return list;
     }
+    public List<OrderDTO> getOrdersByStatus(String status) throws SQLException, ClassNotFoundException {
+    List<OrderDTO> list = new ArrayList<>();
+    String sql = "SELECT * FROM Orders WHERE Status = ?";
+    try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        ps.setString(1, status);
+        ResultSet rs = ps.executeQuery();
+        while (rs.next()) {
+            OrderDTO dto = new OrderDTO();
+            dto.setOrderID(rs.getInt("OrderID"));
+            dto.setUserID(rs.getInt("UserID"));
+            dto.setOrderDate(rs.getDate("OrderDate"));
+            dto.setStatus(rs.getString("Status"));
+            dto.setTotalAmount(rs.getDouble("TotalAmount"));
+            dto.setNote(rs.getString("Note"));
+            list.add(dto);
+        }
+    }
+    return list;
+}
 
     public OrderDTO getOrderById(int orderID) throws SQLException, ClassNotFoundException {
         OrderDTO order = null;
@@ -465,6 +484,28 @@ public class OrderDAO {
         }
         return order;
     }
+    public List<OrderDTO> getPackedOrders() throws SQLException {
+    List<OrderDTO> list = new ArrayList<>();
+    String sql = "SELECT * FROM Orders WHERE Status = 'Packed'";
+
+    try (Connection con = DBUtils.getConnection();
+         PreparedStatement ps = con.prepareStatement(sql);
+         ResultSet rs = ps.executeQuery()) {
+
+        while (rs.next()) {
+            OrderDTO order = new OrderDTO(
+                rs.getInt("OrderID"),
+                rs.getInt("UserID"),
+                rs.getDate("OrderDate"),
+                rs.getDouble("TotalAmount"),
+                rs.getString("Status")
+            );
+            list.add(order);
+        }
+    }
+    return list;
+}
+
     
 public UserAddressDTO getUserAddressInfoByOrderId(int orderId) {
     UserAddressDTO info = null;
@@ -491,6 +532,22 @@ public UserAddressDTO getUserAddressInfoByOrderId(int orderId) {
     }
     return info;
 }
+public boolean assignShipper(int orderID, int shipperID) throws SQLException, ClassNotFoundException {
+    String sql = "INSERT INTO Shipping (OrderID, UserID) VALUES (?, ?); " +
+                 "UPDATE Orders SET Status = 'Shipped' WHERE OrderID = ?";
+    try (Connection conn = DBUtils.getConnection();
+         PreparedStatement ps1 = conn.prepareStatement("INSERT INTO Shipping (OrderID, UserID) VALUES (?, ?)");
+         PreparedStatement ps2 = conn.prepareStatement("UPDATE Orders SET Status = 'Shipped' WHERE OrderID = ?")) {
 
+        // Insert into Shipping
+        ps1.setInt(1, orderID);
+        ps1.setInt(2, shipperID);
+        ps1.executeUpdate();
+
+        // Update status to 'Shipped'
+        ps2.setInt(1, orderID);
+        return ps2.executeUpdate() > 0;
+    }
+}
 
 }

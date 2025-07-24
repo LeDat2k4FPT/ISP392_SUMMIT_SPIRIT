@@ -4,6 +4,18 @@
         <servlet-name>mnproduct</servlet-name>
         <servlet-class>mnproduct</servlet-class>
     </servlet>
+    <servlet>
+        <servlet-name>ShippingListController</servlet-name>
+        <servlet-class>ship.ShippingListController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>MarkDeliveredController</servlet-name>
+        <servlet-class>ship.MarkDeliveredController</servlet-class>
+    </servlet>
+    <servlet>
+        <servlet-name>AcceptShippingController</servlet-name>
+        <servlet-class>ship.AcceptShippingController</servlet-class>
+    </servlet>
     <servlet-mapping>
         <servlet-name>mnproduct</servlet-name>
         <url-pattern>/mnproduct</url-pattern>
@@ -18,6 +30,18 @@
         <url-pattern>/ApplyDiscountServlet</url-pattern>
     </servlet-mapping>
     <!-- Cấu hình session và trang mặc định -->
+    <servlet-mapping>
+        <servlet-name>ShippingListController</servlet-name>
+        <url-pattern>/ShippingListController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>MarkDeliveredController</servlet-name>
+        <url-pattern>/MarkDeliveredController</url-pattern>
+    </servlet-mapping>
+    <servlet-mapping>
+        <servlet-name>AcceptShippingController</servlet-name>
+        <url-pattern>/AcceptShippingController</url-pattern>
+    </servlet-mapping>
     <session-config>
         <session-timeout>30</session-timeout>
     </session-config>

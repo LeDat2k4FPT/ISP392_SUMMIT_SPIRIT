@@ -19,6 +19,8 @@ public class LoginController extends HttpServlet {
     private static final String US = "User";
     private static final String USER_PAGE = "homepage.jsp";
     private static final String ST = "Staff";
+    private static final String SHIPPER_PAGE = "ship/shipDashboard.jsp";
+    private static final String SP = "Shipper";
     private static final String STAFF_PAGE = "staffDashboard.jsp";
     private static final String INCORRECT_MESSAGE = "Incorrect Email or Password!";
     private static final String UNSUPPORT_MESSAGE = "Your role is not supported yet!";
@@ -45,6 +47,8 @@ public class LoginController extends HttpServlet {
                     url = ADMIN_PAGE;
                 } else if (US.equals(role)) {
                     url = USER_PAGE;
+                } else if (SP.equals(role)) {
+                    url = SHIPPER_PAGE;
                 } else if (ST.equals(role)) {
                     url = STAFF_PAGE;
                 } else {

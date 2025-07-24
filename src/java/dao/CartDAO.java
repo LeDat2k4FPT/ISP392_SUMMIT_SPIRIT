@@ -33,7 +33,7 @@ public class CartDAO {
                     return Optional.of(rs.getDouble("DiscountValue"));
                 }
             }
-        } catch (SQLException | ClassNotFoundException e) {
+        } catch (SQLException e) {
             System.err.println("Lỗi khi kiểm tra mã giảm giá: " + e.getMessage());
         }
 
