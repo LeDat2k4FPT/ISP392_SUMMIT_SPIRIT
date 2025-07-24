@@ -106,13 +106,36 @@
                         <%
                             String status = order.getStatus();
                             String badgeClass = "status-badge";
-                            if ("Shipped".equalsIgnoreCase(status)) badgeClass += " status-shipped";
-                            else if ("Processing".equalsIgnoreCase(status)) badgeClass += " status-processing";
-                            else if ("Cancelled".equalsIgnoreCase(status)) badgeClass += " status-canceled";
-                            else if ("Delivered".equalsIgnoreCase(status)) badgeClass += " status-delivered";
+                            String displayStatus;
+
+                            switch (status.toLowerCase()) {
+                                case "shipped":
+                                    badgeClass += " status-shipped";
+                                    displayStatus = "Shipping"; // ✅ đổi chữ hiển thị
+                                    break;
+                                case "packed":
+                                    badgeClass += " status-packed";
+                                    displayStatus = "Packed";
+                                    break;
+                                case "processing":
+                                    badgeClass += " status-processing";
+                                    displayStatus = "Processing";
+                                    break;
+                                case "cancelled":
+                                    badgeClass += " status-canceled";
+                                    displayStatus = "Cancelled";
+                                    break;
+                                case "delivered":
+                                    badgeClass += " status-delivered";
+                                    displayStatus = "Delivered";
+                                    break;
+                                default:
+                                    displayStatus = status;
+                            }
                         %>
-                        <span class="<%= badgeClass %>"><%= status %></span>
+                        <span class="<%= badgeClass %>"><%= displayStatus %></span>
                     </div>
+
                     <div><strong>Total:</strong> <%= nf.format(order.getTotalAmount()) %> ₫</div>
                 </div>
             </div>
@@ -156,7 +179,7 @@
                 </div>
                 <% } %>
             </div>
-            
+
             <% } %>
         </div>
     </body>

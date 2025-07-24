@@ -106,4 +106,7 @@ h2, h3 {
 .status-canceled {
     background: #dc3545; /* đỏ */
 }
+.status-packed {
+    background: orange; /* cam */
+}
 

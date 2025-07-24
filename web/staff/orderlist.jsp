@@ -71,21 +71,42 @@
 
                             if (orders != null && !orders.isEmpty()) {
                                 for (OrderDTO o : orders) {
-                                    if ("Processing".equals(o.getStatus())) {
                         %>
                         <tr>
                             <td><%= index++ %></td> 
                             <td><%= o.getFullName() %></td>
                             <td><%= o.getOrderDate() %></td>
                             <td><%= String.format("%,.0f", o.getTotalAmount()) %></td>
-                            <td><%= o.getStatus() %></td>
+                            <td>
+                                <form action="<%=request.getContextPath()%>/UpdateOrderStatus" method="post" style="display:inline;">
+                                    <input type="hidden" name="orderID" value="<%= o.getOrderID() %>"/>
+                                    <select name="status">
+                                        <option value="Processing" <%= "Processing".equals(o.getStatus()) ? "selected":"" %>>Processing</option>
+                                        <option value="Packed" <%= "Packed".equals(o.getStatus()) ? "selected":"" %>>Packed</option>
+                                        <option value="Shipped" <%= "Shipped".equals(o.getStatus()) ? "selected":"" %>>Shipping</option>
+                                        <option value="Delivered" <%= "Delivered".equals(o.getStatus()) ? "selected":"" %>>Delivered</option>
+                                        <option value="Cancelled" <%= "Cancelled".equals(o.getStatus()) ? "selected":"" %>>Cancelled</option>
+                                    </select>
+                                    <button type="submit">Update</button>
+                                </form>
+
+                                <%-- Hiển thị nút riêng nếu là đơn hàng Processing --%>
+                                <% if ("Processing".equals(o.getStatus())) { %>
+                                <form action="<%=request.getContextPath()%>/UpdateOrderStatus" method="post" style="display:inline;">
+                                    <input type="hidden" name="orderID" value="<%= o.getOrderID() %>" />
+                                    <input type="hidden" name="status" value="Packed" />
+                                    <button type="submit" style="margin-left: 5px;">Order is Packed</button>
+                                </form>
+                                <% } %>
+                            </td>
+
                             <td>
                                 <a href="<%= request.getContextPath() %>/OrderDetailController?orderID=<%=o.getOrderID()%>" class="view-btn">View Detail</a>
                             </td>
+
                         </tr>
                         <%
-                                    } // end if
-                                } // end for
+                                }
                             } else {
                         %>
                         <tr><td colspan="6" style="text-align:center; color:#999;">No orders found.</td></tr>
@@ -103,10 +124,9 @@
                 if (alertBox) {
                     alertBox.style.transition = "opacity 0.5s ease-out";
                     alertBox.style.opacity = "0";
-                    setTimeout(() => alertBox.remove(), 500);
+                    setTimeout(() => alertBox.remove(), 500); // Xoá khỏi DOM sau khi ẩn
                 }
             }, 3000);
         </script>
     </body>
 </html>
-    

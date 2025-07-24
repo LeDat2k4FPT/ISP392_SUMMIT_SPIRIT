@@ -56,8 +56,8 @@
                 <tr>
                     <th>UserID</th>
                     <th>Full Name</th>
-                    <th>Email</th>
                     <th>Phone</th>
+                    <th>Email</th>
                     <th>Address</th>
                     <th>Role</th>
                     <th>Action</th>
