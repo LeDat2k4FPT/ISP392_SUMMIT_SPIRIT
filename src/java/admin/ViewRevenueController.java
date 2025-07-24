@@ -15,6 +15,7 @@ import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.List;
 
 
@@ -51,7 +52,30 @@ public class ViewRevenueController extends HttpServlet {
             CategoryDAO categoryDAO = new CategoryDAO();
 
             // Lấy dữ liệu biểu đồ và bảng
-            List<RevenueDTO> revenueList = revenueDAO.getRevenueByMonthYearCategory(month, year, selectedCategory);
+List<RevenueDTO> rawRevenueList = revenueDAO.getRevenueByMonthCategory(month, selectedCategory);
+
+// Nếu lọc theo cả năm, hiển thị đủ 12 tháng
+List<RevenueDTO> revenueList = new ArrayList<>();
+if (month == 0 && year > 0) {
+    for (int m = 1; m <= 12; m++) {
+        double monthRevenue = 0;
+        for (RevenueDTO dto : rawRevenueList) {
+            if (dto.getMonth() == m) {
+                monthRevenue += dto.getTotalRevenue(); // cộng tất cả category lại
+            }
+        }
+        RevenueDTO monthlyDTO = new RevenueDTO();
+        monthlyDTO.setMonth(m);
+        monthlyDTO.setYear(year);
+        monthlyDTO.setTotalRevenue(monthRevenue);
+        revenueList.add(monthlyDTO);
+    }
+} else {
+    revenueList = rawRevenueList;
+}
+
+
+request.setAttribute("revenueList", revenueList);            
             List<RevenueDTO> topProducts = revenueDAO.getTopSellingProductsByCategory(month, year, selectedCategory);
             List<RevenueDTO> colorStats = revenueDAO.getProductColorStatsByCategory(
                     selectedCategory != null ? selectedCategory : "Clothing");

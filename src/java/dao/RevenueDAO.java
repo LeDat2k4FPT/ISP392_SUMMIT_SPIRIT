@@ -20,53 +20,50 @@ import utils.DBUtils;
  */
 public class RevenueDAO {
 // 1. Doanh thu theo tháng, năm, danh mục (Line Chart + Table)
-    public List<RevenueDTO> getRevenueByMonthYearCategory(int month, int year, String category)
+    public List<RevenueDTO> getRevenueByMonthCategory(int month, String category)
             throws SQLException, ClassNotFoundException {
         List<RevenueDTO> list = new ArrayList<>();
 
         String sql = "SELECT c.CateName, MONTH(o.OrderDate) AS Month, YEAR(o.OrderDate) AS Year, " +
-                "SUM(od.Quantity * od.UnitPrice) AS TotalRevenue, SUM(od.Quantity) AS TotalQuantity " +
-                "FROM Orders o " +
-                "JOIN OrderDetail od ON o.OrderID = od.OrderID " +
-                "JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID " +
-                "JOIN Product p ON pv.ProductID = p.ProductID " +
-                "JOIN Category c ON p.CateID = c.CateID " +
-                "WHERE o.Status = 'Delivered' ";
+            "SUM(od.Quantity * od.UnitPrice) AS TotalRevenue, SUM(od.Quantity) AS TotalQuantity " +
+            "FROM Orders o " +
+            "JOIN OrderDetail od ON o.OrderID = od.OrderID " +
+            "JOIN ProductVariant pv ON od.AttributeID = pv.AttributeID " +
+            "JOIN Product p ON pv.ProductID = p.ProductID " +
+            "JOIN Category c ON p.CateID = c.CateID " +
+            "WHERE o.Status = 'Delivered' " +
+            "AND YEAR(o.OrderDate) = 2025 "; // ✅ cố định năm 2025
 
-        if (month > 0) {
-            sql += "AND MONTH(o.OrderDate) = ? ";
-        }
-        if (year > 0) {
-            sql += "AND YEAR(o.OrderDate) = ? ";
-        }
-        if (category != null && !category.isEmpty()) {
-            sql += "AND c.CateName = ? ";
-        }
+    if (month > 0) {
+        sql += "AND MONTH(o.OrderDate) = ? ";
+    }
+    if (category != null && !category.isEmpty()) {
+        sql += "AND c.CateName = ? ";
+    }
 
-        sql += "GROUP BY c.CateName, MONTH(o.OrderDate), YEAR(o.OrderDate) " +
-               "ORDER BY Year ASC, Month ASC";
+    sql += "GROUP BY c.CateName, MONTH(o.OrderDate), YEAR(o.OrderDate) " +
+           "ORDER BY Month ASC";
 
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
-            int index = 1;
-            if (month > 0) ps.setInt(index++, month);
-            if (year > 0) ps.setInt(index++, year);
-            if (category != null && !category.isEmpty()) ps.setString(index++, category);
+    try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        int index = 1;
+        if (month > 0) ps.setInt(index++, month);
+        if (category != null && !category.isEmpty()) ps.setString(index++, category);
 
-            try (ResultSet rs = ps.executeQuery()) {
-                while (rs.next()) {
-                    RevenueDTO dto = new RevenueDTO();
-                    dto.setCategoryName(rs.getString("CateName"));
-                    dto.setMonth(rs.getInt("Month"));
-                    dto.setYear(rs.getInt("Year"));
-                    dto.setTotalRevenue(rs.getDouble("TotalRevenue"));
-                    dto.setTotalQuantity(rs.getInt("TotalQuantity"));
-                    list.add(dto);
-                }
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                RevenueDTO dto = new RevenueDTO();
+                dto.setCategoryName(rs.getString("CateName"));
+                dto.setMonth(rs.getInt("Month"));
+                dto.setYear(rs.getInt("Year")); // vẫn set được vì có trong select
+                dto.setTotalRevenue(rs.getDouble("TotalRevenue"));
+                dto.setTotalQuantity(rs.getInt("TotalQuantity"));
+                list.add(dto);
             }
         }
-
-        return list;
     }
+
+    return list;
+}
 
     // 2. Lấy top sản phẩm bán chạy nhất theo danh mục (Bar Chart)
     public List<RevenueDTO> getTopSellingProductsByCategory(int month, int year, String category)

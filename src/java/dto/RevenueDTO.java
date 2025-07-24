@@ -37,6 +37,11 @@ public class RevenueDTO {
         this.colorName = colorName;
         this.totalQuantity = totalQuantity;
     }
+// Constructor bổ sung để tạo dữ liệu mặc định khi không có doanh thu
+public RevenueDTO(int month, double totalRevenue) {
+    this.month = month;
+    this.totalRevenue = totalRevenue;
+}
 
     // Getters and Setters
 
