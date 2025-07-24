@@ -20,6 +20,9 @@ public class EditProfileController extends HttpServlet {
 
     private static final String ERROR = "profile.jsp";
     private static final String UNKNOW_MESSAGE = "Unknow error!";
+    private static final String STAFF_PAGE = "staff/staffProfile.jsp";
+    private static final String ADMIN_PAGE = "admin/admin.jsp?page=adminProfile.jsp";
+    private static final String USER_PAGE = "profile.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -65,10 +68,13 @@ public class EditProfileController extends HttpServlet {
                         session.setAttribute("LOGIN_USER", loginUser);
                     }
                     if ("Staff".equals(loginUser.getRole())) {
-                        url = "staff/staffProfile.jsp";
+                        url = STAFF_PAGE;
+                    } else if ("Admin".equals(loginUser.getRole())) {
+                        url = ADMIN_PAGE;
                     } else {
-                        url = "profile.jsp";
+                        url = USER_PAGE;
                     }
+
                 } else {
                     userError.setErrorMessage(UNKNOW_MESSAGE);
                 }

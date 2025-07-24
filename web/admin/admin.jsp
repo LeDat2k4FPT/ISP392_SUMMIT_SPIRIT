@@ -84,7 +84,7 @@
 
         <!-- TOP BAR with user dropdown -->
         <div class="top-bar-custom d-flex justify-content-between align-items-center">
-            <div>Admin Panel</div>
+            <div>Hello Admin </div>
 
             <div class="position-relative user-dropdown">
                 <i class="bi bi-person-fill user-icon" onclick="toggleDropdown()"></i>
