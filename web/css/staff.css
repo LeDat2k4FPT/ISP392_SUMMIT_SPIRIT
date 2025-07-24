@@ -293,19 +293,29 @@ form.search-form button:hover {
     background: #f9f9f9;
     font-weight: bold;
 }*/
-html, body {
+body {
     margin: 0;
     padding: 0;
-    height: 100%;
     font-family: 'Kumbh Sans', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
 }
-
 .top-bar-custom {
     background: #234C45;
     color: white;
     padding: 15px 30px;
     font-size: 18px;
     font-weight: bold;
+}
+.user-icon-link {
+    font-size: 24px;
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.user-icon-link:hover {
+    color: #007bff;
 }
 
 .main-layout {
@@ -349,21 +359,20 @@ html, body {
 }
 
 .logout-btn {
-    background-color: #234C45;
-    color: white;
-    width: 100%;
-    border: none;
-    border-radius: 8px;
-    padding: 10px;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
+    background-color: #234C45 !important;
+    color: white !important;
+    width: 100% !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: bold !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
 }
 
 .logout-btn:hover {
-    background-color: #0e2e2a;
+    background-color: #0e2e2a !important;
 }
 
 .main-content {

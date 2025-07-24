@@ -23,9 +23,10 @@
 <head>
     <meta charset="UTF-8">
     <title>Product</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
+    <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/productList.css">
-    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
 
 </head>
 
@@ -47,7 +48,7 @@
         <!-- 👇 Đây là phần đã chỉnh đúng -->
         <div class="product-header">
             <h2>📦 Product</h2>
-            <a href="staffDashboard.jsp?page=staff/addProduct.jsp" class="btn btn-add-product">
+            <a href="staffDashboard.jsp?page=staff/addProduct.jsp" class="btn-add-product">
                 <i class="bi bi-plus-circle"></i> Add Product
             </a>
         </div>

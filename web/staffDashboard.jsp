@@ -21,6 +21,7 @@
 <head>
     <meta charset="UTF-8">
     <title>Staff Panel</title>
+    <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.2/dist/css/bootstrap.min.css" rel="stylesheet">
     <link href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css" rel="stylesheet">
     <link rel="stylesheet" href="<%= request.getContextPath() %>/css/staff.css">
@@ -30,6 +31,9 @@
     <!-- TOP BAR -->
     <div class="top-bar-custom d-flex justify-content-between align-items-center">
         <span>Hello, <%= loginUser.getFullName() %></span>
+         <a href="<%= request.getContextPath() %>/staff/staffProfile.jsp" class="user-icon-link" title="Profile">
+        <i class="bi bi-person-circle"></i>
+    </a>
     </div>
 
     <!-- MAIN LAYOUT -->

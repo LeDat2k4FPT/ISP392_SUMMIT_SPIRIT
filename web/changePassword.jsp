@@ -12,7 +12,7 @@
     <body>
         <%
             UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
-            if (loginUser == null || !"User".equals(loginUser.getRole())) {
+            if (loginUser == null) {
                 response.sendRedirect("login.jsp");
                 return;
             }
@@ -43,7 +43,7 @@
                 <button type="submit" name="action" value="ChangePassword" class="btn-submit">Update Password</button>
             </form>
             <div class="text-center mt-3">
-                <a href="profile.jsp" class="back-link">Back to profile</a>
+                <button class="back-btn" onclick="history.back()">← Back</button>
             </div>
         </div>
     </body>

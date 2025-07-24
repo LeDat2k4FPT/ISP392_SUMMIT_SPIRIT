@@ -1,10 +1,11 @@
 /* ==== Container ==== */
 
-html, body {
+body {
     margin: 0;
     padding: 0;
-    height: 100%;
     font-family: 'Kumbh Sans', sans-serif;
+    background-color: #f9f9f9;
+    color: #333;
 }
 
 
@@ -34,7 +35,7 @@ html, body {
     font-size: 1.2rem;
 }
 
-.btn-add-product:h  over {
+.btn-add-product:hover {
     color: #195181;
     transform: translateY(-1px);
     text-decoration: none;

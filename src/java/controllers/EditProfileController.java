@@ -19,7 +19,6 @@ import user.UserError;
 public class EditProfileController extends HttpServlet {
 
     private static final String ERROR = "profile.jsp";
-    private static final String SUCCESS = "profile.jsp";
     private static final String UNKNOW_MESSAGE = "Unknow error!";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
@@ -65,7 +64,11 @@ public class EditProfileController extends HttpServlet {
                         loginUser.setPhone(phoneNumber);
                         session.setAttribute("LOGIN_USER", loginUser);
                     }
-                    url = SUCCESS;
+                    if ("Staff".equals(loginUser.getRole())) {
+                        url = "staff/staffProfile.jsp";
+                    } else {
+                        url = "profile.jsp";
+                    }
                 } else {
                     userError.setErrorMessage(UNKNOW_MESSAGE);
                 }
