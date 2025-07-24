@@ -71,28 +71,39 @@ public class ManageUserActionController extends HttpServlet {
      * @throws IOException if an I/O error occurs
      */
     @Override
-    protected void doPost(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
+    protected void doPost(HttpServletRequest request, HttpServletResponse response)
+            throws ServletException, IOException {
+
         int userID = Integer.parseInt(request.getParameter("userID"));
         String action = request.getParameter("action");
-         UserDAO dao = new UserDAO();
+
+        UserDAO dao = new UserDAO();
 
         try {
-            switch (action) {
-                case "editRole":
-                    dao.toggleRole(userID);
-                    break;
-                case "delete":
-                dao.deleteUser(userID); // Gọi phương thức mới trong DAO
-                break;
-                default:
-                    request.setAttribute("ERROR", "Unknown action: " + action);
+            if ("editRole".equals(action)) {
+                String newRole = request.getParameter("newRole");
+                boolean success = dao.updateUserRole(userID, newRole);
+                if (success) {
+                    request.getSession().setAttribute("message", " Role changed to " + newRole + " successfully.");
+                } else {
+                    request.getSession().setAttribute("message", "❌ Failed to update role.");
+                }
+
+            } else if ("delete".equals(action)) {
+                boolean success = dao.deleteUser(userID);
+                if (success) {
+                    request.getSession().setAttribute("message", "🗑️ User deleted successfully.");
+                } else {
+                    request.getSession().setAttribute("message", "❌ Failed to delete user.");
+                }
             }
+
         } catch (Exception e) {
             e.printStackTrace();
-            request.setAttribute("ERROR", "Failed to perform action: " + e.getMessage());
+            request.getSession().setAttribute("message", "❗ Error: " + e.getMessage());
         }
 
-        response.sendRedirect(request.getContextPath() + "/ManageUserAccountController"); // Reload the list with layer
+        response.sendRedirect(request.getContextPath() + "/ManageUserAccountController");
     }
 
     /**

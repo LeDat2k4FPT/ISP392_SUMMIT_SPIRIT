@@ -85,7 +85,6 @@ public class UpdateOrderStatus extends HttpServlet {
             response.sendRedirect("login.jsp");
             return;
         }
-
         String message;
         String type;
         try {
