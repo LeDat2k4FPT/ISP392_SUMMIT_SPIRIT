@@ -45,8 +45,7 @@
     <div class="col-md-3">
         <label>Year:</label>
         <select name="yearValue" class="form-select">
-            <option value="2025" <%= "2025".equals(selectedYear) ? "selected" : "" %>>2025</option>
-          <!--  <option value="all" <%= "all".equals(selectedYear) ? "selected" : "" %>>All</option>
+          <option value="all" <%= "all".equals(selectedYear) ? "selected" : "" %>>All</option>
             <% for (int y = 2023; y <= 2025; y++) { %>
                 <option value="<%= y %>" <%= String.valueOf(y).equals(selectedYear) ? "selected" : "" %>><%= y %></option>
             <% } %>-->

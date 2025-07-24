@@ -42,9 +42,13 @@ public class ViewRevenueController extends HttpServlet {
         if (monthRaw == null || monthRaw.isEmpty()) monthRaw = "all";
         if (yearRaw == null || yearRaw.isEmpty()) yearRaw = "all";
         if (category == null || category.isEmpty()) category = "all";
+        boolean isAll = "all".equalsIgnoreCase(monthRaw) &&
+                "all".equalsIgnoreCase(yearRaw) &&
+                "all".equalsIgnoreCase(category);
+
 
         int month = "all".equalsIgnoreCase(monthRaw) ? 0 : Integer.parseInt(monthRaw);
-        int year = "all".equalsIgnoreCase(yearRaw) ? 0 : Integer.parseInt(yearRaw);
+        int year = "all".equalsIgnoreCase(yearRaw) ? (isAll ? 2025 : 0) : Integer.parseInt(yearRaw);
         String selectedCategory = "all".equalsIgnoreCase(category) ? null : category;
 
         try {
@@ -52,7 +56,7 @@ public class ViewRevenueController extends HttpServlet {
             CategoryDAO categoryDAO = new CategoryDAO();
 
             // Lấy dữ liệu biểu đồ và bảng
-List<RevenueDTO> rawRevenueList = revenueDAO.getRevenueByMonthCategory(month, selectedCategory);
+List<RevenueDTO> rawRevenueList = revenueDAO.getRevenueByMonthYearCategory(month,year, selectedCategory);
 
 // Nếu lọc theo cả năm, hiển thị đủ 12 tháng
 List<RevenueDTO> revenueList = new ArrayList<>();
