@@ -50,13 +50,13 @@
                 <li class="nav-item">
                     <a class="nav-link <%= "staff/orderlist.jsp".equals(currentPage) ? "active" : "" %>" 
                        href="staffDashboard.jsp?page=staff/orderlist.jsp">
-                        <i class="bi bi-list-check"></i> Orders
+                        <i class="bi bi-card-checklist"></i> Orders
                     </a>
                 </li>
                 <li class="nav-item">
                     <a class="nav-link <%= "staff/productlist.jsp".equals(currentPage) ? "active" : "" %>" 
                        href="ProductListController">
-                        <i class="bi bi-list-check"></i> Product
+                        <i class="bi bi-box-seam"></i> Products
                     </a> 
                 </li>
             </ul>

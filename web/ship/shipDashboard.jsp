@@ -25,18 +25,18 @@
     </head>
     <body>
         <div class="top-bar-custom d-flex justify-content-between align-items-center">
-        <span>Hello, <%= loginUser.getFullName() %></span>
-         <a href="<%= request.getContextPath() %>/ship/shipProfile.jsp" class="user-icon-link" title="Profile">
-        <i class="bi bi-person-circle"></i>
-    </a>
-    </div>
+            <span>Hello, <%= loginUser.getFullName() %></span>
+            <a href="<%= request.getContextPath() %>/ship/shipDashboard.jsp?page=ship/shipProfile.jsp" class="user-icon-link" title="Profile">
+                <i class="bi bi-person-circle"></i>
+            </a>
+        </div>
         <div class="dashboard-container">
             <aside class="sidebar">
                 <div class="sidebar-header">
                     <i class="bi bi-truck"></i>
                     <span class="brand-name">Shipper</span>
                 </div>
-                
+
                 <nav class="sidebar-nav">
                     <a href="<%=request.getContextPath()%>/ship/shipDashboard.jsp?page=shipHome.jsp"
                        class="nav-item <%= currentPage.contains("shipHome") ? "active" : "" %>">
@@ -67,6 +67,6 @@
                 <jsp:include page="<%= currentPage %>" />
             </main>
         </div>
-            
+
     </body>
 </html>
