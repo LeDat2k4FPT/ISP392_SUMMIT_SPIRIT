@@ -5,6 +5,20 @@
 --%>
 
 <%@page contentType="text/html" pageEncoding="UTF-8"%>
+<%@page import="dto.UserDTO"%>
+<%
+    UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+    String backLink = "login.jsp";
+    if (loginUser != null) {
+        if ("Admin".equalsIgnoreCase(loginUser.getRole())) {
+            backLink = "admin/admin.jsp?page=adminProfile.jsp";
+        } else if ("User".equalsIgnoreCase(loginUser.getRole())) {
+            backLink = "profile.jsp";
+        } else if ("Staff".equalsIgnoreCase(loginUser.getRole())) {
+            backLink = "staffProfile.jsp"; // nếu có
+        }
+    }
+%>
 <!DOCTYPE html>
 <html>
     <head>
@@ -25,7 +39,10 @@
             %>
             <form action="MainController" method="POST">
                 <input type="hidden" name="action" value="ResetPassword" />
-                
+
+                <label>Current Password:</label>
+                <input type="password" name="currentPassword" required />
+
                 <label>New Password:</label>
                 <input type="password" name="newPassword" required />
 
@@ -35,7 +52,7 @@
                 <input type="submit" value="Update Password" />
                 
                 <div class="text-center mt-3">
-                    <a href="profile.jsp" class="back-link">Back to User Information Page</a>
+                    <a href="<%= backLink %>" class="back-link">Back to Your Profile</a>
                 </div>
             </form>
         </div>
