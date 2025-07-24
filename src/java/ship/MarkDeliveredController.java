@@ -2,7 +2,6 @@
  * Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
  * Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/Servlet.java to edit this template
  */
-
 /**
  *
  * @author Hanne
@@ -55,7 +54,7 @@ public class MarkDeliveredController extends HttpServlet {
 
                 // Lưu ảnh vào thư mục
                 File imageFile = new File(uploadDir, fileName);
-                try (FileOutputStream fos = new FileOutputStream(imageFile)) {
+                try ( FileOutputStream fos = new FileOutputStream(imageFile)) {
                     fos.write(imageBytes);
                 }
 
@@ -66,9 +65,15 @@ public class MarkDeliveredController extends HttpServlet {
             // Cập nhật trạng thái đơn và lưu ảnh
             OrderDAO orderDAO = new OrderDAO();
             ShippingDAO shippingDAO = new ShippingDAO();
-
+            UserDTO shipper = (UserDTO) request.getSession().getAttribute("LOGIN_USER");
             boolean orderUpdated = orderDAO.updateOrderStatus(orderID, "Delivered");
-            boolean shippingUpdated = shippingDAO.markAsDelivered(orderID, imageUrl, note);
+            if (shipper == null) {
+                response.sendRedirect("login.jsp");
+                return;
+            }
+            int userID = shipper.getUserID();
+
+            boolean shippingUpdated = shippingDAO.markAsDelivered(orderID, imageUrl, note, userID);
 
             if (orderUpdated && shippingUpdated) {
                 response.sendRedirect("DeliveryListController");

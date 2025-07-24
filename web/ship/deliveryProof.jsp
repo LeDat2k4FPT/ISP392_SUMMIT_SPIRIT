@@ -1,66 +1,70 @@
-<%-- 
-    Document   : deliveryProof
-    Created on : Jul 24, 2025, 2:12:48 AM
-    Author     : Hanne
---%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="dto.OrderDTO" %>
-
+<%@ page import="dto.UserDTO" %>
 <%
+    UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+    if (loginUser == null || !"Shipper".equals(loginUser.getRole())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
     List<OrderDTO> shippedOrders = (List<OrderDTO>) request.getAttribute("shippedOrders");
 %>
+<link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
+<link rel="stylesheet" href="<%= request.getContextPath() %>/css/deliveryProof.css" />
 
-<h2>📸 Delivery Proof - Shipped Orders</h2>
+<div class="proof-container">
+    <h2>📦 Delivery Confirmation Panel</h2>
 
-<% if (shippedOrders != null && !shippedOrders.isEmpty()) { %>
-    <% for (OrderDTO order : shippedOrders) { %>
-        <div style="border: 1px solid #ccc; padding: 15px; margin-bottom: 30px;">
-            <h3>Order ID: <%= order.getOrderID() %></h3>
-            <p>User ID: <%= order.getUserID() %></p>
-            <p>Order Date: <%= order.getOrderDate() %></p>
-            <p>Total Amount: <%= order.getTotalAmount() %> VND</p>
+    <% if (shippedOrders != null && !shippedOrders.isEmpty()) { %>
+    <div class="grid-wrapper">
+        <% for (OrderDTO order : shippedOrders) { %>
+        <div class="proof-card">
+            <div class="order-meta">
+                <h3>Order #<%= order.getOrderID() %></h3>
+                <p>User ID: <%= order.getUserID() %></p>
+                <p>Date: <%= order.getOrderDate() %></p>
+                <p>Total: <%= String.format("%,.0f", order.getTotalAmount()) %> VND</p>
+            </div>
 
-            <!-- Camera preview -->
-            <video id="video-<%= order.getOrderID() %>" width="320" height="240" autoplay style="border: 1px solid #000;"></video>
-            <canvas id="canvas-<%= order.getOrderID() %>" width="320" height="240" style="display: none;"></canvas>
-            <br>
-            <button type="button" onclick="capture(<%= order.getOrderID() %>)">📸 Chụp ảnh</button>
-            <br><br>
-            <img id="preview-<%= order.getOrderID() %>" src="" style="max-width: 320px; display: none; border: 1px solid #aaa;" />
+            <div class="capture-zone">
+                <video id="video-<%= order.getOrderID() %>" autoplay muted playsinline></video>
+                <canvas id="canvas-<%= order.getOrderID() %>" style="display: none;"></canvas>
+                <img id="preview-<%= order.getOrderID() %>" class="preview-img" style="display: none;" />
+                <button type="button" onclick="capture(<%= order.getOrderID() %>)" class="capture-btn">📷 Take Photo</button>
+            </div>
 
-            <!-- Submit Form -->
-            <form action="${pageContext.request.contextPath}/MarkDeliveredController" method="post">
+            <form action="<%= request.getContextPath() %>/MarkDeliveredController" method="post" class="proof-form">
                 <input type="hidden" name="orderID" value="<%= order.getOrderID() %>">
                 <input type="hidden" name="imageData" id="imageData-<%= order.getOrderID() %>">
-                <label for="note">Ghi chú giao hàng:</label>
-                <input type="text" name="note" placeholder="VD: Khách nhận hàng" required>
-                <br><br>
-                <button type="submit">✅ Mark as Delivered</button>
+                <input type="text" name="note" placeholder="e.g. House with red door" required />
+                <button type="submit" class="submit-btn">
+                    <i class="fas fa-truck"></i> Confirm Delivery
+                </button>
             </form>
         </div>
+        <% } %>
+    </div>
+    <% } else { %>
+    <div class="no-data">🚫 No orders here.</div>
     <% } %>
-<% } else { %>
-    <p>Không có đơn hàng đang giao.</p>
-<% } %>
+</div>
 
 <script>
-    // Bắt đầu mở camera khi trang load
     window.addEventListener("DOMContentLoaded", () => {
-        <% for (OrderDTO order : shippedOrders) { %>
-            const video<%= order.getOrderID() %> = document.getElementById("video-<%= order.getOrderID() %>");
-            navigator.mediaDevices.getUserMedia({ video: true })
+    <% for (OrderDTO order : shippedOrders) { %>
+        const video<%= order.getOrderID() %> = document.getElementById("video-<%= order.getOrderID() %>");
+        navigator.mediaDevices.getUserMedia({video: true})
                 .then(stream => {
                     video<%= order.getOrderID() %>.srcObject = stream;
                 })
                 .catch(err => {
-                    alert("Không thể mở camera: " + err);
+                    alert("📷 Camera not available: " + err);
                 });
-        <% } %>
+    <% } %>
     });
 
-    // Hàm chụp ảnh và hiển thị preview
     function capture(orderID) {
         const video = document.getElementById("video-" + orderID);
         const canvas = document.getElementById("canvas-" + orderID);
@@ -68,6 +72,8 @@
         const imageDataField = document.getElementById("imageData-" + orderID);
 
         const context = canvas.getContext("2d");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
         context.drawImage(video, 0, 0, canvas.width, canvas.height);
 
         const imageData = canvas.toDataURL("image/png");
@@ -75,4 +81,51 @@
         preview.style.display = "block";
         imageDataField.value = imageData;
     }
+</script>
+<script>
+    const activeStreams = new Map();
+
+    function startCamera(orderID) {
+        const video = document.getElementById("video-" + orderID);
+        if (activeStreams.has(orderID)) {
+            // Đã mở cam cho order này rồi
+            return;
+        }
+
+        navigator.mediaDevices.getUserMedia({video: true})
+                .then(stream => {
+                    video.srcObject = stream;
+                    activeStreams.set(orderID, stream);
+                    video.style.display = "block"; // Hiện video
+                })
+                .catch(err => {
+                    alert("📷 Cannot access camera: " + err);
+                });
+    }
+
+    function capture(orderID) {
+        const video = document.getElementById("video-" + orderID);
+        const canvas = document.getElementById("canvas-" + orderID);
+        const preview = document.getElementById("preview-" + orderID);
+        const imageDataField = document.getElementById("imageData-" + orderID);
+
+        // Mở camera nếu chưa mở
+        if (!activeStreams.has(orderID)) {
+            startCamera(orderID);
+            return; // Đợi camera load xong, sau đó mới bấm lại lần 2 để chụp
+        }
+
+        const context = canvas.getContext("2d");
+        canvas.width = video.videoWidth;
+        canvas.height = video.videoHeight;
+        context.drawImage(video, 0, 0, canvas.width, canvas.height);
+
+        const imageData = canvas.toDataURL("image/png");
+        preview.src = imageData;
+        preview.style.display = "block";
+        imageDataField.value = imageData;
+    }
+
+    // 👉 Nếu muốn stop cam sau khi chụp:
+    activeStreams.get(orderID)?.getTracks()?.forEach(track => track.stop());
 </script>

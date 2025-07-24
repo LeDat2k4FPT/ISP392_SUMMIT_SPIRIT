@@ -1,86 +1,72 @@
-<%-- 
-    Document   : shipHome
-    Created on : Jul 24, 2025, 1:53:14 AM
-    Author     : Hanne
---%>
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="dto.UserDTO" %>
-
 <%
-    // Kiểm tra session người dùng
     UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
-    if (loginUser == null || !"Shipper".equalsIgnoreCase(loginUser.getRole())) {
+    if (loginUser == null || !"Shipper".equals(loginUser.getRole())) {
         response.sendRedirect("login.jsp");
         return;
     }
-
-    // Lấy page cần hiển thị
-    String currentPage = (String) request.getAttribute("page");
-    if (currentPage == null || currentPage.isEmpty()) {
-        currentPage = request.getParameter("page");
+    String currentPage = request.getParameter("page");
+    if (currentPage == null) {
+        currentPage = (String) request.getAttribute("page");
     }
-    if (currentPage == null || currentPage.isEmpty()) {
-        currentPage = "shipHome.jsp"; // mặc định
+    if (currentPage == null || currentPage.trim().isEmpty()) {
+        currentPage = "shipHome.jsp";
     }
 %>
-
 <!DOCTYPE html>
 <html>
-<head>
-    <meta charset="UTF-8">
-    <title>Shipper Dashboard</title>
-    <link rel="stylesheet" href="${pageContext.request.contextPath}/css/ship.css">
-    <!-- Có thể thêm Bootstrap hoặc icon font ở đây -->
-</head>
-<body>
-
-<div class="topbar">
-    Hello Shipper, <%= loginUser.getFullName() %>
-</div>
-
-<div class="container-fluid">
-    <div class="row">
-        <!-- SIDEBAR -->
-        <nav class="col-md-2 sidebar-custom">
-            <ul class="nav flex-column">
-                <li class="nav-item">
-                    <a class="nav-link <%= "shipHome.jsp".equals(currentPage) ? "active" : "" %>" 
-                       href="${pageContext.request.contextPath}/ship/shipDashboard.jsp?page=shipHome.jsp">
-                       🏠 Home
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link <%= "shippingList.jsp".equals(currentPage) ? "active" : "" %>" 
-                       href="${pageContext.request.contextPath}/ShippingListController">
-                       📦 Orders to Ship
-                    </a>
-                </li>
-
-                <li class="nav-item">
-                    <a class="nav-link <%= "deliveryProof.jsp".equals(currentPage) ? "active" : "" %>" 
-                       href="${pageContext.request.contextPath}/DeliveryListController">
-                       📸 Delivery Proof
-                    </a>
-                </li>
-                <li class="nav-item">
-    <a class="nav-link <%= "historyShipping.jsp".equals(currentPage) ? "active" : "" %>" 
-       href="${pageContext.request.contextPath}/DeliveryHistoryController">
-       🧾 Delivery History
+    <head>
+        <meta charset="UTF-8">
+        <title>Shipper Dashboard</title>
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/ship.css">
+        <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap-icons@1.10.5/font/bootstrap-icons.css">
+    </head>
+    <body>
+        <div class="top-bar-custom d-flex justify-content-between align-items-center">
+        <span>Hello, <%= loginUser.getFullName() %></span>
+         <a href="<%= request.getContextPath() %>/ship/shipProfile.jsp" class="user-icon-link" title="Profile">
+        <i class="bi bi-person-circle"></i>
     </a>
-</li>
-
-            </ul>
-
-            <a href="${pageContext.request.contextPath}/LogoutController" class="logout-btn">Logout</a>
-        </nav>
-
-        <!-- MAIN CONTENT -->
-        <main class="col-md-10 p-4">
-            <jsp:include page="<%= currentPage %>" />
-        </main>
     </div>
-</div>
+        <div class="dashboard-container">
+            <aside class="sidebar">
+                <div class="sidebar-header">
+                    <i class="bi bi-truck"></i>
+                    <span class="brand-name">Shipper</span>
+                </div>
+                
+                <nav class="sidebar-nav">
+                    <a href="<%=request.getContextPath()%>/ship/shipDashboard.jsp?page=shipHome.jsp"
+                       class="nav-item <%= currentPage.contains("shipHome") ? "active" : "" %>">
+                        <i class="bi bi-house"></i> Home
+                    </a>
+                    <a href="<%=request.getContextPath()%>/ShippingListController"
+                       class="nav-item <%= currentPage.contains("shippingList") ? "active" : "" %>">
+                        <i class="bi bi-box"></i> Shipping List
+                    </a>
+                    <a href="<%=request.getContextPath()%>/DeliveryListController"
+                       class="nav-item <%= currentPage.contains("deliveryProof") ? "active" : "" %>">
+                        <i class="bi bi-camera"></i> Delivery Proof
+                    </a>
+                    <a href="<%=request.getContextPath()%>/DeliveryHistoryController"
+                       class="nav-item <%= currentPage.contains("historyShipping") ? "active" : "" %>">
+                        <i class="bi bi-clock-history"></i> History
+                    </a>
+                </nav>
 
-</body>
+                <form action="<%=request.getContextPath()%>/LogoutController" method="post" class="logout-form">
+                    <button type="submit" class="logout-btn">
+                        <i class="bi bi-power"></i> Logout
+                    </button>
+                </form>
+            </aside>
+
+            <main class="content">
+                <jsp:include page="<%= currentPage %>" />
+            </main>
+        </div>
+            
+    </body>
 </html>

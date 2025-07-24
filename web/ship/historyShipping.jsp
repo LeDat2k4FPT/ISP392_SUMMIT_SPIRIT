@@ -1,36 +1,40 @@
-<%-- 
-    Document   : historyShipping
-    Created on : Jul 24, 2025, 5:02:09 PM
-    Author     : Hanne
---%>
-
 <%@ page contentType="text/html;charset=UTF-8" language="java" %>
 <%@ page import="java.util.List" %>
 <%@ page import="dto.ShippingDTO" %>
-
+<%@ page import="dto.UserDTO" %>
 <%
+    UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
+    if (loginUser == null || !"Shipper".equals(loginUser.getRole())) {
+        response.sendRedirect("login.jsp");
+        return;
+    }
     List<ShippingDTO> deliveredList = (List<ShippingDTO>) request.getAttribute("deliveredList");
 %>
+<link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
+<link rel="stylesheet" href="<%= request.getContextPath() %>/css/historyShipping.css" />
 
-<h2>📜 Delivery History - Giao hàng thành công</h2>
+<div class="history-container">
+    <h2>📜 Delivery History - Giao hàng thành công</h2>
 
-<% if (deliveredList != null && !deliveredList.isEmpty()) { %>
-    <div style="display: flex; flex-wrap: wrap; gap: 20px;">
-        <% for (ShippingDTO item : deliveredList) { %>
-            <div style="border: 1px solid #ccc; padding: 15px; width: 320px;">
-                <h4>🚚 Order ID: <%= item.getOrderID() %></h4>
-<!--                <p><strong>Shipper ID: </strong> <%= item.getUserID() %></p>-->
-                <p><strong>Delivered At:</strong> <%= item.getDeliveryTime() %></p>
-                <p><strong>Note:</strong> <%= item.getNote() != null ? item.getNote() : "Không có" %></p>
-                <% if (item.getDeliveryImageURL() != null) { %>
-                    <img src="<%= request.getContextPath() + "/" + item.getDeliveryImageURL() %>" alt="Delivery Image" style="max-width: 100%; border: 1px solid #999;" />
-                <% } else { %>
-                    <p style="color: red;">⚠️ Không có ảnh giao hàng</p>
-                <% } %>
-            </div>
-        <% } %>
-    </div>
-<% } else { %>
-    <p>Không có đơn hàng nào đã giao thành công.</p>
-<% } %>
+    <% if (deliveredList != null && !deliveredList.isEmpty()) { %>
+        <div class="history-grid">
+            <% for (ShippingDTO item : deliveredList) { %>
+                <div class="history-card">
+                    <h4>🚚 Order ID: <%= item.getOrderID() %></h4>
+                    <p><strong>Delivered At:</strong> <%= item.getDeliveryTime() %></p>
+                    <p><strong>Note:</strong> <%= item.getNote() != null ? item.getNote() : "Không có" %></p>
 
+                    <% if (item.getDeliveryImageURL() != null) { %>
+                        <img src="<%= request.getContextPath() + "/" + item.getDeliveryImageURL() %>"
+                             alt="Delivery Image"
+                             class="delivery-image" />
+                    <% } else { %>
+                        <p class="no-image">⚠️ No delivery photos</p>
+                    <% } %>
+                </div>
+            <% } %>
+        </div>
+    <% } else { %>
+        <p class="empty-message">No orders have been delivered successfully.</p>
+    <% } %>
+</div>

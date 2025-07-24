@@ -40,7 +40,7 @@ public class ShippingListController extends HttpServlet {
             out.println("<!DOCTYPE html>");
             out.println("<html>");
             out.println("<head>");
-            out.println("<title>Servlet ShippingListController</title>");            
+            out.println("<title>Servlet ShippingListController</title>");
             out.println("</head>");
             out.println("<body>");
             out.println("<h1>Servlet ShippingListController at " + request.getContextPath() + "</h1>");
@@ -64,9 +64,10 @@ public class ShippingListController extends HttpServlet {
         try {
             OrderDAO orderDAO = new OrderDAO();
             List<OrderDTO> packedOrders = orderDAO.getOrdersByStatus("Packed");
+            request.setAttribute("page", "shippingList.jsp");
             request.setAttribute("packedOrders", packedOrders);
-            request.setAttribute("page", "shippingList.jsp"); // để shipDashboard.jsp include đúng
             request.getRequestDispatcher("/ship/shipDashboard.jsp").forward(request, response);
+
         } catch (Exception e) {
             e.printStackTrace();
             response.sendError(500, "Error loading shipping list");

@@ -5,6 +5,6 @@
 --%>
 
 <div class="main-content">
-        <h2>Welcome to Shipper Dashboard</h2>
+        <h1>Welcome to Shipper Dashboard</h1>
         <p>Select a menu on the left to manage the system.</p>
 </div>

@@ -31,16 +31,54 @@ public class ShippingDAO {
     }
 
     // Cập nhật ảnh, thời gian và ghi chú khi giao thành công
-    public boolean markAsDelivered(int orderID, String imageUrl, String note) throws SQLException {
-        String sql = "UPDATE Shipping SET DeliveryTime = GETDATE(), DeliveryImageURL = ?, Note = ? WHERE OrderID = ?";
-        try (Connection conn = DBUtils.getConnection();
-             PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setString(1, imageUrl);
-            ps.setString(2, note);
-            ps.setInt(3, orderID);
-            return ps.executeUpdate() > 0;
+//    public boolean markAsDelivered(int orderID, String imageUrl, String note) throws SQLException {
+//        String sql = "UPDATE Shipping SET DeliveryTime = GETDATE(), DeliveryImageURL = ?, Note = ? WHERE OrderID = ?";
+//        try (Connection conn = DBUtils.getConnection();
+//             PreparedStatement ps = conn.prepareStatement(sql)) {
+//            ps.setString(1, imageUrl);
+//            ps.setString(2, note);
+//            ps.setInt(3, orderID);
+//            return ps.executeUpdate() > 0;
+//        }
+//    }
+    
+   public boolean markAsDelivered(int orderID, String imageUrl, String note, int userID) throws SQLException {
+    String updateSql = "UPDATE Shipping SET DeliveryTime = GETDATE(), DeliveryImageURL = ?, Note = ?, UserID = ? WHERE OrderID = ?";
+    String insertSql = "INSERT INTO Shipping (OrderID, DeliveryTime, DeliveryImageURL, Note, UserID) VALUES (?, GETDATE(), ?, ?, ?)";
+
+    try (Connection conn = DBUtils.getConnection()) {
+        // Thử UPDATE trước
+        try (PreparedStatement updateStmt = conn.prepareStatement(updateSql)) {
+            updateStmt.setString(1, imageUrl);
+            updateStmt.setString(2, note);
+            updateStmt.setInt(3, userID);
+            updateStmt.setInt(4, orderID);
+
+            int updatedRows = updateStmt.executeUpdate();
+            System.out.println("[ShippingDAO] Updated rows = " + updatedRows + " for OrderID=" + orderID);
+
+            if (updatedRows > 0) return true;
         }
+
+        // Nếu không UPDATE được thì INSERT mới
+        try (PreparedStatement insertStmt = conn.prepareStatement(insertSql)) {
+            insertStmt.setInt(1, orderID);
+            insertStmt.setString(2, imageUrl);
+            insertStmt.setString(3, note);
+            insertStmt.setInt(4, userID);
+
+            int inserted = insertStmt.executeUpdate();
+            System.out.println("[ShippingDAO] Inserted new row for OrderID = " + orderID);
+            return inserted > 0;
+        }
+    } catch (SQLException e) {
+        System.err.println("[ShippingDAO] Error: " + e.getMessage());
+        throw e;
     }
+}
+
+
+
 
     // Truy xuất lịch sử giao hàng của shipper (cho historyShipping.jsp)
     public List<ShippingDTO> getDeliveredByShipper(int shipperID) throws SQLException {
