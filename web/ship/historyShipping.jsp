@@ -17,24 +17,27 @@
     <h2>📜 Delivery History - Giao hàng thành công</h2>
 
     <% if (deliveredList != null && !deliveredList.isEmpty()) { %>
-        <div class="history-grid">
-            <% for (ShippingDTO item : deliveredList) { %>
-                <div class="history-card">
-                    <h4>🚚 Order ID: <%= item.getOrderID() %></h4>
-                    <p><strong>Delivered At:</strong> <%= item.getDeliveryTime() %></p>
-                    <p><strong>Note:</strong> <%= item.getNote() != null ? item.getNote() : "Không có" %></p>
+        <% for (ShippingDTO item : deliveredList) { %>
+            <div class="history-card">
+                <!-- Cột trái: Thông tin -->
+                <div class="history-info">
+                    <p><span class="label">🚚 Order ID:</span> <%= item.getOrderID() %></p>
+                    <p><span class="label">Delivered At:</span> <%= item.getDeliveryTime() %></p>
+                    <p><span class="label">Note:</span> <%= item.getNote() != null ? item.getNote() : "Không có" %></p>
+                </div>
 
+                <!-- Cột phải: Ảnh -->
+                <div class="history-image">
                     <% if (item.getDeliveryImageURL() != null) { %>
-                        <img src="<%= request.getContextPath() + "/" + item.getDeliveryImageURL() %>"
-                             alt="Delivery Image"
-                             class="delivery-image" />
+                        <img src="<%= request.getContextPath() + "/" + item.getDeliveryImageURL() %>" alt="Delivery Image" />
                     <% } else { %>
-                        <p class="no-image">⚠️ No delivery photos</p>
+                        <span class="no-image">⚠️ No delivery photos</span>
                     <% } %>
                 </div>
-            <% } %>
-        </div>
+            </div>
+        <% } %>
     <% } else { %>
         <p class="empty-message">No orders have been delivered successfully.</p>
     <% } %>
 </div>
+

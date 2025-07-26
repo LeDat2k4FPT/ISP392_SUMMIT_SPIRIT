@@ -6,6 +6,7 @@ package ship;
 
 import dao.OrderDAO;
 import dto.OrderDTO;
+import dto.UserAddressDTO;
 import jakarta.servlet.ServletException;
 import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
@@ -13,7 +14,9 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import java.io.IOException;
 import java.io.PrintWriter;
+import java.util.HashMap;
 import java.util.List;
+import java.util.Map;
 /**
  *
  * @author Hanne
@@ -58,19 +61,28 @@ public class DeliveryListController extends HttpServlet {
      */
     
     @Override
-    protected void doGet(HttpServletRequest request, HttpServletResponse response)
-            throws ServletException, IOException {
-        try {
-            OrderDAO orderDAO = new OrderDAO();
-            List<OrderDTO> shippedOrders = orderDAO.getOrdersByStatus("Shipped");
-            request.setAttribute("shippedOrders", shippedOrders);
-            request.setAttribute("page", "deliveryProof.jsp");
-            request.getRequestDispatcher("/ship/shipDashboard.jsp").forward(request, response);
-        } catch (Exception e) {
-            e.printStackTrace();
-            response.sendError(500, "Error loading delivery proof list");
+protected void doGet(HttpServletRequest request, HttpServletResponse response)
+        throws ServletException, IOException {
+    try {
+        OrderDAO orderDAO = new OrderDAO();
+        List<OrderDTO> shippedOrders = orderDAO.getOrdersByStatus("Shipped");
+        Map<Integer, UserAddressDTO> addressMap = new HashMap<>();
+
+        for (OrderDTO order : shippedOrders) {
+            UserAddressDTO info = orderDAO.getUserAddressInfoByOrderId(order.getOrderID());
+            addressMap.put(order.getOrderID(), info);
         }
+
+        request.setAttribute("shippedOrders", shippedOrders);
+        request.setAttribute("addressMap", addressMap);
+        request.setAttribute("page", "deliveryProof.jsp");
+        request.getRequestDispatcher("/ship/shipDashboard.jsp").forward(request, response);
+    } catch (Exception e) {
+        e.printStackTrace();
+        response.sendError(500, "Error loading delivery proof list");
     }
+}
+
 
     /**
      * Returns a short description of the servlet.

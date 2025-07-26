@@ -527,6 +527,10 @@ public class OrderDAO {
         }
         return info;
     }
+    private String getSafeString(ResultSet rs, String column) throws SQLException {
+    String value = rs.getString(column);
+    return value != null ? value : "";
+}
 
     public boolean assignShipper(int orderID, int shipperID) throws SQLException, ClassNotFoundException {
         String sql = "INSERT INTO Shipping (OrderID, UserID) VALUES (?, ?); "

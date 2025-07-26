@@ -2,6 +2,9 @@
 <%@ page import="java.util.List" %>
 <%@ page import="dto.OrderDTO" %>
 <%@ page import="dto.UserDTO" %>
+<%@ page import="dto.UserAddressDTO" %>
+<%@ page import="java.util.Map" %>
+
 <%
     UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
     if (loginUser == null || !"Shipper".equals(loginUser.getRole())) {
@@ -9,6 +12,8 @@
         return;
     }
     List<OrderDTO> shippedOrders = (List<OrderDTO>) request.getAttribute("shippedOrders");
+    Map<Integer, UserAddressDTO> addressMap = (Map<Integer, UserAddressDTO>) request.getAttribute("addressMap");
+
 %>
 <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
 <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.5.0/css/all.min.css">
@@ -19,14 +24,25 @@
 
     <% if (shippedOrders != null && !shippedOrders.isEmpty()) { %>
     <div class="grid-wrapper">
-        <% for (OrderDTO order : shippedOrders) { %>
-        <div class="proof-card">
-            <div class="order-meta">
-                <h3>Order #<%= order.getOrderID() %></h3>
-                <p>User ID: <%= order.getUserID() %></p>
-                <p>Date: <%= order.getOrderDate() %></p>
-                <p>Total: <%= String.format("%,.0f", order.getTotalAmount()) %> VND</p>
-            </div>
+        <% for (OrderDTO order : shippedOrders) { 
+        UserAddressDTO info = addressMap.get(order.getOrderID());
+    %>
+    <div class="proof-card">
+        <div class="order-meta">
+            <h3>Order #<%= order.getOrderID() %></h3>
+            <p>User ID: <%= order.getUserID() %></p>
+            <p>Customer: <%= info != null ? info.getFullName() : "N/A" %></p>
+            <p>Phone: <%= info != null ? info.getPhone() : "N/A" %></p>
+            <p>Address:
+                <% if (info != null) { %>
+                    <%= info.getAddress() %>, <%= info.getDistrict() %>, <%= info.getCity() %>, <%= info.getCountry() %>
+                <% } else { %>
+                    N/A
+                <% } %>
+            </p>
+            <p>Date: <%= order.getOrderDate() %></p>
+            <p>Total: <%= String.format("%,.0f", order.getTotalAmount()) %> VND</p>
+        </div>
 
             <div class="capture-zone">
                 <video id="video-<%= order.getOrderID() %>" autoplay muted playsinline></video>

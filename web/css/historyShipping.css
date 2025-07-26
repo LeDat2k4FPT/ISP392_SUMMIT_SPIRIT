@@ -1,12 +1,3 @@
-/*
-Click nbfs://nbhost/SystemFileSystem/Templates/Licenses/license-default.txt to change this license
-Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css to edit this template
-*/
-/* 
-    Created on : Jul 25, 2025, 3:36:43 AM
-    Author     : Admin
-*/
-
 .history-container {
     padding: 20px;
     font-family: 'Kumbh Sans', sans-serif;
@@ -15,52 +6,82 @@ Click nbfs://nbhost/SystemFileSystem/Templates/JSP_Servlet/CascadeStyleSheet.css
 .history-container h2 {
     margin-bottom: 20px;
     color: #333;
-}
-
-.history-grid {
-    display: flex;
-    flex-wrap: wrap;
-    gap: 20px;
+    text-align: center;
 }
 
 .history-card {
-    width: 320px;
-    border: 1px solid #ddd;
-    border-radius: 10px;
-    padding: 16px;
-    background-color: #fdfdfd;
-    box-shadow: 0 2px 6px rgba(0,0,0,0.1);
-    transition: transform 0.2s ease;
-}
+    display: flex;
+    justify-content: space-between;
+    align-items: flex-start;
+    gap: 20px;
 
-.history-card:hover {
-    transform: translateY(-3px);
-}
-
-.history-card h4 {
-    margin-top: 0;
-    color: #2b2b2b;
-}
-
-.history-card p {
-    margin: 6px 0;
-    font-size: 14px;
-    color: #555;
-}
-
-.delivery-image {
     width: 100%;
-    border-radius: 6px;
-    margin-top: 10px;
-    border: 1px solid #aaa;
+    max-width: 960px;
+    margin: 16px auto;
+    padding: 20px;
+
+    background-color: #ffffff;
+    border: 1px solid #ddd;
+    border-radius: 12px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.05);
+}
+
+/* ====== Cột trái: Thông tin ====== */
+.history-info {
+    flex: 2;
+    display: flex;
+    flex-direction: column;  /* Thông tin xếp dọc */
+    gap: 10px;
+    font-size: 16px;
+    color: #333;
+}
+
+.history-info p {
+    margin: 0;
+    line-height: 1.4;
+}
+
+.history-info .label {
+    font-weight: bold;
+    margin-right: 6px;
+    color: #222;
+}
+
+/* ====== Cột phải: Ảnh giao hàng ====== */
+.history-image {
+    flex: 1;
+    display: flex;
+    justify-content: center;
+    align-items: center;
+}
+
+.history-image img {
+    max-width: 200px;
+    max-height: 200px;
+    object-fit: cover;
+    border-radius: 8px;
+    border: 1px solid #ccc;
 }
 
 .no-image {
-    color: red;
     font-style: italic;
+    color: #999;
 }
 
-.empty-message {
-    font-style: italic;
-    color: #888;
+/* ====== Responsive cho mobile ====== */
+@media (max-width: 768px) {
+    .history-card {
+        flex-direction: column;
+        align-items: flex-start;
+    }
+
+    .history-image {
+        margin-top: 16px;
+        width: 100%;
+        justify-content: flex-start;
+    }
+
+    .history-image img {
+        max-width: 100%;
+    }
 }
