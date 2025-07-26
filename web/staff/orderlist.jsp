@@ -78,20 +78,17 @@
                             <td><%= o.getOrderDate() %></td>
                             <td><%= String.format("%,.0f", o.getTotalAmount()) %></td>
                             <td>
-                                <form action="<%=request.getContextPath()%>/UpdateOrderStatus" method="post" style="display:inline;">
-                                    <input type="hidden" name="orderID" value="<%= o.getOrderID() %>"/>
-                                    <select name="status">
-                                        <option value="Processing" <%= "Processing".equals(o.getStatus()) ? "selected":"" %>>Processing</option>
-                                        <option value="Packed" <%= "Packed".equals(o.getStatus()) ? "selected":"" %>>Packed</option>
-                                        <option value="Shipped" <%= "Shipped".equals(o.getStatus()) ? "selected":"" %>>Shipping</option>
-                                        <option value="Delivered" <%= "Delivered".equals(o.getStatus()) ? "selected":"" %>>Delivered</option>
-                                        <option value="Cancelled" <%= "Cancelled".equals(o.getStatus()) ? "selected":"" %>>Cancelled</option>
-                                    </select>
-                                    <button type="submit">Update</button>
-                                </form>
+                                <!-- Hiển thị status, đổi 'Shipped' thành 'Shipping' -->
+                                <%
+                                    String rawStatus = o.getStatus();
+                                    String displayStatus = "Shipped".equals(rawStatus) ? "Shipping" : rawStatus;
+                                %>
+                                <span class="status <%= rawStatus.toLowerCase() %>">
+                                    <%= displayStatus %>
+                                </span>
 
-                                <%-- Hiển thị nút riêng nếu là đơn hàng Processing --%>
-                                <% if ("Processing".equals(o.getStatus())) { %>
+                                <%-- Nếu là đơn hàng Processing, hiển thị thêm nút "Order is Packed" --%>
+                                <% if ("Processing".equals(rawStatus)) { %>
                                 <form action="<%=request.getContextPath()%>/UpdateOrderStatus" method="post" style="display:inline;">
                                     <input type="hidden" name="orderID" value="<%= o.getOrderID() %>" />
                                     <input type="hidden" name="status" value="Packed" />
@@ -103,8 +100,8 @@
                             <td>
                                 <a href="<%= request.getContextPath() %>/OrderDetailController?orderID=<%=o.getOrderID()%>" class="view-btn">View Detail</a>
                             </td>
-
                         </tr>
+
                         <%
                                 }
                             } else {
