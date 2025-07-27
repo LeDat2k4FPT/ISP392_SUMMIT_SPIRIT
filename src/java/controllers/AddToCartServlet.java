@@ -60,7 +60,7 @@ public class AddToCartServlet extends HttpServlet {
             HttpSession session = request.getSession();
             UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
             if (user == null) {
-                response.sendRedirect("user/login.jsp");
+                response.sendRedirect("login.jsp");
                 return;
             }
 

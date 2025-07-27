@@ -13,7 +13,7 @@ import dto.UserDTO;
 @WebServlet(name = "LoginController", urlPatterns = {"/LoginController"})
 public class LoginController extends HttpServlet {
 
-    private static final String ERROR = "user/login.jsp";
+    private static final String ERROR = "login.jsp";
     private static final String AD = "Admin";
     private static final String ADMIN_PAGE = "admin/admin.jsp";
     private static final String US = "User";

@@ -20,7 +20,7 @@ import java.io.IOException;
 public class LogoutController extends HttpServlet {
 
     private static final String ERROR = "user/error.jsp";
-    private static final String SUCCESS = "user/login.jsp";
+    private static final String SUCCESS = "login.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {

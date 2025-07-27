@@ -29,11 +29,11 @@ public class EditProductController extends HttpServlet {
                 request.getRequestDispatcher("staffDashboard.jsp").forward(request, response);
 
             } else {
-                response.sendRedirect("staffDashboard.jsp?page=staff/productlist.jsp&msg=Product+not+found&type=danger");
+                response.sendRedirect("/staff/staffDashboard.jsp?page=productlist.jsp&msg=Product+not+found&type=danger");
             }
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("staffDashboard.jsp?page=staff/productlist.jsp&msg=Error+loading+product&type=danger");
+            response.sendRedirect("/staff/staffDashboard.jsp?page=productlist.jsp&msg=Error+loading+product&type=danger");
         }
     }
 

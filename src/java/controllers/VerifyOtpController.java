@@ -15,8 +15,8 @@ import java.io.IOException;
 @WebServlet(name = "VerifyOtpController", urlPatterns = {"/VerifyOtpController"})
 public class VerifyOtpController extends HttpServlet {
 
-    private static final String ERROR = "user/verifyOtp.jsp";
-    private static final String SUCCESS = "user/resetPassword.jsp";
+    private static final String ERROR = "verifyOtp.jsp";
+    private static final String SUCCESS = "resetPassword.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");

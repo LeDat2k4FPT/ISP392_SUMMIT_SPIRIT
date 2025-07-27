@@ -16,7 +16,7 @@
         <%
             UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
             if (loginUser == null || !"User".equals(loginUser.getRole())) {
-                response.sendRedirect("user/login.jsp");
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
                 return;
             }
             UserError userError = (UserError) request.getAttribute("USER_ERROR");
@@ -43,7 +43,7 @@
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
                         <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser.getFullName() %></a>
-                        <a href="MainController?action=Logout">Logout</a>
+                        <a href="<%= request.getContextPath() %>/MainController?action=Logout">Logout</a>
                     </div>
                 </div>
             </div>
@@ -113,7 +113,7 @@
 
                         <div class="btn-group">
                             <a href="<%= request.getContextPath() %>/user/homepage.jsp" class="btn btn-outline">Cancel</a>
-                            <a href="<%= request.getContextPath() %>/user/changePassword.jsp" class="btn btn-secondary">Change Password</a>
+                            <a href="<%= request.getContextPath() %>/changePassword.jsp" class="btn btn-secondary">Change Password</a>
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
                     </form>

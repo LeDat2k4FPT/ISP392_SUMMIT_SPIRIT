@@ -10,7 +10,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Reset Password</title>
-        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/css/resetpassword.css">
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/css/resetPassword.css">
     </head>
     <body>
         <div class="form-container">

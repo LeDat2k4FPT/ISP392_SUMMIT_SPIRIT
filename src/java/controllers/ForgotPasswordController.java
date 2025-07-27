@@ -19,8 +19,8 @@ import utils.EmailUtils;
 @WebServlet(name = "ForgotPasswordController", urlPatterns = {"/ForgotPasswordController"})
 public class ForgotPasswordController extends HttpServlet {
 
-    private static final String ERROR = "user/forgotPassword.jsp";
-    private static final String SUCCESS = "user/verifyOtp.jsp";
+    private static final String ERROR = "forgotPassword.jsp";
+    private static final String SUCCESS = "verifyOtp.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");

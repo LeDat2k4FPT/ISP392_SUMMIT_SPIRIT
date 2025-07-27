@@ -33,7 +33,7 @@ public class SubmitReviewController extends HttpServlet {
             }
 
             if (user == null) {
-                response.sendRedirect("user/login.jsp");
+                response.sendRedirect("login.jsp");
                 return;
             }
 

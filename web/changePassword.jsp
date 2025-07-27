@@ -13,7 +13,7 @@
         <%
             UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
             if (loginUser == null) {
-                response.sendRedirect("user/login.jsp");
+                response.sendRedirect(request.getContextPath() + "/login.jsp");
                 return;
             }
             String message = (String) request.getAttribute("MESSAGE");

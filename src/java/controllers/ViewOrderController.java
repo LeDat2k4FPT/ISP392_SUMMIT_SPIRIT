@@ -22,7 +22,7 @@ public class ViewOrderController extends HttpServlet {
 
         if (loginUser == null) {
 
-            response.sendRedirect("user/login.jsp");
+            response.sendRedirect("login.jsp");
             return;
         }
 

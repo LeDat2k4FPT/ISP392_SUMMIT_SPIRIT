@@ -52,7 +52,7 @@ public class ProductListController extends HttpServlet {
             String msg = request.getParameter("msg");
             String type = request.getParameter("type");
 
-            String redirectURL = request.getContextPath() + "/staffDashboard.jsp?page=staff/productlist.jsp";
+            String redirectURL = request.getContextPath() + "/staff/staffDashboard.jsp?page=productlist.jsp";
 
             if (msg != null && type != null) {
                 redirectURL += "&msg=" + java.net.URLEncoder.encode(msg, "UTF-8")

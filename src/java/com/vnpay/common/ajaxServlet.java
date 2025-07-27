@@ -35,7 +35,7 @@ public class ajaxServlet extends HttpServlet {
         HttpSession session = req.getSession();
         UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
         if (loginUser == null) {
-            resp.sendRedirect("<%= request.getContextPath() %>/user/login.jsp");
+            resp.sendRedirect("login.jsp");
             return;
         }
 
@@ -99,7 +99,7 @@ public class ajaxServlet extends HttpServlet {
             Logger.getLogger(ajaxServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
         if (orderId_new < 0) {
-            resp.sendRedirect("<%= request.getContextPath() %>/user/error.jsp");
+            resp.sendRedirect("error.jsp");
             return;
         }
         String vnp_TxnRef = orderId_new + "-" + System.currentTimeMillis();

@@ -35,8 +35,8 @@
                 <h2>Order List</h2>
             </div>
 
-            <form class="search-form" action="<%= request.getContextPath() %>/staffDashboard.jsp" method="get">
-                <input type="hidden" name="page" value="staff/orderlist.jsp" />
+            <form class="search-form" action="<%= request.getContextPath() %>/staff/staffDashboard.jsp" method="get">
+                <input type="hidden" name="page" value="orderlist.jsp" />
                 <input type="text" name="keyword"
                        value="<%= request.getParameter("keyword") != null ? request.getParameter("keyword") : "" %>"
                        placeholder="Search by customer name, email, status, or ID" />
@@ -57,7 +57,7 @@
                 <table class="order-table">
                     <thead>
                         <tr>
-                            <th>No</th> 
+                            <th>No</th>
                             <th>Customer</th>
                             <th>Date</th>
                             <th>Total</th>
@@ -79,13 +79,13 @@
                                 orders = orderDAO.getAllOrders();
                             }
 
-                            int index = 1; 
+                            int index = 1;
 
                             if (orders != null && !orders.isEmpty()) {
                                 for (OrderDTO o : orders) {
                         %>
                         <tr>
-                            <td><%= index++ %></td> 
+                            <td><%= index++ %></td>
                             <td><%= o.getFullName() %></td>
                             <td><%= o.getOrderDate() %></td>
                             <td><%= String.format("%,.0f", o.getTotalAmount()) %></td>
@@ -119,7 +119,7 @@
                             }
                         %>
                     </tbody>
-                </table>      
+                </table>
             </div>
         </div>
 

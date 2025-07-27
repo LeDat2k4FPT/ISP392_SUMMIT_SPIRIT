@@ -32,7 +32,7 @@
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
                         <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser != null ? loginUser.getFullName() : "Account" %></a>
-                        <a href="MainController?action=Logout">Logout</a>
+                        <a href="<%= request.getContextPath() %>/MainController?action=Logout">Logout</a>
                     </div>
                 </div>
             </div>
@@ -69,6 +69,7 @@
             <div>
                 <h3 class="success">
                     Your transaction has been successful!
+                    🌄 Thank you for shopping at Summit Spirit!
                     <i class="fas fa-check-circle"></i>
                 </h3>
                 <% if (transactionId != null) { %>
@@ -80,6 +81,7 @@
                 <% if (orderInfo != null) { %>
                 <p>Order information: <b><%= orderInfo %></b></p>
                 <% } %>
+
                 <div class="text-center mt-3">
                     <a href="UserOrderHistoryController" class="back-link">View Order History</a>
                 </div>
@@ -89,21 +91,33 @@
                 <h3 class="failed">
                     Transaction order failed!
                 </h3>
-                <a href="<%= retryLink != null ? retryLink : "<%= request.getContextPath() %>/user/checkout.jsp" %>" class="btn-retry">🔁 Back to payment</a>
+                <%
+                    String fallbackLink = request.getContextPath() + "/user/checkout.jsp";
+                    String finalLink = (retryLink != null) ? retryLink : fallbackLink;
+                %>
+                <a href="<%= finalLink %>" class="btn-retry">🔁 Back to payment</a>
             </div>
             <% } else if ("invalid".equals(paymentResult)) { %>
             <div>
                 <h3 class="invalid">
                     Invalid signature! Data may have been modified.
                 </h3>
-                <a href="<%= retryLink != null ? retryLink : "<%= request.getContextPath() %>/user/checkout.jsp" %>" class="btn-retry">🔁 Back to payment</a>
+                <%
+                    String fallbackLink = request.getContextPath() + "/user/checkout.jsp";
+                    String finalLink = (retryLink != null) ? retryLink : fallbackLink;
+                %>
+                <a href="<%= finalLink %>" class="btn-retry">🔁 Back to payment</a>
             </div>
             <% } else if ("error".equals(paymentResult)) { %>
             <div>
                 <h3 class="error">
                     An error occurred while processing the transaction!
                 </h3>
-                <a href="<%= retryLink != null ? retryLink : "<%= request.getContextPath() %>/user/checkout.jsp" %>" class="btn-retry">🔁 Back to payment</a>
+                <%
+                    String fallbackLink = request.getContextPath() + "/user/checkout.jsp";
+                    String finalLink = (retryLink != null) ? retryLink : fallbackLink;
+                %>
+                <a href="<%= finalLink %>" class="btn-retry">🔁 Back to payment</a>
             </div>
             <% } else { %>
             <div>

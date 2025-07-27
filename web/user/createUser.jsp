@@ -11,7 +11,7 @@
     </head>
     <body>
         <div class="logo" >
-            <a href="user/homepage.jsp">
+            <a href="<%= request.getContextPath() %>/user/homepage.jsp">
                 <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
         </div>
@@ -84,7 +84,7 @@
                 </div>
 
                 <div class="already">
-                    Already have an account? <a href="user/login.jsp">Log In</a>
+                    Already have an account? <a href="<%= request.getContextPath() %>/login.jsp">Log In</a>
                 </div>
             </form>
         </div>

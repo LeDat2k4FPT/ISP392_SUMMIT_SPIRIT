@@ -91,7 +91,7 @@ double avgRating = 0;
     </head>
     <body>
         <div class="header">
-            <a href="<%= request.getContextPath() %>user/homepage.jsp">
+            <a href="<%= request.getContextPath() %>/user/homepage.jsp">
                 <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
             <div class="nav-links">
@@ -326,7 +326,7 @@ double avgRating = 0;
                 <% } else if (loginUser != null) { %>
                 <p style="color: gray;"><i>Only customers who have purchased this product can write a review.</i></p>
                 <% } else { %>
-                <p><a href="<%= request.getContextPath() %>/user/login.jsp">Login</a> to write a review.</p>
+                <p><a href="<%= request.getContextPath() %>/login.jsp">Login</a> to write a review.</p>
                 <% } %>
 
             </div>

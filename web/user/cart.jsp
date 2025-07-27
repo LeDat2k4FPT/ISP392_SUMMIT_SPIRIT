@@ -6,7 +6,7 @@
     CartDTO cart = (CartDTO) session.getAttribute("CART");
     UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
     if (loginUser == null) {
-        response.sendRedirect("user/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
     double discountPercent = 0.0;
@@ -45,7 +45,7 @@
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
                         <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser.getFullName() %></a>
-                        <a href="MainController?action=Logout">Logout</a>
+                        <a href="<%= request.getContextPath() %>/MainController?action=Logout">Logout</a>
                     </div>
                 </div>
             </div>
@@ -103,7 +103,7 @@
                         const productID = parts[0];
                         const size = parts[1];
                         const color = parts[2];
-                        window.location.href = "RemoveFromCartServlet?productID=" + productID + "&size=" + size + "&color=" + color;
+                        window.location.href = "<%= request.getContextPath() %>/RemoveFromCartServlet?productID=" + productID + "&size=" + size + "&color=" + color;
                         return;
                     } else {
                         input.value = 1;
@@ -127,7 +127,7 @@
                         const productID = parts[0];
                         const size = parts[1];
                         const color = parts[2];
-                        window.location.href = "RemoveFromCartServlet?productID=" + productID + "&size=" + size + "&color=" + color;
+                        window.location.href = "<%= request.getContextPath() %>/RemoveFromCartServlet?productID=" + productID + "&size=" + size + "&color=" + color;
                         return;
                     } else {
                         input.value = 1;
@@ -221,7 +221,7 @@
                                 String safeSize = (p.getSize() != null && !p.getSize().trim().isEmpty()) ? p.getSize().trim() : "N/A";
                                 String safeColor = (p.getColor() != null && !p.getColor().trim().isEmpty()) ? p.getColor().trim() : "N/A";
                             %>
-                            <a href="RemoveFromCartServlet?productID=<%= p.getProductID() %>&size=<%= safeSize %>&color=<%= safeColor %>" class="delete-link">
+                            <a href="<%= request.getContextPath() %>/RemoveFromCartServlet?productID=<%= p.getProductID() %>&size=<%= safeSize %>&color=<%= safeColor %>" class="delete-link">
                                 <i class="fa fa-trash"></i>
                             </a>
 

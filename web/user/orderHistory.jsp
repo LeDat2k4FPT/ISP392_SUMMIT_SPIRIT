@@ -6,7 +6,7 @@
 <%
      UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
     if (loginUser == null || !"User".equals(loginUser.getRole())) {
-        response.sendRedirect("user/login.jsp");
+        response.sendRedirect(request.getContextPath() + "/login.jsp");
         return;
     }
     List<OrderDTO> orders = (List<OrderDTO>) request.getAttribute("orders");

@@ -16,7 +16,7 @@
     </head>
     <body>
         <div class="logo" >
-            <a href="user/homepage.jsp">
+            <a href="<%= request.getContextPath() %>/user/homepage.jsp">
                 <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
         </div>
@@ -43,7 +43,7 @@
                 <button type="submit" name="action" value="ForgotPassword" class="btn btn-forgot w-100">Send OTP</button>
 
                 <div class="text-center mt-3">
-                    <a href="<%= request.getContextPath() %>/user/login.jsp" class="back-link">Back to Login</a>
+                    <a href="<%= request.getContextPath() %>/login.jsp" class="back-link">Back to Login</a>
                 </div>
             </form>
         </div>

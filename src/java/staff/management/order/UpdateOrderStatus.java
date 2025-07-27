@@ -113,7 +113,7 @@ public class UpdateOrderStatus extends HttpServlet {
         }
 
         response.sendRedirect(request.getContextPath()
-                + "/staffDashboard.jsp?page=staff/orderlist.jsp&msg="
+                + "/staff/staffDashboard.jsp?page=orderlist.jsp&msg="
                 + java.net.URLEncoder.encode(message, "UTF-8")
                 + "&type=" + type);
     }

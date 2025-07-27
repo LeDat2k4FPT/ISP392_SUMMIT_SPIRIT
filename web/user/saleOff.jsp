@@ -33,7 +33,7 @@
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
                         <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser.getFullName() %></a>
-                        <a href="MainController?action=Logout">Logout</a>
+                        <a href="<%= request.getContextPath() %>/MainController?action=Logout">Logout</a>
                     </div>
                 </div>
             </div>

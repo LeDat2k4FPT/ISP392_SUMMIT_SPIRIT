@@ -28,7 +28,7 @@
                 <button type="submit" name="action" value="VerifyOtp" class="btn btn-verify w-100">Verify</button>
 
                 <div class="text-center mt-3">
-                    <a href="<%= request.getContextPath() %>/user/login.jsp" class="back-link">Back to Login</a>
+                    <a href="<%= request.getContextPath() %>/login.jsp" class="back-link">Back to Login</a>
                 </div>
 
                 <%

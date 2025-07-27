@@ -17,8 +17,8 @@ import java.io.IOException;
 @WebServlet(name = "ChangePasswordController", urlPatterns = {"/ChangePasswordController"})
 public class ChangePasswordController extends HttpServlet {
 
-    private static final String ERROR = "user/changePassword.jsp";
-    private static final String SUCCESS = "user/login.jsp";
+    private static final String ERROR = "changePassword.jsp";
+    private static final String SUCCESS = "login.jsp";
     private static final String NOT_MATCH = "Please make sure the password and confirm password match!";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

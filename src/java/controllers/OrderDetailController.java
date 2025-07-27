@@ -67,7 +67,7 @@ public class OrderDetailController extends HttpServlet {
             UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
             if (user == null) {
                 // Nếu chưa login thì redirect về login.jsp
-                response.sendRedirect("user/login.jsp");
+                response.sendRedirect("login.jsp");
                 return;
             }
             int orderID = Integer.parseInt(request.getParameter("orderID"));

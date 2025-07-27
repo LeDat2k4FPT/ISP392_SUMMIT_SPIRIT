@@ -48,7 +48,7 @@
         <!-- 👇 Đây là phần đã chỉnh đúng -->
         <div class="product-header">
             <h2>📦 Product</h2>
-            <a href="staffDashboard.jsp?page=staff/addProduct.jsp" class="btn-add-product">
+            <a href="<%=request.getContextPath()%>/staff/staffDashboard.jsp?page=addProduct.jsp" class="btn-add-product">
                 <i class="bi bi-plus-circle"></i> Add Product
             </a>
         </div>
@@ -127,7 +127,7 @@
                         <td><%= p.getStock() %></td>
                         <td><%= p.getStatus() != null ? p.getStatus() : "active" %></td>
                         <td class="actions">
-                            <a href="EditProductController?productID=<%= p.getProductID() %>">🖋️</a>
+                            <a href="<%= request.getContextPath() %>/EditProductController?productID=<%= p.getProductID() %>">🖋️</a>
                             <a href="<%= request.getContextPath() %>/DeleteProductController?productID=<%= p.getProductID() %>"
                                onclick="return confirm('Are you sure you want to deactivate this product?')">🗑️</a>
                         </td>

@@ -42,7 +42,7 @@
         <link rel="stylesheet" href="<%= request.getContextPath() %>/css/orderDetailStaff.css">
     </head>
     <body>
-        <button class="btn" onclick="location.href = 'staffDashboard.jsp?page=staff/orderlist.jsp'">← Back</button>
+        <button class="btn" onclick="location.href = 'javascript:history.back()'">← Back</button>
 
         <div class="container">
             <% if (order == null) { %>
@@ -58,7 +58,7 @@
                     <div><strong>Customer:</strong> <%= userInfo.getFullName() %></div>
                     <div><strong>Email:</strong> <%= userInfo.getEmail() %></div>
                     <div><strong>Phone:</strong> <%= userInfo.getPhone() %></div>
-                    <div><strong>Address:</strong> <%= userInfo.getAddress() %>, <%= userInfo.getDistrict() %>, 
+                    <div><strong>Address:</strong> <%= userInfo.getAddress() %>, <%= userInfo.getDistrict() %>,
                         <%= userInfo.getCity() %>, <%= userInfo.getCountry() %></div>
                         <% } else { %>
                     <div><strong>Customer:</strong> <i>Not provided yet</i></div>
@@ -108,7 +108,7 @@
                     <p><strong>Unit Price:</strong> <%= nf.format(od.getUnitPrice()) %> ₫</p>
 
                     <%-- ✅ Thêm nút Review nếu đơn hàng đã giao --%>
-                    <% if ("Delivered".equalsIgnoreCase(order.getStatus())) { 
+                    <% if ("Delivered".equalsIgnoreCase(order.getStatus())) {
                            String fullAddress = userInfo != null ? userInfo.getAddress() + ", " + userInfo.getDistrict() + ", " + userInfo.getCity() + ", " + userInfo.getCountry() : "";
                     %>
                     <form action="rating.jsp" method="get">

@@ -3,7 +3,7 @@
 <%
     UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
     if (user == null || !"Staff".equals(user.getRole())) {
-        response.sendRedirect(request.getContextPath() + "/login.jsp");
+        response.sendRedirect("login.jsp");
         return;
     }
 
@@ -24,7 +24,7 @@
     <div class="alert alert-danger"><%= error %></div>
     <% } %>
 
-    <form action="AddProductController" method="post" enctype="multipart/form-data">
+    <form action="<%= request.getContextPath() %>/AddProductController" method="post" enctype="multipart/form-data">
         <label>Product Name</label>
         <input type="text" name="productName" required>
 

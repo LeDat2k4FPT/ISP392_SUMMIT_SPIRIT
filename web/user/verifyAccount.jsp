@@ -9,7 +9,7 @@
 <%
     UserDTO pendingUser = (UserDTO) session.getAttribute("PENDING_USER");
     if (pendingUser == null || !"User".equals(pendingUser.getRole())) {
-        response.sendRedirect("user/createUser.jsp");
+        response.sendRedirect(request.getContextPath() + "/user/createUser.jsp");
         return;
     }
 %>

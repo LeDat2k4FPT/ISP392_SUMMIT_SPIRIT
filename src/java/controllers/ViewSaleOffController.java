@@ -22,7 +22,7 @@ public class ViewSaleOffController extends HttpServlet {
         UserDTO loginUser = (session != null) ? (UserDTO) session.getAttribute("LOGIN_USER") : null;
 
         if (loginUser == null || !"User".equals(loginUser.getRole())) {
-            response.sendRedirect("user/login.jsp");
+            response.sendRedirect("login.jsp");
             return;
         }
 

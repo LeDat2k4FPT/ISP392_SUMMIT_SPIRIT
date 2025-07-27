@@ -32,7 +32,7 @@
                     Don’t have an account yet? <a href="<%= request.getContextPath() %>/user/createUser.jsp">Register here</a>
                 </div>
                 <div class="forgot-link">
-                    <a href="<%= request.getContextPath() %>/user/forgotPassword.jsp">Forgot password</a>
+                    <a href="<%= request.getContextPath() %>/forgotPassword.jsp">Forgot password</a>
                 </div>
             </form>
         </div>
