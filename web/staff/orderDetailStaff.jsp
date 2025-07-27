@@ -42,7 +42,7 @@
         <link rel="stylesheet" href="<%= request.getContextPath() %>/css/orderDetailStaff.css">
     </head>
     <body>
-        <button class="btn" onclick="loadContent('staff/orderlist.jsp')">← Back</button>
+        <button class="btn" onclick="location.href = 'staffDashboard.jsp?page=staff/orderlist.jsp'">← Back</button>
 
         <div class="container">
             <% if (order == null) { %>
@@ -72,12 +72,25 @@
                         <%
                             String status = order.getStatus();
                             String badgeClass = "status-badge";
-                            if ("Shipped".equalsIgnoreCase(status)) badgeClass += " status-shipped";
-                            else if ("Processing".equalsIgnoreCase(status)) badgeClass += " status-processing";
-                            else if ("Cancelled".equalsIgnoreCase(status)) badgeClass += " status-canceled";
-                            else if ("Delivered".equalsIgnoreCase(status)) badgeClass += " status-delivered";
+                            String displayStatus = status;
+
+                            if ("Shipped".equalsIgnoreCase(status)) {
+                                badgeClass += " status-shipped";
+                                displayStatus = "Shipping";
+                            } else if ("Packed".equalsIgnoreCase(status)) {
+                                badgeClass += " status-packed";
+                                displayStatus = "Packed"; // hoặc: displayStatus = "Packing";
+                            } else if ("Processing".equalsIgnoreCase(status)) {
+                                badgeClass += " status-processing";
+                            } else if ("Cancelled".equalsIgnoreCase(status)) {
+                                badgeClass += " status-canceled";
+                            } else if ("Delivered".equalsIgnoreCase(status)) {
+                                badgeClass += " status-delivered";
+                            }
                         %>
-                        <span class="<%= badgeClass %>"><%= status %></span>
+                        <span class="<%= badgeClass %>"><%= displayStatus %></span>
+
+
                     </div>
                     <div><strong>Total:</strong> <%= nf.format(order.getTotalAmount()) %> ₫</div>
                 </div>

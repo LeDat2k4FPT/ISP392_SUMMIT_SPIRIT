@@ -289,36 +289,56 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% if (orders != null && !orders.isEmpty()) {
-                               for (OrderDTO o : orders) {
-                                  String status = o.getStatus() != null ? o.getStatus() : "";
-                                  String statusClass = "";
-                                  if ("Cancelled".equalsIgnoreCase(status)) statusClass = "status-cancelled";
-                                  else if ("Cancelling".equalsIgnoreCase(status)) statusClass = "status-cancelling";
-                                  else if ("Processing".equalsIgnoreCase(status)) statusClass = "status-processing";
-                                  else if ("Shipped".equalsIgnoreCase(status)) statusClass = "status-shipped";
-                                  else if ("Pending".equalsIgnoreCase(status)) statusClass = "status-pending";
+                        <% 
+       if (orders != null && !orders.isEmpty()) {
+           for (OrderDTO o : orders) {
+               String status = o.getStatus() != null ? o.getStatus() : "";
+               String statusClass = "";
+               String displayStatus = status;
+
+               if ("Cancelled".equalsIgnoreCase(status)) {
+                   statusClass = "status-cancelled";
+               } else if ("Cancelling".equalsIgnoreCase(status)) {
+                   statusClass = "status-cancelling";
+               } else if ("Processing".equalsIgnoreCase(status)) {
+                   statusClass = "status-processing";
+               } else if ("Shipped".equalsIgnoreCase(status)) {
+                   statusClass = "status-shipped";
+                   displayStatus = "Shipping";
+               } else if ("Packed".equalsIgnoreCase(status)) {
+                   statusClass = "status-packed";
+               } else if ("Pending".equalsIgnoreCase(status)) {
+                   statusClass = "status-pending";
+               } else if ("Delivered".equalsIgnoreCase(status)) {
+                   statusClass = "status-delivered";
+               }
                         %>
                         <tr>
                             <td><%= o.getOrderID() %></td>
                             <td><%= o.getOrderDate() %></td>
-                            <td class="<%= statusClass %>"><%= o.getStatus() %></td>
+                            <td class="<%= statusClass %>"><%= displayStatus %></td> 
                             <td><%= String.format("%,.0f", o.getTotalAmount()) %></td>
                             <td><a href="OrderDetailController?orderID=<%= o.getOrderID() %>">VIEW</a></td>
                             <td>
                                 <% if (!"Cancelled".equalsIgnoreCase(status)
                                        && !"Delivered".equalsIgnoreCase(status)
-                                       && !"Cancelling".equalsIgnoreCase(status)) { %>
+                                       && !"Cancelling".equalsIgnoreCase(status)
+                                       && !"Packed".equalsIgnoreCase(status)
+                                       && !"Shipped".equalsIgnoreCase(status)) { %> 
                                 <button onclick="openCancelModal(<%= o.getOrderID() %>)">Cancel</button>
                                 <% } else { %>&nbsp;<% } %>
+
                             </td>
                         </tr>
-                        <%  }
-               } else { %>
+                        <%
+                                }
+                            } else {
+                        %>
                         <tr>
                             <td colspan="6">No orders found.</td>
                         </tr>
                         <% } %>
+
                     </tbody>
                 </table>
             </div>

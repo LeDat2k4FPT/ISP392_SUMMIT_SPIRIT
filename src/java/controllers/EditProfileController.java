@@ -19,8 +19,11 @@ import user.UserError;
 public class EditProfileController extends HttpServlet {
 
     private static final String ERROR = "profile.jsp";
-    private static final String SUCCESS = "profile.jsp";
     private static final String UNKNOW_MESSAGE = "Unknow error!";
+    private static final String STAFF_PAGE = "staff/staffProfile.jsp";
+    private static final String ADMIN_PAGE = "admin/admin.jsp?page=adminProfile.jsp";
+    private static final String USER_PAGE = "profile.jsp";
+    private static final String SHIPPER_PAGE = "ship/shipProfile.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {
         response.setContentType("text/html;charset=UTF-8");
@@ -65,7 +68,16 @@ public class EditProfileController extends HttpServlet {
                         loginUser.setPhone(phoneNumber);
                         session.setAttribute("LOGIN_USER", loginUser);
                     }
-                    url = SUCCESS;
+                    if ("Staff".equals(loginUser.getRole())) {
+                        url = STAFF_PAGE;
+                    } else if ("Admin".equals(loginUser.getRole())) {
+                        url = ADMIN_PAGE;
+                    } else if ("Shipper".equals(loginUser.getRole())) {
+                        url = SHIPPER_PAGE;
+                    } else {
+                        url = USER_PAGE;
+                    }
+
                 } else {
                     userError.setErrorMessage(UNKNOW_MESSAGE);
                 }

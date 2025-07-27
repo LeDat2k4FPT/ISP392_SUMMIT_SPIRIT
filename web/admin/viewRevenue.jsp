@@ -45,10 +45,10 @@
     <div class="col-md-3">
         <label>Year:</label>
         <select name="yearValue" class="form-select">
-            <option value="all" <%= "all".equals(selectedYear) ? "selected" : "" %>>All</option>
+          <option value="all" <%= "all".equals(selectedYear) ? "selected" : "" %>>All</option>
             <% for (int y = 2023; y <= 2025; y++) { %>
                 <option value="<%= y %>" <%= String.valueOf(y).equals(selectedYear) ? "selected" : "" %>><%= y %></option>
-            <% } %>
+            <% } %>-->
         </select>
     </div>
     <div class="col-md-3">
@@ -168,7 +168,7 @@
     const colorStats = <%= colorStatsJson %>;
 
     // LINE CHART: Revenue over time
-    const lineLabels = revenueData.map(item => `${item.month}/${item.year}`);
+const lineLabels = revenueData.map(item => item.month); // chỉ hiện số tháng
     const lineValues = revenueData.map(item => item.totalRevenue);
 
     new Chart(document.getElementById('lineChart'), {

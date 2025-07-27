@@ -1,311 +1,27 @@
-/* Reset 
-* {
-    margin: 0;
-    padding: 0;
-    box-sizing: border-box;
-}
 
 body {
     margin: 0;
     padding: 0;
     font-family: 'Kumbh Sans', sans-serif;
-    background-color: #f0f0f0;
-    color: #333;
-    font-size: 14px;
-    
-}
-
- Layout container 
-.layout {
-    display: flex;
-    height: calc(100vh - 72px);  Giảm chiều cao của topbar 
-}
-
- Sidebar 
-.sidebar {
-    width: 220px;
-    background: #ffffff;
-    padding: 30px 20px;
-    box-shadow: 2px 0 6px rgba(0, 0, 0, 0.05);
-    display: flex;
-    flex-direction: column;
-    justify-content: space-between;
-}
-
- Top bar inside sidebar 
-.top-bar {
-    background-color: #234C45;
-    padding: 20px 30px;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-}
-
-.top-bar span {
-    font-weight: bold;
-    color: white;
-    display: block;
-    margin-bottom: 10px;
-}
-
-.logout-btn {
-    width: 100%;
-    background: #234C45;
-    color: white;
-    border: none;
-    padding: 10px;
-    border-radius: 6px;
-    font-weight: bold;
-}
-
-.logout-btn:hover {
-    background-color: #123732;
-}
-
- Navigation menu 
-.menu button {
-    display: block;
-    width: 100%;
-    padding: 12px;
-    margin-bottom: 10px;
-    background-color: transparent;
-    border: none;
-    text-align: left;
-    font-size: 16px;
-    cursor: pointer;
-    color: #333;
-    border-radius: 8px;
-    transition: background-color 0.2s;
-}
-
-.menu button:hover,
-.menu button.active {
-    background-color: #cfe3de;
-    color: #234C45;
-}
- Main content area 
-.main-content {
-    flex-grow: 1;
-    padding: 40px;
     background-color: #f9f9f9;
-    overflow-y: auto;
-}
-
-
- -----------------------Product List------------------------ 
-.product-section {
-    background: #fff;
-    padding: 24px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-
-}
-
-.product-header {
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    margin-bottom: 20px;
-}
-
-.product-header h2 {
-    font-size: 24px;
-    font-weight: 600;
-}
-
-.btn-add {
-    padding: 8px 16px;
-    background-color: #195181;
-    color: #fff;
-    text-decoration: none;
-    border-radius: 0;
-    border-radius: 10px;
-    transition: background 0.3s;
-}
-
-.btn-add:hover {
-    background-color: #123732;
-}
-
-table
-.product-table-wrapper {
-    overflow-x: auto;
-}
-
-.product-table {
-    width: 100%;
-    border-collapse: collapse;
-    font-size: 14px;
-}
-
-.product-table th, .product-table td {
-    padding: 12px;
-    border-bottom: 1px solid #ddd;
-    text-align: left;
-}
-
-.product-table th {
-    background-color: #195181;
-    color: white;
-    font-weight: 500;
-}
-
-.row-even {
-    background-color: #E7F0FB;
-}
-
-.row-odd {
-    background-color: #ffffff;
-}
-
-.actions a {
-    margin-right: 10px;
-    font-size: 18px;
-    text-decoration: none;
     color: #333;
 }
-
-.actions a:hover {
-    opacity: 0.7;
-}
-
-.no-data {
-    text-align: center;
-    color: #999;
-    font-style: italic;
-}
- Search form 
-form.search-form {
-    display: flex;
-    justify-content: center;
-    margin-bottom: 25px;
-    gap: 10px;
-}
-
-form.search-form input[type="text"] {
-    padding: 10px 16px;
-    width: 300px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-}
-
-form.search-form button {
-    padding: 10px 16px;
-    background-color: #234C45;
-    color: white;
-    border: none;
-    border-radius: 8px;
-    cursor: pointer;
-}
-
-form.search-form button:hover {
-    background-color: #195181;
-}
- ----------------------add product-------------------- 
-.product-form-wrapper {
-    background: #fff;
-    padding: 24px;
-    margin: 20px;
-    border-radius: 12px;
-    box-shadow: 0 2px 8px rgba(0,0,0,0.05);
-}
-
-.product-form-wrapper h2 {
-    font-size: 24px;
-    font-weight: 600;
-}
-
-.product-form-wrapper label input {
-    font-weight: 500;
-    margin-bottom: 5px;
-    display: block;
-    margin-top: 5px;
-}
-
-.product-form-wrapper input,
-.product-form-wrapper textarea,
-.product-form-wrapper select  {
-    width: 100%;
-    padding: 10px;
-    border: 1px solid #ddd;
-    border-radius: 8px;
-    margin-top: 5px;
-    background-color: #E7F0FB;
-}
-
-.product-form-wrapper .form-row {
-    display: flex;
-    gap: 20px;
-    margin-top: 15px; 
-}
-.product-form-wrapper .form-row div {
-    flex: 1 1 0;
-    min-width: 200px;
-}
-
-.submit-btn {
-    margin-top: 25px;
-    width: 100%;
-    padding: 12px;
-    background-color: #234C45;
-    color: white;
-    font-weight: bold;
-    border: none;
-    border-radius: 8px;
-}
-
-.error-msg {
-    color: red;
-    margin: 10px 0;
-}
-.alert {
-    padding: 12px 16px;
-    border-radius: 8px;
-    margin-bottom: 20px;
-    font-weight: 500;
-    background-color: #e7f7ef;
-    color: #1e5b3e;
-    border-left: 5px solid #34c38f;
-}
-
-.alert-error {
-    background-color: #fdecea;
-    color: #aa1e1e;
-    border-color: #f46a6a;
-}
-
-.product-table td table {
-    border: 1px solid #ddd;
-    width: 100%;
-    border-collapse: collapse;
-    margin-top: 4px;
-}
-
-.product-table td table th,
-.product-table td table td {
-    border: 1px solid #ddd;
-    padding: 2px 4px;
-    text-align: center;
-    font-size: 12px;
-}
-
-.product-table td table th {
-    background: #f9f9f9;
-    font-weight: bold;
-}*/
-html, body {
-    margin: 0;
-    padding: 0;
-    height: 100%;
-    font-family: 'Kumbh Sans', sans-serif;
-}
-
 .top-bar-custom {
     background: #234C45;
     color: white;
     padding: 15px 30px;
     font-size: 18px;
     font-weight: bold;
+}
+.user-icon-link {
+    font-size: 24px;
+    color: #fff;
+    text-decoration: none;
+    transition: color 0.3s ease;
+}
+
+.user-icon-link:hover {
+    color: #007bff;
 }
 
 .main-layout {
@@ -349,21 +65,20 @@ html, body {
 }
 
 .logout-btn {
-    background-color: #234C45;
-    color: white;
-    width: 100%;
-    border: none;
-    border-radius: 8px;
-    padding: 10px;
-    font-weight: bold;
-    display: flex;
-    justify-content: center;
-    align-items: center;
-    gap: 8px;
+    background-color: #234C45 !important;
+    color: white !important;
+    width: 100% !important;
+    border: none !important;
+    border-radius: 8px !important;
+    font-weight: bold !important;
+    display: flex !important;
+    justify-content: center !important;
+    align-items: center !important;
+    gap: 8px !important;
 }
 
 .logout-btn:hover {
-    background-color: #0e2e2a;
+    background-color: #0e2e2a !important;
 }
 
 .main-content {
@@ -371,4 +86,9 @@ html, body {
     overflow-y: auto;
     padding: 30px;
     background-color: #f8f9fa;
+}
+.logo-icon {
+    color: #2e7d32;
+    font-size: 24px;
+    margin-right: 10px;
 }

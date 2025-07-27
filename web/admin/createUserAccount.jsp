@@ -41,12 +41,14 @@
             <select class="form-select" name="role">
                 <option value="User" <%= "User".equals(request.getAttribute("role")) ? "selected" : "" %>>User</option>
                 <option value="Staff" <%= "Staff".equals(request.getAttribute("role")) ? "selected" : "" %>>Staff</option>
+                <option value="Shipper" <%= "Shipper".equals(request.getAttribute("role")) ? "selected" : "" %>>Shipper</option>
                 <option value="Admin" <%= "Admin".equals(request.getAttribute("role")) ? "selected" : "" %>>Admin</option>
             </select>
         </div>
+
         <div class="d-flex justify-content-between">
             <button type="submit" class="btn btn-success px-4" style="background:#234C45;">Create</button>
-            <button type="button" class="btn btn-outline-secondary px-4" onclick="location.href='${pageContext.request.contextPath}/ManageUserAccountController'">Cancel</button>
+            <button type="button" class="btn btn-outline-secondary px-4" onclick="location.href = '${pageContext.request.contextPath}/ManageUserAccountController'">Cancel</button>
         </div>
     </form>
 </div>

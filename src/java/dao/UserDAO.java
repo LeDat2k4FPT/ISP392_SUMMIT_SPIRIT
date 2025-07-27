@@ -279,44 +279,43 @@ public class UserDAO {
     }
 
     public List<UserDTO> searchUsers(String keyword, String role) {
-    List<UserDTO> list = new ArrayList<>();
-    StringBuilder sql = new StringBuilder(
-        "SELECT * FROM Account WHERE (FullName LIKE ? OR Email LIKE ? OR Phone LIKE ?) AND Role <> 'admin'"
-    );
-    if (role != null && !role.isEmpty() && !"all".equalsIgnoreCase(role)) {
-        sql.append(" AND Role = ?");
-    }
-
-    try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
-        String k = "%" + keyword + "%";
-        ps.setString(1, k);
-        ps.setString(2, k);
-        ps.setString(3, k);
-
+        List<UserDTO> list = new ArrayList<>();
+        StringBuilder sql = new StringBuilder(
+                "SELECT * FROM Account WHERE (FullName LIKE ? OR Email LIKE ? OR Phone LIKE ?) AND Role <> 'admin'"
+        );
         if (role != null && !role.isEmpty() && !"all".equalsIgnoreCase(role)) {
-            ps.setString(4, role);
+            sql.append(" AND Role = ?");
         }
 
-        ResultSet rs = ps.executeQuery();
-        while (rs.next()) {
-            UserDTO user = new UserDTO(
-                rs.getInt("UserID"),
-                rs.getString("FullName"),
-                rs.getString("Address"),
-                rs.getString("Password"),
-                rs.getString("Phone"),
-                rs.getString("Email"),
-                rs.getString("Role")
-            );
-            list.add(user);
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+            String k = "%" + keyword + "%";
+            ps.setString(1, k);
+            ps.setString(2, k);
+            ps.setString(3, k);
+
+            if (role != null && !role.isEmpty() && !"all".equalsIgnoreCase(role)) {
+                ps.setString(4, role);
+            }
+
+            ResultSet rs = ps.executeQuery();
+            while (rs.next()) {
+                UserDTO user = new UserDTO(
+                        rs.getInt("UserID"),
+                        rs.getString("FullName"),
+                        rs.getString("Address"),
+                        rs.getString("Password"),
+                        rs.getString("Phone"),
+                        rs.getString("Email"),
+                        rs.getString("Role")
+                );
+                list.add(user);
+            }
+        } catch (Exception e) {
+            e.printStackTrace();
         }
-    } catch (Exception e) {
-        e.printStackTrace();
+
+        return list;
     }
-
-    return list;
-}
-
 
     public List<UserDTO> getAllUsers(String role) {
         List<UserDTO> list = new ArrayList<>();
@@ -324,7 +323,7 @@ public class UserDAO {
         if (role != null && !role.isEmpty() && !"all".equalsIgnoreCase(role)) {
             sql.append(" AND Role = ?");
         }
-        try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql.toString())) {
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql.toString())) {
             if (role != null && !role.isEmpty() && !"all".equalsIgnoreCase(role)) {
                 ps.setString(1, role);
             }
@@ -359,8 +358,8 @@ public class UserDAO {
                         rs.getString("FullName"),
                         rs.getString("Address"),
                         rs.getString("Password"),
-                        rs.getString("Email"),
                         rs.getString("Phone"),
+                        rs.getString("Email"),
                         rs.getString("Role")
                 );
                 list.add(user);
@@ -372,23 +371,37 @@ public class UserDAO {
         return list;
     }
 
-    public void toggleRole(int userID) {
-        String sql = "UPDATE Account SET Role = CASE WHEN Role = 'User' THEN 'Staff' ELSE 'User' END WHERE UserID = ?";
-        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
-            ps.setInt(1, userID);
-            ps.executeUpdate();
-        } catch (Exception e) {
-            e.printStackTrace();
-        }
-    }
-
-    public void deleteUser(int userID) {
+//    public void toggleRole(int userID) {
+//        String sql = "UPDATE Account SET Role = CASE WHEN Role = 'User' THEN 'Staff' ELSE 'User' END WHERE UserID = ?";
+//        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+//            ps.setInt(1, userID);
+//            ps.executeUpdate();
+//        } catch (Exception e) {
+//            e.printStackTrace();
+//        }
+//    }
+    public boolean deleteUser(int userID) {
         String sql = "DELETE FROM Account WHERE UserID = ?";
         try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
             ps.setInt(1, userID);
-            ps.executeUpdate();
+            int rowsAffected = ps.executeUpdate();
+            return rowsAffected > 0;
         } catch (Exception e) {
             e.printStackTrace();
+            return false;
         }
     }
+
+    public boolean updateUserRole(int userID, String newRole) {
+        String sql = "UPDATE Account SET Role = ? WHERE UserID = ?";
+        try ( Connection conn = DBUtils.getConnection();  PreparedStatement ps = conn.prepareStatement(sql)) {
+            ps.setString(1, newRole);
+            ps.setInt(2, userID);
+            return ps.executeUpdate() > 0;
+        } catch (Exception e) {
+            e.printStackTrace();
+            return false;
+        }
+    }
+
 }

@@ -40,6 +40,16 @@
                 <input type="text" name="keyword"
                        value="<%= request.getParameter("keyword") != null ? request.getParameter("keyword") : "" %>"
                        placeholder="Search by customer name, email, status, or ID" />
+
+                <select name="status">
+                    <option value="">All Statuses</option>
+                    <option value="Processing" <%= "Processing".equals(request.getParameter("status")) ? "selected" : "" %>>Processing</option>
+                    <option value="Packed" <%= "Packed".equals(request.getParameter("status")) ? "selected" : "" %>>Packed</option>
+                    <option value="Shipped" <%= "Shipped".equals(request.getParameter("status")) ? "selected" : "" %>>Shipped</option>
+                    <option value="Delivered" <%= "Delivered".equals(request.getParameter("status")) ? "selected" : "" %>>Delivered</option>
+                    <option value="Cancelled" <%= "Cancelled".equals(request.getParameter("status")) ? "selected" : "" %>>Cancelled</option>
+                </select>
+
                 <button type="submit">Search</button>
             </form>
 
@@ -58,11 +68,13 @@
                     <tbody>
                         <%
                             String keyword = request.getParameter("keyword");
+                            String status = request.getParameter("status");
+
                             OrderDAO orderDAO = new OrderDAO();
                             List<OrderDTO> orders;
 
-                            if (keyword != null && !keyword.trim().isEmpty()) {
-                                orders = orderDAO.searchOrders(keyword.trim());
+                            if ((keyword != null && !keyword.trim().isEmpty()) || (status != null && !status.isEmpty())) {
+                                orders = orderDAO.searchOrders(keyword != null ? keyword.trim() : "", status);
                             } else {
                                 orders = orderDAO.getAllOrders();
                             }
@@ -78,21 +90,25 @@
                             <td><%= o.getOrderDate() %></td>
                             <td><%= String.format("%,.0f", o.getTotalAmount()) %></td>
                             <td>
+                                <%
+                                    String rawStatus = o.getStatus();
+                                    String displayStatus = "Shipped".equals(rawStatus) ? "Shipping" : rawStatus;
+                                %>
+                                <span class="status <%= rawStatus.toLowerCase() %>">
+                                    <%= displayStatus %>
+                                </span>
+
+                                <% if ("Processing".equals(rawStatus)) { %>
                                 <form action="<%=request.getContextPath()%>/UpdateOrderStatus" method="post" style="display:inline;">
-                                    <input type="hidden" name="orderID" value="<%= o.getOrderID() %>"/>
-                                    <select name="status">
-                                        <option value="Processing" <%= "Processing".equals(o.getStatus()) ? "selected":"" %>>Processing</option>
-                                        <option value="Shipped" <%= "Shipped".equals(o.getStatus()) ? "selected":"" %>>Shipped</option>
-                                        <option value="Delivered" <%= "Delivered".equals(o.getStatus()) ? "selected":"" %>>Delivered</option>
-                                        <option value="Cancelled" <%= "Cancelled".equals(o.getStatus()) ? "selected":"" %>>Cancelled</option>
-                                    </select>
-                                    <button type="submit">Update</button>
+                                    <input type="hidden" name="orderID" value="<%= o.getOrderID() %>" />
+                                    <input type="hidden" name="status" value="Packed" />
+                                    <button type="submit" style="margin-left: 5px;">Order is Packed</button>
                                 </form>
+                                <% } %>
                             </td>
                             <td>
                                 <a href="<%= request.getContextPath() %>/OrderDetailController?orderID=<%=o.getOrderID()%>" class="view-btn">View Detail</a>
                             </td>
-
                         </tr>
                         <%
                                 }
@@ -106,6 +122,7 @@
                 </table>      
             </div>
         </div>
+
         <script>
             // Tự động ẩn alert sau 3 giây
             setTimeout(function () {
@@ -113,7 +130,7 @@
                 if (alertBox) {
                     alertBox.style.transition = "opacity 0.5s ease-out";
                     alertBox.style.opacity = "0";
-                    setTimeout(() => alertBox.remove(), 500); // Xoá khỏi DOM sau khi ẩn
+                    setTimeout(() => alertBox.remove(), 500);
                 }
             }, 3000);
         </script>
