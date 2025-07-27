@@ -300,6 +300,35 @@ public class OrderDAO {
         }
         return list;
     }
+public List<OrderDTO> searchOrders(String keyword, String status) throws SQLException, ClassNotFoundException {
+    List<OrderDTO> list = new ArrayList<>();
+    String sql = "SELECT o.OrderID, o.OrderDate, o.TotalAmount, o.Status, a.FullName "
+               + "FROM Orders o "
+               + "JOIN Account a ON o.UserID = a.UserID "
+               + "WHERE (o.OrderID LIKE ? OR a.FullName LIKE ? OR a.Email LIKE ?) "
+               + "AND o.Status LIKE ? "
+               + "ORDER BY o.OrderDate DESC";
+    try (Connection conn = DBUtils.getConnection(); PreparedStatement ps = conn.prepareStatement(sql)) {
+        String kw = "%" + keyword + "%";
+        String st = "%" + status + "%";
+        ps.setString(1, kw);
+        ps.setString(2, kw);
+        ps.setString(3, kw);
+        ps.setString(4, st);
+        try (ResultSet rs = ps.executeQuery()) {
+            while (rs.next()) {
+                OrderDTO order = new OrderDTO();
+                order.setOrderID(rs.getInt("OrderID"));
+                order.setOrderDate(rs.getDate("OrderDate"));
+                order.setTotalAmount(rs.getDouble("TotalAmount"));
+                order.setStatus(rs.getString("Status"));
+                order.setFullName(rs.getString("FullName"));
+                list.add(order);
+            }
+        }
+    }
+    return list;
+}
 
     public double getTotalSpentByUser(int userID) throws SQLException, ClassNotFoundException {
         String sql = "SELECT SUM(TotalAmount) FROM Orders WHERE UserID = ? AND Status = 'Delivered'";

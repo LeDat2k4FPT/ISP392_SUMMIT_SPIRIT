@@ -40,6 +40,16 @@
                 <input type="text" name="keyword"
                        value="<%= request.getParameter("keyword") != null ? request.getParameter("keyword") : "" %>"
                        placeholder="Search by customer name, email, status, or ID" />
+
+                <select name="status">
+                    <option value="">All Statuses</option>
+                    <option value="Processing" <%= "Processing".equals(request.getParameter("status")) ? "selected" : "" %>>Processing</option>
+                    <option value="Packed" <%= "Packed".equals(request.getParameter("status")) ? "selected" : "" %>>Packed</option>
+                    <option value="Shipped" <%= "Shipped".equals(request.getParameter("status")) ? "selected" : "" %>>Shipped</option>
+                    <option value="Delivered" <%= "Delivered".equals(request.getParameter("status")) ? "selected" : "" %>>Delivered</option>
+                    <option value="Cancelled" <%= "Cancelled".equals(request.getParameter("status")) ? "selected" : "" %>>Cancelled</option>
+                </select>
+
                 <button type="submit">Search</button>
             </form>
 
@@ -58,11 +68,13 @@
                     <tbody>
                         <%
                             String keyword = request.getParameter("keyword");
+                            String status = request.getParameter("status");
+
                             OrderDAO orderDAO = new OrderDAO();
                             List<OrderDTO> orders;
 
-                            if (keyword != null && !keyword.trim().isEmpty()) {
-                                orders = orderDAO.searchOrders(keyword.trim());
+                            if ((keyword != null && !keyword.trim().isEmpty()) || (status != null && !status.isEmpty())) {
+                                orders = orderDAO.searchOrders(keyword != null ? keyword.trim() : "", status);
                             } else {
                                 orders = orderDAO.getAllOrders();
                             }
@@ -78,7 +90,6 @@
                             <td><%= o.getOrderDate() %></td>
                             <td><%= String.format("%,.0f", o.getTotalAmount()) %></td>
                             <td>
-                                <!-- Hiển thị status, đổi 'Shipped' thành 'Shipping' -->
                                 <%
                                     String rawStatus = o.getStatus();
                                     String displayStatus = "Shipped".equals(rawStatus) ? "Shipping" : rawStatus;
@@ -87,7 +98,6 @@
                                     <%= displayStatus %>
                                 </span>
 
-                                <%-- Nếu là đơn hàng Processing, hiển thị thêm nút "Order is Packed" --%>
                                 <% if ("Processing".equals(rawStatus)) { %>
                                 <form action="<%=request.getContextPath()%>/UpdateOrderStatus" method="post" style="display:inline;">
                                     <input type="hidden" name="orderID" value="<%= o.getOrderID() %>" />
@@ -96,12 +106,10 @@
                                 </form>
                                 <% } %>
                             </td>
-
                             <td>
                                 <a href="<%= request.getContextPath() %>/OrderDetailController?orderID=<%=o.getOrderID()%>" class="view-btn">View Detail</a>
                             </td>
                         </tr>
-
                         <%
                                 }
                             } else {
@@ -114,6 +122,7 @@
                 </table>      
             </div>
         </div>
+
         <script>
             // Tự động ẩn alert sau 3 giây
             setTimeout(function () {
@@ -121,7 +130,7 @@
                 if (alertBox) {
                     alertBox.style.transition = "opacity 0.5s ease-out";
                     alertBox.style.opacity = "0";
-                    setTimeout(() => alertBox.remove(), 500); // Xoá khỏi DOM sau khi ẩn
+                    setTimeout(() => alertBox.remove(), 500);
                 }
             }, 3000);
         </script>
