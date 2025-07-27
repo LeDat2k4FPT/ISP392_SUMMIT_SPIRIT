@@ -67,11 +67,15 @@
 
             <% if ("success".equals(paymentResult)) { %>
             <div>
-                <h3 class="success">
-                    Your transaction has been successful!
-                    🌄 Thank you for shopping at Summit Spirit!
-                    <i class="fas fa-check-circle"></i>
-                </h3>
+                <div class="success-text text-center">
+                    <p class="fs-5 fw-semibold">
+                        Your transaction has been successful!
+                        <i class="fas fa-check-circle"></i>
+                    </p>
+                    <p class="text-success">
+                        🌄 Thank you for shopping at Summit Spirit!
+                    </p>
+                </div>
                 <% if (transactionId != null) { %>
                 <p>Transaction code: <b><%= transactionId %></b></p>
                 <% } %>

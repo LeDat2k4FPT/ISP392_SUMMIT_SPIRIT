@@ -206,7 +206,7 @@
                 </div>
                 <% } %>
 
-                <form action="SubmitReview" method="post" onsubmit="return validateForm()">
+                <form action="<%= request.getContextPath() %>/SubmitReview" method="post" onsubmit="return validateForm()">
                     <!-- Hidden values to preserve after submit -->
                     <input type="hidden" name="productId" value="<%= productID %>">
                     <input type="hidden" name="orderId" value="<%= orderID %>">

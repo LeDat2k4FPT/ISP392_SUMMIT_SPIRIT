@@ -78,7 +78,7 @@ public class OrderDetailController extends HttpServlet {
             if (user.getRole().equals("Staff")) {
                 request.getRequestDispatcher("staff/orderDetailStaff.jsp").forward(request, response);
             } else {
-                request.getRequestDispatcher("user/orderDetail.jsp").forward(request, response);
+                request.getRequestDispatcher("user/orderDetailUser.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();

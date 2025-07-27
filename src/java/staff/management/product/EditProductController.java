@@ -24,9 +24,9 @@ public class EditProductController extends HttpServlet {
                 request.getSession().setAttribute("PRODUCT", product);
 
                 // Redirect thay vì forward
-                request.setAttribute("page", "staff/editproduct.jsp");
+                //request.setAttribute("page", "staff/editproduct.jsp");
                 request.getSession().setAttribute("PRODUCT", product);
-                request.getRequestDispatcher("staffDashboard.jsp").forward(request, response);
+                request.getRequestDispatcher("staff/editproduct.jsp").forward(request, response);
 
             } else {
                 response.sendRedirect("/staff/staffDashboard.jsp?page=productlist.jsp&msg=Product+not+found&type=danger");

@@ -358,8 +358,8 @@ public class UserDAO {
                         rs.getString("FullName"),
                         rs.getString("Address"),
                         rs.getString("Password"),
-                        rs.getString("Phone"),
                         rs.getString("Email"),
+                        rs.getString("Phone"),
                         rs.getString("Role")
                 );
                 list.add(user);
