@@ -229,7 +229,7 @@
                         <input type="hidden" name="voucherID" value="<%= voucherID %>">
                         <% } %>
                         <% } %>
-                        <button type="submit" name="action" value="CheckoutVNPay" class="pay-btn" onclick="setFormAction('payment')">Continue To Pay</button>
+                        <button type="submit" name="action" value="CheckoutVNPay" class="pay-btn" onclick="setFormAction('<%= request.getContextPath() %>/payment')">Continue To Pay</button>
                     </div>
                 </div>
 
