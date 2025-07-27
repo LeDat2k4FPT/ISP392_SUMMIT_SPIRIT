@@ -35,7 +35,7 @@ public class ajaxServlet extends HttpServlet {
         HttpSession session = req.getSession();
         UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
         if (loginUser == null) {
-            resp.sendRedirect("login.jsp");
+            resp.sendRedirect("<%= request.getContextPath() %>/user/login.jsp");
             return;
         }
 
@@ -47,11 +47,11 @@ public class ajaxServlet extends HttpServlet {
         try {
             amountDouble = Double.parseDouble(amountParam);
             if (amountDouble <= 0) {
-                resp.sendRedirect("checkout.jsp");
+                resp.sendRedirect("<%= request.getContextPath() %>/user/checkout.jsp");
                 return;
             }
         } catch (Exception e) {
-            resp.sendRedirect("checkout.jsp");
+            resp.sendRedirect("<%= request.getContextPath() %>/user/checkout.jsp");
             return;
         }
 
@@ -99,7 +99,7 @@ public class ajaxServlet extends HttpServlet {
             Logger.getLogger(ajaxServlet.class.getName()).log(Level.SEVERE, null, ex);
         }
         if (orderId_new < 0) {
-            resp.sendRedirect("error.jsp");
+            resp.sendRedirect("<%= request.getContextPath() %>/user/error.jsp");
             return;
         }
         String vnp_TxnRef = orderId_new + "-" + System.currentTimeMillis();

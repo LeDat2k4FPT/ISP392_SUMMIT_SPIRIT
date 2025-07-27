@@ -6,7 +6,7 @@
 <%
      UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
     if (loginUser == null || !"User".equals(loginUser.getRole())) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("user/login.jsp");
         return;
     }
     List<OrderDTO> orders = (List<OrderDTO>) request.getAttribute("orders");
@@ -234,12 +234,12 @@
     <body>
         <!-- Header -->
         <div class="header">
-            <a href="homepage.jsp">
-                <img src="image/summit_logo.png" alt="Logo">
+            <a href="<%= request.getContextPath() %>/user/homepage.jsp">
+                <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
             <div class="nav-links">
-                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                <a href="cart.jsp" class="cart-icon">
+                <a href="<%= request.getContextPath() %>/user/homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="<%= request.getContextPath() %>/user/cart.jsp" class="cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                     <% if (cartItemCount > 0) { %>
                     <span class="cart-badge"><%= cartItemCount %></span>
@@ -248,7 +248,7 @@
                 <div class="user-dropdown">
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
-                        <a href="profile.jsp"><%= loginUser.getFullName() %></a>
+                        <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser.getFullName() %></a>
                         <a href="MainController?action=Logout">Logout</a>
                     </div>
                 </div>
@@ -267,10 +267,10 @@
                 }
             });
         </script>
-        <div class="wrapper d-flex"> 
+        <div class="wrapper d-flex">
             <aside class="sidebar">
                 <nav class="menu">
-                    <a href="profile.jsp" class="menu-link ">My Profile</a>
+                    <a href="<%= request.getContextPath() %>/user/profile.jsp" class="menu-link ">My Profile</a>
                     <a href="UserOrderHistoryController" class="menu-link active">Orders History</a>
 
                 </nav>
@@ -289,7 +289,7 @@
                         </tr>
                     </thead>
                     <tbody>
-                        <% 
+                        <%
        if (orders != null && !orders.isEmpty()) {
            for (OrderDTO o : orders) {
                String status = o.getStatus() != null ? o.getStatus() : "";
@@ -316,7 +316,7 @@
                         <tr>
                             <td><%= o.getOrderID() %></td>
                             <td><%= o.getOrderDate() %></td>
-                            <td class="<%= statusClass %>"><%= displayStatus %></td> 
+                            <td class="<%= statusClass %>"><%= displayStatus %></td>
                             <td><%= String.format("%,.0f", o.getTotalAmount()) %></td>
                             <td><a href="OrderDetailController?orderID=<%= o.getOrderID() %>">VIEW</a></td>
                             <td>
@@ -324,7 +324,7 @@
                                        && !"Delivered".equalsIgnoreCase(status)
                                        && !"Cancelling".equalsIgnoreCase(status)
                                        && !"Packed".equalsIgnoreCase(status)
-                                       && !"Shipped".equalsIgnoreCase(status)) { %> 
+                                       && !"Shipped".equalsIgnoreCase(status)) { %>
                                 <button onclick="openCancelModal(<%= o.getOrderID() %>)">Cancel</button>
                                 <% } else { %>&nbsp;<% } %>
 

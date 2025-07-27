@@ -7,7 +7,7 @@
 <%
     UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
     if (loginUser == null) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("user/login.jsp");
         return;
     }
     CartDTO cart = (CartDTO) session.getAttribute("CART");
@@ -41,7 +41,7 @@
         <title>Submit Review</title>
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="css/rating.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/rating.css">
         <style>
             body {
                 font-family: 'Kumbh Sans', sans-serif;
@@ -152,19 +152,19 @@
                 display: flex;
                 gap: 10px;
                 margin-top: 10px;
-                
+
             }
         </style>
     </head>
     <body>
         <!-- Header -->
         <div class="header">
-            <a href="homepage.jsp">
-                <img src="image/summit_logo.png" alt="Logo">
+            <a href="<%= request.getContextPath() %>/user/homepage.jsp">
+                <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
             <div class="nav-links">
-                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                <a href="cart.jsp" class="cart-icon">
+                <a href="<%= request.getContextPath() %>/user/homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="<%= request.getContextPath() %>/user/cart.jsp" class="cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                     <% if (cartItemCount > 0) { %>
                     <span class="cart-badge"><%= cartItemCount %></span>
@@ -173,7 +173,7 @@
                 <div class="user-dropdown">
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
-                        <a href="profile.jsp"><%= loginUser.getFullName() %></a>
+                        <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser.getFullName() %></a>
                         <a href="MainController?action=Logout">Logout</a>
                     </div>
                 </div>
@@ -253,7 +253,7 @@
                 <% } %>
 
                 <h2>
-                    ⭐ <%= String.format("%.1f", avgRating) %> / 5 
+                    ⭐ <%= String.format("%.1f", avgRating) %> / 5
                     (<%= totalReviews %> reviews)
                 </h2>
 

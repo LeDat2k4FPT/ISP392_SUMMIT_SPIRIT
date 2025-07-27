@@ -20,8 +20,8 @@ import utils.EmailUtils;
 @WebServlet(name = "CreateUserController", urlPatterns = {"/CreateUserController"})
 public class CreateUserController extends HttpServlet {
 
-    private static final String ERROR = "createUser.jsp";
-    private static final String SUCCESS = "verifyAccount.jsp";
+    private static final String ERROR = "user/createUser.jsp";
+    private static final String SUCCESS = "user/verifyAccount.jsp";
     private static final String NOT_MATCH = "Please make sure the password and confirm password match!";
     private static final String DUPLICATE_MESSAGE = "Email already exists!";
     private static final String DUPLICATE_PHONE_NUMBER = "Phone number already exists!";

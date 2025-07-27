@@ -18,11 +18,11 @@ import user.UserError;
 @WebServlet(name = "EditProfileController", urlPatterns = {"/EditProfileController"})
 public class EditProfileController extends HttpServlet {
 
-    private static final String ERROR = "profile.jsp";
+    private static final String ERROR = "user/profile.jsp";
     private static final String UNKNOW_MESSAGE = "Unknow error!";
     private static final String STAFF_PAGE = "staff/staffProfile.jsp";
     private static final String ADMIN_PAGE = "admin/admin.jsp?page=adminProfile.jsp";
-    private static final String USER_PAGE = "profile.jsp";
+    private static final String USER_PAGE = "user/profile.jsp";
     private static final String SHIPPER_PAGE = "ship/shipProfile.jsp";
 
     protected void processRequest(HttpServletRequest request, HttpServletResponse response) throws ServletException, IOException {

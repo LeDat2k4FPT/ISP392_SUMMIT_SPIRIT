@@ -13,17 +13,17 @@
         <title>Sale Off - Summit Spirit</title>
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="css/saleOff.css">
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/css/saleOff.css">
     </head>
     <body>
         <!-- Header -->
         <div class="header">
-            <a href="homepage.jsp">
-                <img src="image/summit_logo.png" alt="Logo">
+            <a href="<%= request.getContextPath() %>/user/homepage.jsp">
+                <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
             <div class="nav-links">
-                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                <a href="cart.jsp" class="cart-icon">
+                <a href="<%= request.getContextPath() %>/user/homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="<%= request.getContextPath() %>/user/cart.jsp" class="cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                     <% if (cartItemCount > 0) { %>
                     <span class="cart-badge"><%= cartItemCount %></span>
@@ -32,7 +32,7 @@
                 <div class="user-dropdown">
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
-                        <a href="profile.jsp"><%= loginUser.getFullName() %></a>
+                        <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser.getFullName() %></a>
                         <a href="MainController?action=Logout">Logout</a>
                     </div>
                 </div>
@@ -69,10 +69,10 @@
                 double finalPrice = Math.round(originalPrice * 0.8); // giá đã giảm 20%
             %>
             <div class="product">
-                <a href="productDetail.jsp?id=<%= p.getProductID() %>&fromSaleOff=true">
+                <a href="<%= request.getContextPath() %>/user/productDetail.jsp?id=<%= p.getProductID() %>&fromSaleOff=true">
                     <img src="<%= p.getProductImage() %>" alt="Product Image">
                 </a>
-                <h4><a href="productDetail.jsp?id=<%= p.getProductID() %>&fromSaleOff=true"><%= p.getProductName() %></a></h4>
+                <h4><a href="<%= request.getContextPath() %>/user/productDetail.jsp?id=<%= p.getProductID() %>&fromSaleOff=true"><%= p.getProductName() %></a></h4>
                 <p class="original-price"><%= String.format("%,.0f", originalPrice) %> VND</p>
                 <p class="discount-price"><%= String.format("%,.0f", finalPrice) %> VND (−20%)</p>
 

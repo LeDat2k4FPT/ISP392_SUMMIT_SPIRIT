@@ -9,7 +9,7 @@
 <%
      UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
     if (loginUser == null || !"User".equals(loginUser.getRole())) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("user/login.jsp");
         return;
     }
     CartDTO cart = (CartDTO) session.getAttribute("CART");
@@ -44,12 +44,12 @@
     <body>
         <!-- Header -->
         <div class="header">
-            <a href="homepage.jsp">
-                <img src="image/summit_logo.png" alt="Logo">
+            <a href="<%= request.getContextPath() %>/user/homepage.jsp">
+                <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
             <div class="nav-links">
-                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                <a href="cart.jsp" class="cart-icon">
+                <a href="<%= request.getContextPath() %>/user/homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="<%= request.getContextPath() %>/user/cart.jsp" class="cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                     <% if (cartItemCount > 0) { %>
                     <span class="cart-badge"><%= cartItemCount %></span>
@@ -58,7 +58,7 @@
                 <div class="user-dropdown">
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
-                        <a href="profile.jsp"><%= loginUser.getFullName() %></a>
+                        <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser.getFullName() %></a>
                         <a href="MainController?action=Logout">Logout</a>
                     </div>
                 </div>
@@ -93,7 +93,7 @@
                     <div><strong>Customer:</strong> <%= userInfo.getFullName() %></div>
                     <div><strong>Email:</strong> <%= userInfo.getEmail() %></div>
                     <div><strong>Phone:</strong> <%= userInfo.getPhone() %></div>
-                    <div><strong>Address:</strong> <%= userInfo.getAddress() %>, <%= userInfo.getDistrict() %>, 
+                    <div><strong>Address:</strong> <%= userInfo.getAddress() %>, <%= userInfo.getDistrict() %>,
                         <%= userInfo.getCity() %>, <%= userInfo.getCountry() %></div>
                         <% } else { %>
                     <div><strong>Customer:</strong> <i>Not provided yet</i></div>
@@ -130,10 +130,10 @@
                     <p><strong>Unit Price:</strong> <%= nf.format(od.getUnitPrice()) %> ₫</p>
 
                     <%-- ✅ Thêm nút Review nếu đơn hàng đã giao --%>
-                    <% if ("Delivered".equalsIgnoreCase(order.getStatus())) { 
+                    <% if ("Delivered".equalsIgnoreCase(order.getStatus())) {
                            String fullAddress = userInfo != null ? userInfo.getAddress() + ", " + userInfo.getDistrict() + ", " + userInfo.getCity() + ", " + userInfo.getCountry() : "";
                     %>
-                    <form action="rating.jsp" method="get">
+                    <form action="<%= request.getContextPath() %>/user/rating.jsp" method="get">
                         <input type="hidden" name="orderID" value="<%= order.getOrderID() %>">
                         <input type="hidden" name="productID" value="<%= od.getProductID() %>">
                         <input type="hidden" name="productName" value="<%= od.getProductName() %>">
@@ -157,7 +157,7 @@
                 </div>
                 <% } %>
             </div>
-            
+
             <% } %>
         </div>
     </body>

@@ -22,7 +22,7 @@ public class ApplyDiscountServlet extends HttpServlet {
         String discountCode = request.getParameter("discountCode");
         String sourcePage = request.getParameter("sourcePage");
         if (sourcePage == null || sourcePage.isEmpty()) {
-            sourcePage = "shipping.jsp";
+            sourcePage = "user/shipping.jsp";
         }
 
         HttpSession session = request.getSession();

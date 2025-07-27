@@ -4,7 +4,7 @@
 <%
     UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
     if (loginUser == null || !"User".equals(loginUser.getRole())) {
-        response.sendRedirect("login.jsp");
+        response.sendRedirect("user/login.jsp");
         return;
     }
 
@@ -51,17 +51,17 @@
         <title>Homepage - Summit Spirit</title>
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="css/homepage.css">
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/css/homepage.css">
     </head>
     <body>
         <!-- Header -->
         <div class="header">
-            <a href="homepage.jsp">
-                <img src="image/summit_logo.png" alt="Logo">
+            <a href="<%= request.getContextPath() %>/user/homepage.jsp">
+                <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
             <div class="nav-links">
-                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                <a href="cart.jsp" class="cart-icon">
+                <a href="<%= request.getContextPath() %>/user/homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="<%= request.getContextPath() %>/user/cart.jsp" class="cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                     <% if (cartItemCount > 0) { %>
                     <span class="cart-badge"><%= cartItemCount %></span>
@@ -70,7 +70,7 @@
                 <div class="user-dropdown">
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
-                        <a href="profile.jsp"><%= loginUser.getFullName() %></a>
+                        <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser.getFullName() %></a>
                         <a href="MainController?action=Logout">Logout</a>
                     </div>
                 </div>
@@ -92,7 +92,7 @@
 
         <!-- Hero Banner -->
         <div class="hero">
-            <img src="image/hero_banner.png" alt="Hero Banner">
+            <img src="<%= request.getContextPath() %>/image/hero_banner.png" alt="Hero Banner">
             <div class="hero-text">
                 <h1>SUMMIT SPIRIT</h1>
                 <p>Climb Higher, Live Brighter</p>
@@ -101,31 +101,31 @@
 
         <!-- Categories -->
         <div class="categories">
-            <a href="category.jsp?category=ao" data-category="Shirts">
-                <img src="image/logo_ao.png" alt="Shirts">
+            <a href="<%= request.getContextPath() %>/user/category.jsp?category=ao">
+                <img src="<%= request.getContextPath() %>/image/logo_ao.png" alt="Shirts">
                 Shirts
             </a>
-            <a href="category.jsp?category=quan" data-category="Pants">
-                <img src="image/logo_quan.png" alt="Pants">
+            <a href="<%= request.getContextPath() %>/user/category.jsp?category=quan">
+                <img src="<%= request.getContextPath() %>/image/logo_quan.png" alt="Pants">
                 Pants
             </a>
-            <a href="category.jsp?category=balo" data-category="Backpacks">
-                <img src="image/logo_balo.png" alt="Backpacks">
+            <a href="<%= request.getContextPath() %>/user/category.jsp?category=balo">
+                <img src="<%= request.getContextPath() %>/image/logo_balo.png" alt="Backpacks">
                 Backpacks
             </a>
-            <a href="category.jsp?category=dungcu" data-category="Camping Tools">
-                <img src="image/logo_tool.png" alt="Camping Tools">
+            <a href="<%= request.getContextPath() %>/user/category.jsp?category=dungcu">
+                <img src="<%= request.getContextPath() %>/image/logo_tool.png" alt="Camping Tools">
                 Camping Tools
             </a>
-            <a href="category.jsp?category=trai" data-category="Tents">
-                <img src="image/logo_leu.png" alt="Tents">
+            <a href="<%= request.getContextPath() %>/user/category.jsp?category=trai">
+                <img src="<%= request.getContextPath() %>/image/logo_leu.png" alt="Tents">
                 Tents
             </a>
-            <a href="category.jsp?category=mu" data-category="Hats">
+            <a href="<%= request.getContextPath() %>/user/category.jsp?category=mu">
                 <i class="fa-solid fa-hat-cowboy"></i>
                 Hats
             </a>
-            <a href="category.jsp?category=camping" data-category="Camping Stove">
+            <a href="<%= request.getContextPath() %>/user/category.jsp?category=camping">
                 <i class="fa-solid fa-fire"></i>
                 Camping Stove
             </a>
@@ -138,10 +138,10 @@
                 <% if (topSales != null && !topSales.isEmpty()) {
             for (ProductDTO p : topSales) { %>
                 <div class="product">
-                    <a href="productDetail.jsp?id=<%= p.getProductID() %>">
-                    <img src="<%= p.getProductImage() %>" alt="Product Image">
+                    <a href="<%= request.getContextPath() %>/user/productDetail.jsp?id=<%= p.getProductID() %>">
+                        <img src="<%= p.getProductImage() %>" alt="Product Image">
                     </a>
-                    <h4><a href="productDetail.jsp?id=<%= p.getProductID() %>"><%= p.getProductName() %></a></h4>
+                    <h4><a href="<%= request.getContextPath() %>/user/productDetail.jsp?id=<%= p.getProductID() %>"><%= p.getProductName() %></a></h4>
                     <p><%= p.getDescription() %></p>
                     <strong><%= String.format("%,.0f", p.getPrice()) %> VND</strong>
                 </div>
@@ -156,10 +156,10 @@
             <div class="product-list">
                 <% for (ProductDTO p : selectedProducts) { %>
                 <div class="product">
-                    <a href="productDetail.jsp?id=<%= p.getProductID() %>">
-                    <img src="<%= p.getProductImage() %>" alt="Product Image">
+                    <a href="<%= request.getContextPath() %>/user/productDetail.jsp?id=<%= p.getProductID() %>">
+                        <img src="<%= p.getProductImage() %>" alt="Product Image">
                     </a>
-                    <h4><a href="productDetail.jsp?id=<%= p.getProductID() %>"><%= p.getProductName() %></a></h4>
+                    <h4><a href="<%= request.getContextPath() %>/user/productDetail.jsp?id=<%= p.getProductID() %>"><%= p.getProductName() %></a></h4>
                     <p><%= p.getDescription() %></p>
                     <strong><%= String.format("%,.0f", p.getPrice()) %> VND</strong>
                 </div>
@@ -168,14 +168,12 @@
 
             <!-- Sales Off -->
             <h2>Sales Off</h2>
-            <a href="MainController?action=viewSaleOff">
+            <a href="<%= request.getContextPath() %>/MainController?action=viewSaleOff">
                 <div class="promotion-program">
-                    <img src="image/km_banner_1.png">
+                    <img src="<%= request.getContextPath() %>/image/km_banner_1.png">
                 </div>
             </a>
-
         </div>
-
         <%
             String message = (String) request.getAttribute("MESSAGE");
             if (message == null) message = "";

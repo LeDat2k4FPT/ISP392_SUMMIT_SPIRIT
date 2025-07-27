@@ -18,6 +18,7 @@ public class ViewProductController extends HttpServlet {
 
     // Ánh xạ tên danh mục sang categoryID
     private static final Map<String, Integer> CATEGORY_MAP = new HashMap<>();
+
     static {
         CATEGORY_MAP.put("ao", 2);
         CATEGORY_MAP.put("quan", 1);
@@ -29,7 +30,7 @@ public class ViewProductController extends HttpServlet {
     protected void processRequest(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
 
-        String url = "homepage.jsp";
+        String url = "user/homepage.jsp";
 
         try {
             // Nhận giá trị từ request

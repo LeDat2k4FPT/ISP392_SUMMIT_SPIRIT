@@ -52,8 +52,8 @@ public class VnpayReturn extends HttpServlet {
             String signValue = Config.hashAllFields(fields);
             if (!signValue.equals(vnp_SecureHash)) {
                 request.setAttribute("paymentResult", "invalid");
-                request.setAttribute("retryLink", "checkout.jsp?retry=true");
-                request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
+                request.setAttribute("retryLink", "<%= request.getContextPath() %>/user/checkout.jsp?retry=true");
+                request.getRequestDispatcher("<%= request.getContextPath() %>/user/paymentResult.jsp").forward(request, response);
                 return;
             }
 
@@ -70,8 +70,8 @@ public class VnpayReturn extends HttpServlet {
                 System.out.println("Parsed orderId from vnp_TxnRef: " + orderId);
             } catch (Exception ex) {
                 request.setAttribute("paymentResult", "error");
-                request.setAttribute("retryLink", "checkout.jsp?retry=true");
-                request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
+                request.setAttribute("retryLink", "<%= request.getContextPath() %>/user/checkout.jsp?retry=true");
+                request.getRequestDispatcher("<%= request.getContextPath() %>/user/paymentResult.jsp").forward(request, response);
                 return;
             }
 
@@ -79,8 +79,8 @@ public class VnpayReturn extends HttpServlet {
             Object sessionObj = session.getAttribute("PENDING_ORDER");
             if (!(sessionObj instanceof Map)) {
                 request.setAttribute("paymentResult", "error");
-                request.setAttribute("retryLink", "checkout.jsp?retry=true");
-                request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
+                request.setAttribute("retryLink", "<%= request.getContextPath() %>/user/checkout.jsp?retry=true");
+                request.getRequestDispatcher("<%= request.getContextPath() %>/user/paymentResult.jsp").forward(request, response);
                 return;
             }
 
@@ -149,7 +149,7 @@ public class VnpayReturn extends HttpServlet {
                     request.setAttribute("orderInfo", request.getParameter("vnp_OrderInfo"));
                 } else {
                     request.setAttribute("paymentResult", "error");
-                    String retryLink = "BUY_NOW".equals(checkoutType) ? "checkout.jsp?retry=true" : "shipping.jsp?retry=true";
+                    String retryLink = "BUY_NOW".equals(checkoutType) ? "<%= request.getContextPath() %>/user/checkout.jsp?retry=true" : "user/shipping.jsp?retry=true";
                     request.setAttribute("retryLink", retryLink);
                 }
             } else {
@@ -159,16 +159,16 @@ public class VnpayReturn extends HttpServlet {
                 order.setNote("Order payment failed");
                 boolean updated = orderDao.updateOrderStatusAndNote(order);
                 request.setAttribute("paymentResult", "failed");
-                String retryLink = "BUY_NOW".equals(checkoutType) ? "checkout.jsp?retry=true" : "shipping.jsp?retry=true";
+                String retryLink = "BUY_NOW".equals(checkoutType) ? "<%= request.getContextPath() %>/user/checkout.jsp?retry=true" : "user/shipping.jsp?retry=true";
                 request.setAttribute("retryLink", retryLink);
             }
         } catch (Exception e) {
             Logger.getLogger(VnpayReturn.class.getName()).log(Level.SEVERE, null, e);
             request.setAttribute("paymentResult", "error");
-            request.setAttribute("retryLink", "checkout.jsp?retry=true");
+            request.setAttribute("retryLink", "<%= request.getContextPath() %>/user/checkout.jsp?retry=true");
         }
 
-        request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
+        request.getRequestDispatcher("<%= request.getContextPath() %>/user/paymentResult.jsp").forward(request, response);
     }
 
     @Override

@@ -10,13 +10,13 @@
         <link rel="stylesheet" href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" >
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css">
-        <link rel="stylesheet" href="css/profile.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/profile.css">
     </head>
     <body>
         <%
             UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
             if (loginUser == null || !"User".equals(loginUser.getRole())) {
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("user/login.jsp");
                 return;
             }
             UserError userError = (UserError) request.getAttribute("USER_ERROR");
@@ -28,12 +28,12 @@
 
         <!-- Header -->
         <div class="header">
-            <a href="homepage.jsp">
-                <img src="image/summit_logo.png" alt="Logo">
+            <a href="<%= request.getContextPath() %>/user/homepage.jsp">
+                <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
             <div class="nav-links">
-                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                <a href="cart.jsp" class="cart-icon">
+                <a href="<%= request.getContextPath() %>/user/homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="<%= request.getContextPath() %>/user/cart.jsp" class="cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                     <% if (cartItemCount > 0) { %>
                     <span class="cart-badge"><%= cartItemCount %></span>
@@ -42,7 +42,7 @@
                 <div class="user-dropdown">
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
-                        <a href="profile.jsp"><%= loginUser.getFullName() %></a>
+                        <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser.getFullName() %></a>
                         <a href="MainController?action=Logout">Logout</a>
                     </div>
                 </div>
@@ -68,8 +68,8 @@
             <!-- Sidebar -->
             <aside class="sidebar">
                 <nav class="menu">
-                    <a href="profile.jsp" class="menu-link active">My Profile</a>
-                    <a href="UserOrderHistoryController" class="menu-link">Orders History</a>
+                    <a href="<%= request.getContextPath() %>/user/profile.jsp" class="menu-link active">My Profile</a>
+                    <a href="<%= request.getContextPath() %>/UserOrderHistoryController" class="menu-link">Orders History</a>
                 </nav>
             </aside>
 
@@ -79,7 +79,7 @@
                     <h2 class="title">User Profile</h2>
                     <h4 class="username"><%= loginUser.getFullName().toUpperCase() %></h4>
 
-                    <form action="MainController" method="POST">
+                    <form action="<%= request.getContextPath() %>/MainController" method="POST">
                         <input type="hidden" name="action" value="EditProfile">
                         <input type="hidden" name="userID" value="<%= loginUser.getUserID()%>">
 
@@ -112,8 +112,8 @@
                         </div>
 
                         <div class="btn-group">
-                            <a href="homepage.jsp" class="btn btn-outline">Cancel</a>
-                            <a href="changePassword.jsp" class="btn btn-secondary">Change Password</a>
+                            <a href="<%= request.getContextPath() %>/user/homepage.jsp" class="btn btn-outline">Cancel</a>
+                            <a href="<%= request.getContextPath() %>/user/changePassword.jsp" class="btn btn-secondary">Change Password</a>
                             <button type="submit" class="btn btn-primary">Save Changes</button>
                         </div>
                     </form>

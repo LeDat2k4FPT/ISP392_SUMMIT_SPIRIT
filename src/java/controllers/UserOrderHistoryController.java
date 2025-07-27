@@ -69,7 +69,7 @@ public class UserOrderHistoryController extends HttpServlet {
             HttpSession session = request.getSession();
             UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
             if (user == null) {
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("user/login.jsp");
                 return;
             }
 
@@ -79,7 +79,7 @@ public class UserOrderHistoryController extends HttpServlet {
             System.out.println("Orders found: " + orders.size());
 
             request.setAttribute("orders", orders);
-            request.getRequestDispatcher("orderHistory.jsp").forward(request, response);
+            request.getRequestDispatcher("user/orderHistory.jsp").forward(request, response);
         } catch (SQLException ex) {
             Logger.getLogger(UserOrderHistoryController.class.getName()).log(Level.SEVERE, null, ex);
         }

@@ -100,7 +100,7 @@ public class CartServlet extends HttpServlet {
             log("Error in CartServlet: " + e);
         }
 
-        request.getRequestDispatcher("cart.jsp").forward(request, response);
+        request.getRequestDispatcher("user/cart.jsp").forward(request, response);
     }
 
     @Override

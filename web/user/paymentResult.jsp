@@ -13,16 +13,16 @@
         <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.2/css/all.min.css"
               integrity="sha512-z3gLpd7yknf1YoNbCzqRKc4qyor8gaKU1qmn+CShxbuBusANI9QpRohGBreCFkKxLhei6S9CQXFEbbKuqLg0DA=="
               crossorigin="anonymous" referrerpolicy="no-referrer" />
-        <link rel="stylesheet" href="css/paymentResult.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/paymentResult.css">
     </head>
     <body>
         <div class="header">
-            <a href="homepage.jsp">
-                <img src="image/summit_logo.png" alt="Logo">
+            <a href="<%= request.getContextPath() %>/user/homepage.jsp">
+                <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
             <div class="nav-links">
-                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                <a href="cart.jsp" class="cart-icon">
+                <a href="<%= request.getContextPath() %>/user/homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="<%= request.getContextPath() %>/user/cart.jsp" class="cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                     <% if (cartItemCount > 0) { %>
                     <span class="cart-badge"><%= cartItemCount %></span>
@@ -31,7 +31,7 @@
                 <div class="user-dropdown">
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
-                        <a href="profile.jsp"><%= loginUser != null ? loginUser.getFullName() : "Account" %></a>
+                        <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser != null ? loginUser.getFullName() : "Account" %></a>
                         <a href="MainController?action=Logout">Logout</a>
                     </div>
                 </div>
@@ -89,21 +89,21 @@
                 <h3 class="failed">
                     Transaction order failed!
                 </h3>
-                <a href="<%= retryLink != null ? retryLink : "checkout.jsp" %>" class="btn-retry">🔁 Back to payment</a>
+                <a href="<%= retryLink != null ? retryLink : "<%= request.getContextPath() %>/user/checkout.jsp" %>" class="btn-retry">🔁 Back to payment</a>
             </div>
             <% } else if ("invalid".equals(paymentResult)) { %>
             <div>
                 <h3 class="invalid">
                     Invalid signature! Data may have been modified.
                 </h3>
-                <a href="<%= retryLink != null ? retryLink : "checkout.jsp" %>" class="btn-retry">🔁 Back to payment</a>
+                <a href="<%= retryLink != null ? retryLink : "<%= request.getContextPath() %>/user/checkout.jsp" %>" class="btn-retry">🔁 Back to payment</a>
             </div>
             <% } else if ("error".equals(paymentResult)) { %>
             <div>
                 <h3 class="error">
                     An error occurred while processing the transaction!
                 </h3>
-                <a href="<%= retryLink != null ? retryLink : "checkout.jsp" %>" class="btn-retry">🔁 Back to payment</a>
+                <a href="<%= retryLink != null ? retryLink : "<%= request.getContextPath() %>/user/checkout.jsp" %>" class="btn-retry">🔁 Back to payment</a>
             </div>
             <% } else { %>
             <div>

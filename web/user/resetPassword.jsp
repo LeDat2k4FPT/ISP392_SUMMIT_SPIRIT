@@ -10,7 +10,7 @@
     <head>
         <meta charset="UTF-8">
         <title>Reset Password</title>
-        <link rel="stylesheet" type="text/css" href="css/resetpassword.css">
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/css/resetpassword.css">
     </head>
     <body>
         <div class="form-container">
@@ -23,9 +23,9 @@
             <%
                 }
             %>
-            <form action="MainController" method="POST">
+            <form action="<%= request.getContextPath() %>/MainController" method="POST">
                 <input type="hidden" name="action" value="ResetPassword" />
-                
+
                 <label>New Password:</label>
                 <input type="password" name="newPassword" required />
 
@@ -33,9 +33,9 @@
                 <input type="password" name="confirmNewPassword" required />
 
                 <input type="submit" value="Update Password" />
-                
+
                 <div class="text-center mt-3">
-                    <a href="profile.jsp" class="back-link">Back to User Information Page</a>
+                    <a href="<%= request.getContextPath() %>/user/profile.jsp" class="back-link">Back to User Information Page</a>
                 </div>
             </form>
         </div>

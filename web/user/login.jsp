@@ -6,10 +6,10 @@
         <title>Login</title>
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="css/login.css">
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/css/login.css">
     </head>
     <body>
-        <img src="image/summit_logo.png" alt="Summit Spirit Logo" class="logo">
+        <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Summit Spirit Logo" class="logo">
         <div class="login-box">
             <h2 class="login-title">LOGIN</h2>
             <%
@@ -20,7 +20,7 @@
             <%
                 }
             %>
-            <form id="login-form" action="MainController" method="POST">
+            <form id="login-form" action="<%= request.getContextPath() %>/MainController" method="POST">
                 <input type="email" class="form-control mb-3" name="email" placeholder="email" required>
                 <input type="password" class="form-control mb-3" name="password" placeholder="password" required>
 
@@ -29,10 +29,10 @@
 
                 <button type="submit" name="action" value="Login" class="btn btn-login">Login</button>
                 <div class="register-link">
-                    Don’t have an account yet? <a href="createUser.jsp">Register here</a>
+                    Don’t have an account yet? <a href="<%= request.getContextPath() %>/user/createUser.jsp">Register here</a>
                 </div>
                 <div class="forgot-link">
-                    <a href="forgotPassword.jsp">Forgot password</a>
+                    <a href="<%= request.getContextPath() %>/user/forgotPassword.jsp">Forgot password</a>
                 </div>
             </form>
         </div>

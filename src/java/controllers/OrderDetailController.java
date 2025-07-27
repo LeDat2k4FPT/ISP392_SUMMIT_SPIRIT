@@ -67,7 +67,7 @@ public class OrderDetailController extends HttpServlet {
             UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
             if (user == null) {
                 // Nếu chưa login thì redirect về login.jsp
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("user/login.jsp");
                 return;
             }
             int orderID = Integer.parseInt(request.getParameter("orderID"));
@@ -78,7 +78,7 @@ public class OrderDetailController extends HttpServlet {
             if (user.getRole().equals("Staff")) {
                 request.getRequestDispatcher("staff/orderDetailStaff.jsp").forward(request, response);
             } else {
-                request.getRequestDispatcher("orderDetail.jsp").forward(request, response);
+                request.getRequestDispatcher("user/orderDetail.jsp").forward(request, response);
             }
         } catch (Exception e) {
             e.printStackTrace();

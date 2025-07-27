@@ -7,15 +7,15 @@
         <title>Register</title>
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
         <link href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css" rel="stylesheet">
-        <link rel="stylesheet" type="text/css" href="css/register.css">
+        <link rel="stylesheet" type="text/css" href="<%= request.getContextPath() %>/css/register.css">
     </head>
     <body>
-        <div class="logo" >  
-            <a href="homepage.jsp">
-                <img src="image/summit_logo.png" alt="Logo">
+        <div class="logo" >
+            <a href="user/homepage.jsp">
+                <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
-        </div>      
-        
+        </div>
+
         <div class="container register-box">
             <h2>Welcome to Summit Spirit</h2>
             <h5>Register your account</h5>
@@ -38,7 +38,7 @@
             <%
                 }
             %>
-            <form id="create-form" action="MainController" method="POST">
+            <form id="create-form" action="<%= request.getContextPath() %>/MainController" method="POST">
                 <div class="row g-3">
                     <div class="col-md-6">
                         <label for="fullName" class="form-label">Full Name</label>
@@ -84,7 +84,7 @@
                 </div>
 
                 <div class="already">
-                    Already have an account? <a href="login.jsp">Log In</a>
+                    Already have an account? <a href="user/login.jsp">Log In</a>
                 </div>
             </form>
         </div>

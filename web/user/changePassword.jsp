@@ -7,16 +7,15 @@
         <title>Change Password</title>
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
         <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/bootstrap@5.3.0/dist/css/bootstrap.min.css">
-        <link rel="stylesheet" href="css/changePassword.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/changePassword.css">
     </head>
     <body>
         <%
             UserDTO loginUser = (UserDTO) session.getAttribute("LOGIN_USER");
             if (loginUser == null) {
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("user/login.jsp");
                 return;
             }
-
             String message = (String) request.getAttribute("MESSAGE");
         %>
 
@@ -28,7 +27,7 @@
             <div class="error"><%= message %></div>
             <% } %>
 
-            <form action="MainController" method="POST">
+            <form action="<%= request.getContextPath() %>/MainController" method="POST">
                 <input type="hidden" name="action" value="ChangePassword" />
 
                 <label class="form-label">Current Password</label>

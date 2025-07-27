@@ -81,7 +81,7 @@ public class ReturnUrlController extends HttpServlet {
         }
 
         // Chuyển tới trang hiển thị kết quả
-        request.getRequestDispatcher("paymentResult.jsp").forward(request, response);
+        request.getRequestDispatcher("user/paymentResult.jsp").forward(request, response);
     }
 
     @Override

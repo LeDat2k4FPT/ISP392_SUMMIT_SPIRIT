@@ -13,15 +13,15 @@ import dto.UserDTO;
 @WebServlet(name = "LoginController", urlPatterns = {"/LoginController"})
 public class LoginController extends HttpServlet {
 
-    private static final String ERROR = "login.jsp";
+    private static final String ERROR = "user/login.jsp";
     private static final String AD = "Admin";
     private static final String ADMIN_PAGE = "admin/admin.jsp";
     private static final String US = "User";
-    private static final String USER_PAGE = "homepage.jsp";
+    private static final String USER_PAGE = "user/homepage.jsp";
     private static final String ST = "Staff";
     private static final String SHIPPER_PAGE = "ship/shipDashboard.jsp";
     private static final String SP = "Shipper";
-    private static final String STAFF_PAGE = "staffDashboard.jsp";
+    private static final String STAFF_PAGE = "staff/staffDashboard.jsp";
     private static final String INCORRECT_MESSAGE = "Incorrect Email or Password!";
     private static final String UNSUPPORT_MESSAGE = "Your role is not supported yet!";
 

@@ -31,18 +31,22 @@ public class AddToCartServlet extends HttpServlet {
             boolean fromSaleOff = "true".equals(request.getParameter("fromSaleOff"));
 
             // Làm sạch dữ liệu size và color
-            if (size != null) size = size.trim();
-            if (color != null) color = color.trim();
+            if (size != null) {
+                size = size.trim();
+            }
+            if (color != null) {
+                color = color.trim();
+            }
 
             if (quantity <= 0) {
-                response.sendRedirect("productDetail.jsp?id=" + productID + "&error=invalid_quantity");
+                response.sendRedirect("user/productDetail.jsp?id=" + productID + "&error=invalid_quantity");
                 return;
             }
 
             ProductDAO dao = new ProductDAO();
             ProductDTO product = dao.getFullProductByID(productID);
             if (product == null) {
-                response.sendRedirect("error.jsp");
+                response.sendRedirect("user/error.jsp");
                 return;
             }
 
@@ -56,7 +60,7 @@ public class AddToCartServlet extends HttpServlet {
             HttpSession session = request.getSession();
             UserDTO user = (UserDTO) session.getAttribute("LOGIN_USER");
             if (user == null) {
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("user/login.jsp");
                 return;
             }
 
@@ -72,7 +76,7 @@ public class AddToCartServlet extends HttpServlet {
 
             if (quantity + existingQuantity > stock) {
                 int available = stock - existingQuantity;
-                response.sendRedirect("productDetail.jsp?id=" + productID + "&error=stock&available=" + available);
+                response.sendRedirect("user/productDetail.jsp?id=" + productID + "&error=stock&available=" + available);
                 return;
             }
 
@@ -80,11 +84,11 @@ public class AddToCartServlet extends HttpServlet {
             session.setAttribute("CART", cart);
 
             // Trả về lại trang sản phẩm kèm theo fromSaleOff nếu có
-            response.sendRedirect("productDetail.jsp?id=" + productID + (fromSaleOff ? "&fromSaleOff=true" : ""));
+            response.sendRedirect("user/productDetail.jsp?id=" + productID + (fromSaleOff ? "&fromSaleOff=true" : ""));
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp");
+            response.sendRedirect("user/error.jsp");
         }
     }
 }

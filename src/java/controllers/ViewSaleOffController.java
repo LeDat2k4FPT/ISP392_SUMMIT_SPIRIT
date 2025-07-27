@@ -13,6 +13,7 @@ import java.util.List;
 
 @WebServlet(name = "ViewSaleOffController", urlPatterns = {"/ViewSaleOffController"})
 public class ViewSaleOffController extends HttpServlet {
+
     @Override
     protected void doGet(HttpServletRequest request, HttpServletResponse response)
             throws ServletException, IOException {
@@ -21,7 +22,7 @@ public class ViewSaleOffController extends HttpServlet {
         UserDTO loginUser = (session != null) ? (UserDTO) session.getAttribute("LOGIN_USER") : null;
 
         if (loginUser == null || !"User".equals(loginUser.getRole())) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("user/login.jsp");
             return;
         }
 
@@ -36,6 +37,6 @@ public class ViewSaleOffController extends HttpServlet {
             request.setAttribute("error", "Error while fetching discounted products!");
         }
 
-        request.getRequestDispatcher("saleOff.jsp").forward(request, response);
+        request.getRequestDispatcher("user/saleOff.jsp").forward(request, response);
     }
 }

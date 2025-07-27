@@ -9,9 +9,7 @@ import jakarta.servlet.annotation.WebServlet;
 import jakarta.servlet.http.HttpServlet;
 import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
-
 import java.io.IOException;
-import java.util.Objects;
 
 @WebServlet("/SubmitReview")
 public class SubmitReviewController extends HttpServlet {
@@ -35,7 +33,7 @@ public class SubmitReviewController extends HttpServlet {
             }
 
             if (user == null) {
-                response.sendRedirect("login.jsp");
+                response.sendRedirect("user/login.jsp");
                 return;
             }
 
@@ -50,7 +48,7 @@ public class SubmitReviewController extends HttpServlet {
             boolean isEligible = orderDAO.hasUserPurchasedProduct(userId, productId);
 
             if (!isEligible) {
-                response.sendRedirect("productDetail.jsp?id=" + productId + "&error=unauthorized");
+                response.sendRedirect("user/productDetail.jsp?id=" + productId + "&error=unauthorized");
                 return;
             }
 
@@ -59,11 +57,11 @@ public class SubmitReviewController extends HttpServlet {
             reviewDAO.upsertReview(userId, productId, rating, comment);
 
             // ✅ Redirect trở lại trang productDetail.jsp sau khi submit review thành công
-            response.sendRedirect("productDetail.jsp?id=" + productId + "&review=success");
+            response.sendRedirect("user/productDetail.jsp?id=" + productId + "&review=success");
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp");
+            response.sendRedirect("user/error.jsp");
         }
     }
 }

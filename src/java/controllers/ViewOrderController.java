@@ -22,7 +22,7 @@ public class ViewOrderController extends HttpServlet {
 
         if (loginUser == null) {
 
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("user/login.jsp");
             return;
         }
 
@@ -44,7 +44,7 @@ public class ViewOrderController extends HttpServlet {
             request.setAttribute("ERROR", "Đã xảy ra lỗi khi lấy thông tin đơn hàng. Vui lòng thử lại sau.");
         }
 
-        request.getRequestDispatcher("orderHistory.jsp").forward(request, response);
+        request.getRequestDispatcher("user/orderHistory.jsp").forward(request, response);
     }
 
     @Override

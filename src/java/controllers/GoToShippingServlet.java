@@ -19,7 +19,7 @@ public class GoToShippingServlet extends HttpServlet {
 
         // ✅ Kiểm tra đăng nhập
         if (request.getSession().getAttribute("LOGIN_USER") == null) {
-            response.sendRedirect("login.jsp");
+            response.sendRedirect("user/login.jsp");
             return;
         }
 
@@ -45,6 +45,6 @@ public class GoToShippingServlet extends HttpServlet {
         }
 
         // ✅ Chuyển sang shipping.jsp
-        request.getRequestDispatcher("shipping.jsp").forward(request, response);
+        request.getRequestDispatcher("user/shipping.jsp").forward(request, response);
     }
 }

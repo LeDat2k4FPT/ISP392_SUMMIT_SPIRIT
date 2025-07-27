@@ -81,17 +81,17 @@
         <title>Shipping Address - Summit Spirit</title>
         <link href="https://fonts.googleapis.com/css2?family=Kumbh+Sans&display=swap" rel="stylesheet">
         <link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/6.4.0/css/all.min.css" rel="stylesheet">
-        <link rel="stylesheet" href="css/shipping.css">
+        <link rel="stylesheet" href="<%= request.getContextPath() %>/css/shipping.css">
     </head>
     <body>
 
         <div class="header">
-            <a href="homepage.jsp">
-                <img src="image/summit_logo.png" alt="Logo">
+            <a href="<%= request.getContextPath() %>/user/homepage.jsp">
+                <img src="<%= request.getContextPath() %>/image/summit_logo.png" alt="Logo">
             </a>
             <div class="nav-links">
-                <a href="homepage.jsp"><i class="fas fa-home"></i></a>
-                <a href="cart.jsp" class="cart-icon">
+                <a href="<%= request.getContextPath() %>/user/homepage.jsp"><i class="fas fa-home"></i></a>
+                <a href="<%= request.getContextPath() %>/user/cart.jsp" class="cart-icon">
                     <i class="fas fa-shopping-cart"></i>
                     <% if (cartItemCount > 0) { %>
                     <span class="cart-badge"><%= cartItemCount %></span>
@@ -100,7 +100,7 @@
                 <div class="user-dropdown">
                     <div class="user-name" onclick="toggleMenu()"><i class="fas fa-user"></i></div>
                     <div id="dropdown" class="dropdown-menu">
-                        <a href="profile.jsp"><%= loginUser != null ? loginUser.getFullName() : "Account" %></a>
+                        <a href="<%= request.getContextPath() %>/user/profile.jsp"><%= loginUser != null ? loginUser.getFullName() : "Account" %></a>
                         <a href="MainController?action=Logout">Logout</a>
                     </div>
                 </div>
@@ -141,9 +141,9 @@
 
                     <% if (!hasSaleOffProduct) { %>
                     <div class="row">
-                        <input type="hidden" name="sourcePage" value="shipping.jsp">
+                        <input type="hidden" name="sourcePage" value="user/shipping.jsp">
                         <input type="text" name="discountCode" placeholder="Discount code" value="<%= discountCode %>">
-                        <button type="submit" class ="apply-btn" name="action" value="ApplyDiscount" onclick="setFormAction('MainController')">Apply</button>
+                        <button type="submit" class ="apply-btn" name="action" value="ApplyDiscount" onclick="setFormAction('<%= request.getContextPath() %>/MainController')">Apply</button>
                     </div>
                     <% if (discountError != null) { %>
                     <div class="error-message"><%= discountError %></div>
@@ -155,7 +155,7 @@
                     <% } %>
 
                     <div class="footer-buttons">
-                        <a href="cart.jsp" class="back-btn">← Return To Cart</a>
+                        <a href="<%= request.getContextPath() %>/user/cart.jsp" class="back-btn">← Return To Cart</a>
                         <%-- Hidden inputs for VNPay checkout --%>
                         <% if (cart != null && !cart.isEmpty()) {
                             double total = 0;

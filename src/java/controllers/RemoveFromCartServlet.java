@@ -23,8 +23,12 @@ public class RemoveFromCartServlet extends HttpServlet {
             String color = request.getParameter("color");
 
             // Làm sạch dữ liệu
-            if (size != null) size = size.trim();
-            if (color != null) color = color.trim();
+            if (size != null) {
+                size = size.trim();
+            }
+            if (color != null) {
+                color = color.trim();
+            }
 
             HttpSession session = request.getSession();
             CartDTO cart = (CartDTO) session.getAttribute("CART");
@@ -34,11 +38,11 @@ public class RemoveFromCartServlet extends HttpServlet {
                 session.setAttribute("CART", cart);
             }
 
-            response.sendRedirect("cart.jsp");
+            response.sendRedirect("user/cart.jsp");
 
         } catch (Exception e) {
             e.printStackTrace();
-            response.sendRedirect("error.jsp");
+            response.sendRedirect("user/error.jsp");
         }
     }
 }
