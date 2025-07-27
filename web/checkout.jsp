@@ -24,16 +24,21 @@
     String paramProductId = request.getParameter("productId");
     String paramSize = request.getParameter("size");
     String paramColor = request.getParameter("color");
-    String paramQuantity = request.getParameter("quantity");
+String paramQuantity = request.getParameter("quantity");
+boolean hasSaleOffProduct = false; // ✅ Fix lỗi biến chưa được khai báo
 
-    boolean hasSaleOffProduct = false;
-    boolean isRetry = request.getParameter("retry") != null;
 
-    ProductDTO product = null;
-    int quantity = 1;
+boolean fromSaleOffParam = "true".equals(request.getParameter("fromSaleOff")); // ✅ kiểm tra URL
 
-    CartDTO cart = (CartDTO) session.getAttribute("CART");
-    int cartItemCount = (cart != null) ? cart.getCartItems().size() : 0;
+boolean isRetry = request.getParameter("retry") != null;
+
+ProductDTO product = null;
+int quantity = 1;
+double displayedPrice = 0; // ✅ thêm dòng này
+
+CartDTO cart = (CartDTO) session.getAttribute("CART");
+int cartItemCount = (cart != null) ? cart.getCartItems().size() : 0;
+
 
     // Nếu là retry từ giỏ hàng, không xử lý buy now
     if (session.getAttribute("PENDING_ORDER") != null && isRetry) {
@@ -87,6 +92,17 @@
                 product.setQuantity(quantity);
                 boolean fromSaleOff = hasSaleOffProduct || "true".equals(request.getParameter("fromSaleOff"));
                 product.setFromSaleOff(fromSaleOff);
+                // ✅ Nếu truyền giá từ productDetail.jsp (Buy Now), thì dùng giá đó
+String priceParam = request.getParameter("price");
+displayedPrice = product.getPrice(); // ✅ không khai báo lại, chỉ gán giá trị
+
+if (priceParam != null && !priceParam.isEmpty()) {
+    try {
+        displayedPrice = Double.parseDouble(priceParam);
+    } catch (NumberFormatException e) {
+        displayedPrice = product.getPrice(); // fallback nếu lỗi
+    }
+}
 
                 // Nếu không phải retry từ giỏ hàng thì set BUY_NOW_PRODUCT
                 if (!isRetry && request.getParameter("fromCart") == null) {
@@ -191,31 +207,40 @@
                         <input type="text" name="city" placeholder="City" value="<%= city %>" required>
                     </div>
 
-                    <% if (!hasSaleOffProduct) { %>
-                    <div class="row">
-                        <input type="hidden" name="sourcePage" value="checkout.jsp">
-                        <input type="hidden" name="productId" value="<%= paramProductId %>">
-                        <input type="hidden" name="quantity" value="<%= paramQuantity %>">
-                        <input type="text" name="discountCode" placeholder="Discount code" value="<%= discountCode %>">
-                        <button type="submit" class="apply-btn" name="action" value="ApplyDiscount" onclick="setFormAction('MainController')">Apply</button>
-                    </div>
-                    <% if (discountError != null) { %>
-                    <div class="error-message"><%= discountError %></div>
-                    <% } else if (!discountCode.trim().isEmpty() && discountPercent > 0) { %>
-                    <div class="success-message">Discount code has been applied!</div>
-                    <% } %>
-                    <% } else { %>
-                    <div class="error-message">You cannot apply the discount code because the product is already discounted.</div>
-                    <% } %>
+                    <% if (!fromSaleOffParam) { %>
+    <div class="row">
+        <input type="hidden" name="sourcePage" value="checkout.jsp">
+        <input type="hidden" name="productId" value="<%= paramProductId %>">
+        <input type="hidden" name="quantity" value="<%= paramQuantity %>">
+        <input type="text" name="discountCode" placeholder="Discount code" value="<%= discountCode %>">
+        <input type="hidden" name="fromSaleOff" value="<%= hasSaleOffProduct %>">
+
+        <button type="submit" class="apply-btn" name="action" value="ApplyDiscount" onclick="setFormAction('MainController')">Apply</button>
+    </div>
+<% } else { %>
+    <div class="error-message">You cannot apply the discount code because the product is already discounted.</div>
+<% } %>
+
+
+<%-- ✅ Phần hiển thị thông báo lỗi/đã áp dụng ở ngoài để luôn hiển thị --%>
+<% if (hasSaleOffProduct) { %>
+    <div class="error-message">You cannot apply the discount code because the product is already discounted.</div>
+<% } else if (discountError != null) { %>
+    <div class="error-message"><%= discountError %></div>
+<% } else if (!discountCode.trim().isEmpty() && discountPercent > 0) { %>
+    <div class="success-message">Discount code has been applied!</div>
+<% } %>
+
 
                     <div class="footer-buttons">
                         <a href="javascript:history.back()" class="back-btn">← Back</a>
                         <% if (product != null) {
-                            double total = product.getPrice() * quantity;
-                            double shipFee = 30000;
-                            double discountAmount = total * discountPercent / 100;
-                            double grandTotal = total + shipFee - discountAmount;
-                        %>
+    double total = displayedPrice * quantity;
+    double shipFee = 30000;
+    double discountAmount = total * discountPercent / 100;
+    double grandTotal = total + shipFee - discountAmount;
+%>
+
                         <input type="hidden" name="amount" value="<%= (int) grandTotal %>">
                         <input type="hidden" name="productName" value="<%= product.getProductName() %>">
                         <input type="hidden" name="size" value="<%= product.getSize() != null ? product.getSize() : "N/A" %>">
@@ -236,11 +261,12 @@
                 <div class="cart-preview">
                     <h3>Your Order</h3>
                     <% if (product != null) {
-                            double total = product.getPrice() * quantity;
-                            double shipFee = 30000;
-                            double discountAmount = total * discountPercent / 100;
-                            double grandTotal = total + shipFee - discountAmount;
-                    %>
+    double total = displayedPrice * quantity;
+    double shipFee = 30000;
+    double discountAmount = total * discountPercent / 100;
+    double grandTotal = total + shipFee - discountAmount;
+%>
+
                     <div class="cart-item">
                         <img src="<%= product.getProductImage() %>" alt="">
                         <div class="cart-info">
@@ -253,7 +279,8 @@
                             <% } %>
                             <div class="quantity-box"><span><%= quantity %></span></div>
                         </div>
-                        <div><%= String.format("%,.0f", product.getPrice()) %></div>
+                        <div><%= String.format("%,.0f", displayedPrice) %></div>
+
                     </div>
                     <div class="summary-line">Subtotal: <span><%= String.format("%,.0f", total) %></span></div>
                     <div class="summary-line">Ship: <span><%= String.format("%,.0f", shipFee) %></span></div>

@@ -250,31 +250,42 @@
                 <% } %>
             </div>
 
-            <div class="summary-section">
-                <h3>ORDER SUMMARY</h3>
-                <% double shipFee = 30000;
-                   double discountAmount = total * discountPercent / 100;
-                   double grandTotal = total + shipFee - discountAmount; %>
-                <div class="summary-line">Subtotal: <span id="subtotal"><%= String.format("%,.0f", total) %></span></div>
-                <div class="summary-line">Shipping: <span id="ship"><%= String.format("%,.0f", shipFee) %></span></div>
-                    <% if (discountPercent > 0) { %>
-                <div class="summary-line" id="discount-line">Discount (<%= discountPercent %>%): <span id="discount">-<%= String.format("%,.0f", discountAmount) %></span></div>
-                <% } %>
-                <div class="summary-line total-line">TOTAL <span id="grandTotal"><%= String.format("%,.0f", grandTotal) %> VND</span></div>
+            <%
+    double subtotal = 0;
+    for (CartItemDTO item : cart.getCartItems()) {
+        ProductDTO p = item.getProduct();
+        double price = p.getPrice();
+        
+        subtotal += price * item.getQuantity();
+    }
 
-                <form action="GoToShippingServlet" method="post">
-                    <% for (CartItemDTO item : cart.getCartItems()) {
-                        ProductDTO p = item.getProduct();
-                        String uniqueKey = p.getProductID() + "_" + p.getSize() + "_" + p.getColor();
-                        int quantity = item.getQuantity();
-                    %>
-                    <input type="hidden" name="quantity_<%= uniqueKey %>" value="<%= quantity %>" id="hidden_qty_<%= uniqueKey %>">
-                    <% } %>
-                    <button type="submit" class="btn-continue">CONTINUE</button>
-                </form>
-            </div>
+    double shipFee = 30000;
+    double discountAmount = subtotal * discountPercent / 100;
+    double grandTotal = subtotal + shipFee - discountAmount;
+%>
+<div class="summary-section">
+    <h3>ORDER SUMMARY</h3>
+    <div class="summary-line">Subtotal: <span id="subtotal"><%= String.format("%,.0f", subtotal) %></span></div>
+    <div class="summary-line">Shipping: <span id="ship"><%= String.format("%,.0f", shipFee) %></span></div>
+    <% if (discountPercent > 0) { %>
+        <div class="summary-line" id="discount-line">
+            Discount (<%= discountPercent %>%): 
+            <span id="discount">-<%= String.format("%,.0f", discountAmount) %></span>
         </div>
+    <% } %>
+    <div class="summary-line total-line">TOTAL <span id="grandTotal"><%= String.format("%,.0f", grandTotal) %> VND</span></div>
 
+    <form action="GoToShippingServlet" method="post">
+        <% for (CartItemDTO item : cart.getCartItems()) {
+            ProductDTO p = item.getProduct();
+            String uniqueKey = p.getProductID() + "_" + p.getSize() + "_" + p.getColor();
+            int quantity = item.getQuantity();
+        %>
+        <input type="hidden" name="quantity_<%= uniqueKey %>" value="<%= quantity %>" id="hidden_qty_<%= uniqueKey %>">
+        <% } %>
+        <button type="submit" class="btn-continue">CONTINUE</button>
+    </form>
+</div>
         <% } %>
     </body>
 </html>

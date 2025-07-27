@@ -438,43 +438,52 @@ const maxAvailable = variantStockMap[key] || 0;
             }
 
             function submitBuyNow() {
-                var size = document.getElementById('size').value;
-                var color = document.getElementById('color').value;
-                var quantity = document.getElementById('quantity').value;
-                var productId = '<%= product.getProductID() %>';
-                var valid = true;
-            <% if (!sizeList.isEmpty()) { %>
-                if (!size) {
-                    document.getElementById('size-error').style.display = 'block';
-                    valid = false;
-                } else {
-                    document.getElementById('size-error').style.display = 'none';
-                }
-            <% } %>
-            <% if (!colorList.isEmpty()) { %>
-                if (!color) {
-                    document.getElementById('color-error').style.display = 'block';
-                    valid = false;
-                } else {
-                    document.getElementById('color-error').style.display = 'none';
-                }
-            <% } %>
-                if (!valid)
-                    return;
+    var size = document.getElementById('size') ? document.getElementById('size').value : '';
+    var color = document.getElementById('color') ? document.getElementById('color').value : '';
+    var quantity = document.getElementById('quantity').value;
+    var productId = '<%= product.getProductID() %>';
+    var price = document.getElementById('price-input').value;
+    var fromSaleOff = "<%= fromSaleOff %>";
+    var valid = true;
 
-                var form = document.createElement('form');
-                form.method = 'GET';
-                form.action = 'checkout.jsp';
+    <% if (!sizeList.isEmpty()) { %>
+    if (!size) {
+        document.getElementById('size-error').style.display = 'block';
+        valid = false;
+    } else {
+        document.getElementById('size-error').style.display = 'none';
+    }
+    <% } %>
+    <% if (!colorList.isEmpty()) { %>
+    if (!color) {
+        document.getElementById('color-error').style.display = 'block';
+        valid = false;
+    } else {
+        document.getElementById('color-error').style.display = 'none';
+    }
+    <% } %>
 
-                form.innerHTML =
-                        '<input type="hidden" name="productId" value="' + productId + '">' +
-                        '<input type="hidden" name="size" value="' + size + '">' +
-                        '<input type="hidden" name="color" value="' + color + '">' +
-                        '<input type="hidden" name="quantity" value="' + quantity + '">';
+    if (!valid)
+        return;
 
-                document.body.appendChild(form);
-                form.submit();
-            }
+   var form = document.createElement('form');
+form.method = 'GET';
+form.action = 'checkout.jsp';
+
+form.innerHTML =
+  '<input type="hidden" name="productId" value="' + productId + '">' +
+  '<input type="hidden" name="size" value="' + size + '">' +
+  '<input type="hidden" name="color" value="' + color + '">' +
+  '<input type="hidden" name="quantity" value="' + quantity + '">' +
+  '<input type="hidden" name="price" value="' + price + '">' +
+  '<input type="hidden" name="fromSaleOff" value="' + fromSaleOff + '">';
+
+
+    document.body.appendChild(form);
+    form.submit();
+}
+
+
 
 
 // ✅ THÊM Ở ĐÂY:
